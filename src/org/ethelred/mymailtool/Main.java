@@ -29,11 +29,13 @@ import org.kohsuke.args4j.Option;
  */
 public class Main {
 
-    private final static String USER = "mail.imap.user";
+    private final static String PROTOCOL = "mail.store.protocol";
+    private final static String USER = "mail.user";
     private final static String PASSWORD = "mymailtool.password";
-    private final static String HOST = "mail.imap.host";
-    private final static String PORT = "mail.imap.port";
+    private final static String HOST = "mail.host";
+    private final static String PORT = "mail.port";
     final static String FOLDER = "mymailtool.rules.folder";
+    final static String MIN_AGE = "mymailtool.minage";
     private Properties props;
     private Queue<Task> taskQueue;
     private Session session;
@@ -72,8 +74,14 @@ public class Main {
         props.setProperty(USER, username);
     }
 
+    @Option(name = "--min-age", usage = "Minimum age of mail to process", aliases = {"-t"})
+    private void setMinAge(String minAge) {
+        props.setProperty(MIN_AGE, minAge);
+    }
+
     private Main() {
         props = new Properties();
+        props.setProperty(PROTOCOL, "imap");//default to IMAP
         taskQueue = new LinkedList<Task>();
     }
 
@@ -127,7 +135,7 @@ public class Main {
     private void connect() {
         try {
             session = Session.getDefaultInstance(props, new MyAuthenticator());
-            store = session.getStore("imap");
+            store = session.getStore();
             store.connect();
 
         } catch (NoSuchProviderException ex) {
