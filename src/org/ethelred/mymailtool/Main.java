@@ -59,6 +59,12 @@ public class Main {
         taskQueue.offer(new ApplyMessageRulesTask(props));
     }
 
+    @Option(name = "--month-split", usage = "Split folder into monthly subfolders", aliases = {"-m"})
+    private void taskSplitByMonth(String folderName) {
+        props.setProperty(FOLDER, folderName);
+        taskQueue.offer(new DateSplitTask(props));
+    }
+
     @Option(name = "--host", usage = "mail hostname", aliases = {"-H"})
     private void setHost(String hostname) {
         props.setProperty(HOST, hostname);
