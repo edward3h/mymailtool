@@ -4,6 +4,7 @@
  */
 package org.ethelred.mymailtool;
 
+import java.util.Properties;
 import javax.mail.Store;
 
 /**
@@ -13,6 +14,15 @@ import javax.mail.Store;
 abstract class Task {
 
     private Store store;
+
+    private String folder;
+
+    protected Properties props;
+
+    Task(Properties props)
+    {
+        this.props = props;
+    }
 
     void setStore(Store store) {
         this.store = store;
@@ -27,6 +37,26 @@ abstract class Task {
             throw new IllegalStateException("Not connected");
         }
         storeRun(store);
+    }
+
+    protected String getFolder()
+    {
+        if(this.folder != null && this.folder.length() > 0)
+        {
+            return this.folder;
+        }
+        else
+        {
+            return props.getProperty(Main.FOLDER);
+        }
+    }
+
+    protected void setFolder(String folder)
+    {
+        if(folder != null && folder.trim().length() > 0)
+        {
+            this.folder = folder.trim();
+        }
     }
 
     protected abstract void storeRun(Store store);

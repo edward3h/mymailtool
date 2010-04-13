@@ -5,6 +5,7 @@
 
 package org.ethelred.mymailtool;
 
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Folder;
@@ -16,6 +17,12 @@ import javax.mail.Store;
  * @author edward
  */
 class ListFoldersTask extends Task {
+
+    public ListFoldersTask(Properties props)
+    {
+        super(props);
+    }
+    
 
     @Override
     protected void storeRun(Store store) {

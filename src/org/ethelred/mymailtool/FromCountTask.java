@@ -7,6 +7,7 @@ package org.ethelred.mymailtool;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Address;
@@ -20,18 +21,18 @@ import javax.mail.Store;
  * @author edward
  */
 class FromCountTask extends Task {
-    private String folderName;
     private Map<Address, Integer> counts;
 
-    public FromCountTask(String folderName) {
-        this.folderName = folderName;
+    public FromCountTask(Properties props, String folderName) {
+        super(props);
+        setFolder(folderName);
         counts = new HashMap<Address, Integer>(100);
     }
 
     @Override
     protected void storeRun(Store store) {
         try {
-            Folder folder = store.getFolder(folderName);
+            Folder folder = store.getFolder(getFolder());
             if(folder.exists()) {
                 folder.open(Folder.READ_ONLY);
                 for(Message m: folder.getMessages()) {
@@ -48,7 +49,7 @@ class FromCountTask extends Task {
                     System.out.printf("%d - %s%n", e.getValue(), e.getKey());
                 }
             } else {
-                System.out.printf("Folder %s was not found.%n", folderName);
+                System.out.printf("Folder %s was not found.%n", getFolder());
             }
         } catch (MessagingException ex) {
             Logger.getLogger(FromCountTask.class.getName()).log(Level.SEVERE, null, ex);

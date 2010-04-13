@@ -42,15 +42,88 @@ public class Main {
     private Store store;
     @Option(name = "--help", usage = "Show help.", aliases = {"-h", "-?"})
     private boolean showUsage = false;
+    private static final String TASK_PREFIX = "task.";
+
+    private Task createTask(String trim)
+    {
+        if("apply".equalsIgnoreCase(trim))
+        {
+            return new ApplyMessageRulesTask(props);
+        }
+        if("split".equalsIgnoreCase(trim))
+        {
+            return new DateSplitTask(props);
+        }
+        return null;
+    }
+
+    private File getConfigFile(String[] args)
+    {
+        File n = null;
+
+        for(int i = 0; i < args.length; i++)
+        {
+            if("--config".equals(args[i]) || "-c".equals(args[i]))
+            {
+                if(args.length > (i + 1))
+                {
+                    System.err.println("--config/-c specified but no file name provided");
+                    System.exit(1);
+                }
+                else
+                {
+                    String filename = args[i+1];
+                    n = new File(filename);
+                    if(!n.canRead())
+                    {
+                        System.err.println("Config file " + filename + " is not readable");
+                        System.exit(1);
+                    }
+                    break;
+                }
+            }
+        }
+
+        if(n == null)
+        {
+            n = new File(System.getProperty("user.home"), ".mymailtoolrc");
+        }
+        return n;
+    }
+
+    private void readTasks(Properties props)
+    {
+        for (int i = 1; props.containsKey(TASK_PREFIX + i); i++) {
+            String taskDesc = props.getProperty(TASK_PREFIX + i);
+            if(taskDesc != null)
+            {
+                String[] descParts = taskDesc.split("\\s");
+                if(descParts.length >= 2)
+                {
+                    Task t = createTask(descParts[0].trim());
+                    if(t != null)
+                    {
+                        t.setFolder(descParts[1]);
+                        taskQueue.add(t);
+                    }
+                }
+            }
+        }
+    }
+
+    @Option(name = "--config", usage = "Specify config file. (default $HOME/.mymailtoolrc)", aliases = {"-c"})
+    private void setConfigFile(String fake) {
+        // this is only here to make the arguments appear correctly
+    }
 
     @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
     private void taskListFolders(boolean fake) {
-        taskQueue.offer(new ListFoldersTask());
+        taskQueue.offer(new ListFoldersTask(props));
     }
 
     @Option(name = "--fromCount", usage = "Count occurrences of from addresses", aliases = {"-f"})
     private void taskFromCount(String folderName) {
-        taskQueue.offer(new FromCountTask(folderName));
+        taskQueue.offer(new FromCountTask(props, folderName));
     }
 
     @Option(name = "--apply", usage = "Apply rules - define rules in config file", aliases = {"-a"})
@@ -93,7 +166,7 @@ public class Main {
 
     private void init(String[] args) {
         try {
-            File conffile = new File(System.getProperty("user.home"), ".mymailtoolrc");
+            File conffile = getConfigFile(args);//new File(System.getProperty("user.home"), ".mymailtoolrc");
             if (conffile.canRead()) {
                 props.load(new FileReader(conffile));
 
@@ -101,6 +174,11 @@ public class Main {
 
             CmdLineParser parser = new CmdLineParser(this);
             parser.parseArgument(args);
+
+            if(taskQueue.isEmpty())
+            {
+                readTasks(props);
+            }
 
             if (showUsage || taskQueue.isEmpty()) {
                 parser.printUsage(System.err);

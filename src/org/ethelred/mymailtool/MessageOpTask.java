@@ -29,10 +29,9 @@ abstract class MessageOpTask extends Task {
     protected DateTime ageCompare;
     protected Map<String, Folder> folderCache;
     protected int opLimit = 100;
-    protected Properties props;
 
     protected MessageOpTask(Properties p) {
-        this.props = p;
+        super(p);
         folderCache = new HashMap<String, Folder>();
     }
 
@@ -95,7 +94,7 @@ abstract class MessageOpTask extends Task {
     @Override
     protected void storeRun(Store store) {
         init(store);
-        String folderName = props.getProperty(Main.FOLDER);
+        String folderName = getFolder();
         try {
             Folder folder = store.getFolder(folderName);
             if (folder.exists()) {
