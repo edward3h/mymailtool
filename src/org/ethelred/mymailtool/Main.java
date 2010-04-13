@@ -97,7 +97,7 @@ public class Main {
             String taskDesc = props.getProperty(TASK_PREFIX + i);
             if(taskDesc != null)
             {
-                String[] descParts = taskDesc.split("\\s");
+                String[] descParts = taskDesc.split("\\s", 2);
                 if(descParts.length >= 2)
                 {
                     Task t = createTask(descParts[0].trim());
