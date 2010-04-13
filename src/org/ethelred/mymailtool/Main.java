@@ -67,11 +67,6 @@ public class Main {
             {
                 if(args.length > (i + 1))
                 {
-                    System.err.println("--config/-c specified but no file name provided");
-                    System.exit(1);
-                }
-                else
-                {
                     String filename = args[i+1];
                     n = new File(filename);
                     if(!n.canRead())
@@ -80,6 +75,11 @@ public class Main {
                         System.exit(1);
                     }
                     break;
+                }
+                else
+                {
+                    System.err.println("--config/-c specified but no file name provided");
+                    System.exit(1);
                 }
             }
         }
