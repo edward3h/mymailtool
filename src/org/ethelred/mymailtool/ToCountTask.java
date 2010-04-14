@@ -14,10 +14,9 @@ import javax.mail.MessagingException;
  *
  * @author edward
  */
-class FromCountTask extends AddressCountTask
+class ToCountTask extends AddressCountTask
 {
-
-    public FromCountTask(Properties props, String folderName)
+    public ToCountTask(Properties props, String folderName)
     {
         super(props, folderName);
     }
@@ -25,10 +24,10 @@ class FromCountTask extends AddressCountTask
     @Override
     protected void countMessage(Message m) throws MessagingException
     {
-        Address[] from = m.getFrom();
-        if(from != null)
+        Address[] to = m.getAllRecipients();
+        if(to != null)
         {
-            for(Address a : from)
+            for(Address a : to)
             {
                 countAddress(a);
             }

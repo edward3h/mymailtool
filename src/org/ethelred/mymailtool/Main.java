@@ -126,6 +126,11 @@ public class Main {
         taskQueue.offer(new FromCountTask(props, folderName));
     }
 
+        @Option(name = "--toCount", usage = "Count occurrences of to (and CC) addresses", aliases = {"-o"})
+    private void taskToCount(String folderName) {
+        taskQueue.offer(new ToCountTask(props, folderName));
+    }
+
     @Option(name = "--apply", usage = "Apply rules - define rules in config file", aliases = {"-a"})
     private void taskApplyRules(String folderName) {
         props.setProperty(FOLDER, folderName);

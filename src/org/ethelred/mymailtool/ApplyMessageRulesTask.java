@@ -45,14 +45,23 @@ class ApplyMessageRulesTask extends MessageOpTask {
     private void initRule(int i, Store store) {
         try {
             RuleType type = RuleType.valueOf(props.getProperty(RULE_PREFIX + i + ".type"));
-            String addressList = props.getProperty(RULE_PREFIX + i + ".match");
+            String fromAddressList = props.getProperty(RULE_PREFIX + i + ".match");
+            if(fromAddressList == null)
+            {
+                fromAddressList = props.getProperty(RULE_PREFIX + i + ".from");
+            }
             String moveTo = props.getProperty(RULE_PREFIX + i + ".folder");
+            String toAddressList = props.getProperty(RULE_PREFIX + i + ".to");
             RuleConfig newRule = new RuleConfig();
             newRule.type = type;
-            if (addressList != null && "*".equals(addressList.trim())) {
+            if (fromAddressList != null && "*".equals(fromAddressList.trim())) {
                 newRule.any = true;
             } else {
-                newRule.addresses = InternetAddress.parse(addressList);
+                newRule.fromAddresses = InternetAddress.parse(fromAddressList);
+            }
+            if(toAddressList != null)
+            {
+                newRule.toAddresses = InternetAddress.parse(toAddressList);
             }
             if (type == RuleType.move) {
                 newRule.moveTo = getFolder(store, moveTo);
@@ -95,15 +104,43 @@ class ApplyMessageRulesTask extends MessageOpTask {
 
         @Override
         public String toString() {
-            return String.format("Message Rule: %s %s to %s", type, any ? "*" : Arrays.toString(addresses), moveTo);
+            return String.format("Message Rule: %s %s to %s", type, any ? "*" : Arrays.toString(fromAddresses), moveTo);
         }
-        Address[] addresses;
+        Address[] fromAddresses;
+        Address[] toAddresses;
         Folder moveTo;
         RuleType type;
         boolean any = false;
 
         private boolean matches(Message m) {
-            if (any) {
+            return fromMatches(m) && toMatches(m);
+        }
+
+        private boolean toMatches(Message m) {
+            if(toAddresses == null || toAddresses.length == 0)
+            {
+                return true;
+            }
+            try {
+                Address[] to = m.getAllRecipients();
+       
+
+                for (Address a : toAddresses) {
+                    for(Address b: to)
+                    {
+                        if(a != null && a.equals(b)) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (MessagingException ex) {
+                Logger.getLogger(ApplyMessageRulesTask.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return false;
+        }
+
+        private boolean fromMatches(Message m) {
+            if (any || fromAddresses == null || fromAddresses.length == 0) {
                 return true;
             }
             try {
@@ -112,7 +149,7 @@ class ApplyMessageRulesTask extends MessageOpTask {
                     return false;
                 }
 
-                for (Address a : addresses) {
+                for (Address a : fromAddresses) {
                     if (from[0].equals(a)) {
                         return true;
                     }
