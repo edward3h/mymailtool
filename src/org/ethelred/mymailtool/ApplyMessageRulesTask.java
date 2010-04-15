@@ -56,7 +56,7 @@ class ApplyMessageRulesTask extends MessageOpTask {
             newRule.type = type;
             if (fromAddressList != null && "*".equals(fromAddressList.trim())) {
                 newRule.any = true;
-            } else {
+            } else if (fromAddressList != null) {
                 newRule.fromAddresses = InternetAddress.parse(fromAddressList);
             }
             if(toAddressList != null)
