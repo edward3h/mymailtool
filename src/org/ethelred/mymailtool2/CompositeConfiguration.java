@@ -58,6 +58,16 @@ class CompositeConfiguration implements MailToolConfiguration
         // we want the iterators to report files as they are added by other files
         return new LazyCombinedIterable();
     }
+
+    public int getOperationLimit()
+    {
+        return (Integer) first("getOperationLimit");
+    }
+
+    public String getMinAge()
+    {
+        return (String) first("getMinAge");
+    }
     
     private class LazyCombinedIterable implements Iterable<String>
     {

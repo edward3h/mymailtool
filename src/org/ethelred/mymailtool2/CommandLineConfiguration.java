@@ -1,6 +1,11 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import java.util.List;
 import java.util.Map;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.Option;
 
 /**
  *
@@ -8,35 +13,125 @@ import java.util.Map;
  */
 class CommandLineConfiguration implements MailToolConfiguration
 {
+    
+    private final static String PROTOCOL = "mail.store.protocol";
+    private final static String USER = "mail.user";
+    private final static String HOST = "mail.host";
+    private final static String PORT = "mail.port";
+    
+    private String user;
+    
+    @Option(name = "--help", usage = "Show help.", aliases = {"-h", "-?"})
+    private boolean showUsage = false;
+    
+    private int limit;
+    
+    
+    @Option(name = "--min-age", usage = "Minimum age of mail to process", aliases = {"-t"})
+    private String minAge;
+    
+    private Map<String, String> mailProperties = Maps.newHashMap();
+    
+    private List<String> fileLocations = Lists.newArrayList();
+    
+    private TaskName tn;
+    
+    private static enum TaskName
+    {
+        LIST, FROM_COUNT, TO_COUNT, APPLY
+        
+    }
 
+    
+    @Option(name = "--config", usage = "Specify config file. (default $HOME/.mymailtoolrc)", aliases = {"-c"})
+    private void setConfigFile(String fake) {
+        // this is only here to make the arguments appear correctly
+    }
+
+    @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
+    private void taskListFolders(boolean fake) {
+        tn = TaskName.LIST;
+    }
+
+    @Option(name = "--fromCount", usage = "Count occurrences of from addresses", aliases = {"-f"})
+    private void taskFromCount(String folderName) {
+        tn = TaskName.FROM_COUNT;
+    }
+
+        @Option(name = "--toCount", usage = "Count occurrences of to (and CC) addresses", aliases = {"-o"})
+    private void taskToCount(String folderName) {
+        tn = TaskName.TO_COUNT;
+    }
+
+    @Option(name = "--apply", usage = "Apply rules - define rules in config file", aliases = {"-a"})
+    private void taskApplyRules(String folderName) {
+        tn = TaskName.APPLY;
+    }
+
+    @Option(name = "--host", usage = "mail hostname", aliases = {"-H"})
+    private void setHost(String hostname) {
+        mailProperties.put(HOST, hostname);
+    }
+
+    @Option(name = "--port", usage = "mail port. Default 143", aliases = {"-p"})
+    private void setPort(int port) {
+        mailProperties.put(PORT, String.valueOf(port));
+    }
+
+    @Option(name = "--user", usage = "mail user", aliases = {"-u"})
+    private void setUser(String username) {
+        mailProperties.put(USER, username);
+        user = username;
+    }
+    
     boolean isShowUsage()
     {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return showUsage;
     }
 
     public String getPassword()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 
     public Map<String, String> getMailProperties()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return mailProperties;
     }
 
     public String getUser()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return user;
     }
 
     public Iterable<String> getFileLocations()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return fileLocations;
     }
 
-    public Task getTask()
+    public Task getTask() throws CmdLineException
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(tn != null)
+        {
+            switch(tn)
+            {
+                case APPLY:
+                    throw new CmdLineException("Apply is not currently supported from command line, please set up with config file");
+                default:
+                    throw new CmdLineException("Task " + tn + " is not supported yet");
+            }
+        }
+        return null;
+    }
+
+    public int getOperationLimit()
+    {
+        return limit;
+    }
+
+    public String getMinAge()
+    {
+        return minAge;
     }
     
 }

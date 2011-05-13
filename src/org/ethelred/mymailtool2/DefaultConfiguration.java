@@ -36,5 +36,15 @@ class DefaultConfiguration implements MailToolConfiguration
     {
         return ApplyMatchOperationsTask.create();
     }
+
+    public int getOperationLimit()
+    {
+        return 100;
+    }
+
+    public String getMinAge()
+    {
+        return "1 month";
+    }
     
 }

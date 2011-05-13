@@ -17,6 +17,10 @@ public interface MailToolConfiguration
 
     public Iterable<String> getFileLocations();
 
-    public Task getTask();
+    public Task getTask() throws Exception;
+
+    public int getOperationLimit();
+
+    public String getMinAge();
     
 }

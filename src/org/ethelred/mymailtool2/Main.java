@@ -1,15 +1,23 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.collect.Maps;
 import java.io.Console;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Authenticator;
+import javax.mail.Folder;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Period;
+import org.joda.time.ReadablePeriod;
+import org.joda.time.format.PeriodFormat;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -24,6 +32,13 @@ public class Main implements MailToolContext
     
     private Session session;
     private Store store;
+    
+    private int opCount = 0;
+    
+    protected Map<String, Folder> folderCache;
+    
+    protected static final ReadablePeriod DEFAULT_MIN_AGE = Days.days(30);
+    private DateTime ageCompare;
     
     private void init(String[] args) {
         try {
@@ -66,6 +81,10 @@ public class Main implements MailToolContext
             Task t = config.getTask();
             t.init(this);
             t.run();
+        }
+        catch(Exception e)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
             
         } finally {
             disconnect();
@@ -78,6 +97,8 @@ public class Main implements MailToolContext
             session = Session.getDefaultInstance(mapAsProperties(config.getMailProperties()), new MyAuthenticator());
             store = session.getStore();
             store.connect();
+            
+            folderCache = Maps.newHashMap();
 
         /*} catch (NoSuchProviderException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);*/
@@ -113,6 +134,37 @@ public class Main implements MailToolContext
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    public void countOperation()
+    {
+        if(++opCount > config.getOperationLimit())
+        {
+            throw new OperationLimitException();
+        }
+    }
+
+    public boolean isOldEnough(Message m) throws MessagingException {
+        DateTime received = new DateTime(m.getReceivedDate());
+        return received.isBefore(getAgeCompare());
+    }
+    
+    private DateTime getAgeCompare()
+    {
+        if(ageCompare != null)
+        {
+            return ageCompare;
+        }
+        
+        try {
+            Period p = PeriodFormat.getDefault().parsePeriod(config.getMinAge());
+            ageCompare = new DateTime().minus(p);
+        } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            ageCompare = new DateTime().minus(DEFAULT_MIN_AGE);
+        }
+        
+        return ageCompare;
+    }
+
     private class MyAuthenticator extends Authenticator {
 
         @Override
@@ -132,6 +184,29 @@ public class Main implements MailToolContext
             }
             return null;
         }
+    }
+    
+    public Folder getFolder(String folderName) {
+        try {
+            Folder result = null;
+            //try cache
+            result = folderCache.get(folderName);
+            if (result != null) {
+                return result;
+            }
+            //now store
+            result = store.getFolder(folderName);
+            if (result != null) {
+                if (!result.exists()) {
+                    result.create(Folder.HOLDS_FOLDERS | Folder.HOLDS_MESSAGES);
+                }
+                folderCache.put(folderName, result);
+                return result;
+            }
+        } catch (MessagingException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     /**
