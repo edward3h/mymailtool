@@ -11,6 +11,9 @@ import java.util.Map;
 class DefaultConfiguration implements MailToolConfiguration
 {
     private Iterable<String> defaultFileLocations = ImmutableList.of(new File(System.getProperty("user.home"), ".mymailtoolrc").getAbsolutePath(), "/etc/mymailtoolrc");
+
+    private Iterable<FileConfigurationHandler> defaultFileHandlers
+            = ImmutableList.of(); // TODO add handlers
     
     public String getPassword()
     {
@@ -45,6 +48,11 @@ class DefaultConfiguration implements MailToolConfiguration
     public String getMinAge()
     {
         return "1 month";
+    }
+
+    public Iterable<FileConfigurationHandler> getFileHandlers()
+    {
+        return defaultFileHandlers;
     }
     
 }

@@ -1,17 +1,18 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Predicate;
 import javax.mail.Message;
 
 /**
  *
  * @author edward
  */
-class MatchOperation
+public class MatchOperation
 {
-    private final MessageMatcher match;
+    private final Predicate<Message> match;
     private final MessageOperation operation;
 
-    public MatchOperation(MessageMatcher match, MessageOperation operation)
+    public MatchOperation(Predicate<Message> match, MessageOperation operation)
     {
         this.match = match;
         this.operation = operation;

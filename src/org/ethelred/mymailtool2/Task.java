@@ -4,7 +4,7 @@ package org.ethelred.mymailtool2;
  *
  * @author edward
  */
-interface Task
+public interface Task
 {
 
     void run();

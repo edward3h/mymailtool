@@ -14,13 +14,13 @@ import javax.mail.MessagingException;
  *
  * @author edward
  */
-class ApplyMatchOperationsTask extends TaskBase
+public class ApplyMatchOperationsTask extends TaskBase
 {
     // order is important
     // key is folder name
     LinkedHashMap<String, List<MatchOperation>> rules = Maps.newLinkedHashMap();
 
-    static ApplyMatchOperationsTask create()
+    public static ApplyMatchOperationsTask create()
     {
         return new ApplyMatchOperationsTask();
     }

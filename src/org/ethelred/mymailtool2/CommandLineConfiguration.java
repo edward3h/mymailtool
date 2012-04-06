@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
@@ -13,11 +15,6 @@ import org.kohsuke.args4j.Option;
  */
 class CommandLineConfiguration implements MailToolConfiguration
 {
-    
-    private final static String PROTOCOL = "mail.store.protocol";
-    private final static String USER = "mail.user";
-    private final static String HOST = "mail.host";
-    private final static String PORT = "mail.port";
     
     private String user;
     
@@ -33,8 +30,15 @@ class CommandLineConfiguration implements MailToolConfiguration
     private Map<String, String> mailProperties = Maps.newHashMap();
     
     private List<String> fileLocations = Lists.newArrayList();
+
+    private List<FileConfigurationHandler> fileHandlers = Lists.newArrayList();
     
     private TaskName tn;
+
+    public Iterable<FileConfigurationHandler> getFileHandlers()
+    {
+        return fileHandlers;
+    }
     
     private static enum TaskName
     {
@@ -44,10 +48,20 @@ class CommandLineConfiguration implements MailToolConfiguration
 
     
     @Option(name = "--config", usage = "Specify config file. (default $HOME/.mymailtoolrc)", aliases = {"-c"})
-    private void setConfigFile(String fake) {
-        // this is only here to make the arguments appear correctly
+    private void setConfigFile(String fileName) {
+        fileLocations.add(fileName);
     }
-
+    
+    @Option(name = "--handler", usage = "Specify a file handler class to load alternate config file language")
+    private void setFileHandlerClass(String className)
+    {
+        FileConfigurationHandler handler = FileConfigurationHelper.getHandlerForClassName(className);
+        if(handler != null)
+        {
+            fileHandlers.add(handler);
+        }
+    }
+    
     @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
     private void taskListFolders(boolean fake) {
         tn = TaskName.LIST;

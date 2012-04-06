@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,9 +23,9 @@ class CompositeConfiguration implements MailToolConfiguration
      */
     private List<MailToolConfiguration> configs;
 
-    CompositeConfiguration(MailToolConfiguration top, MailToolConfiguration bottom)
+    CompositeConfiguration(MailToolConfiguration... initial)
     {
-        configs = Lists.newArrayList(top, bottom);
+        configs = Lists.newArrayList(initial);
     }
 
     public String getPassword()
@@ -53,10 +54,19 @@ class CompositeConfiguration implements MailToolConfiguration
         configs.add(configs.size() - 1, fileConfig);
     }
 
+    private static Function<MailToolConfiguration, Iterable<String>> FILE_LOCATIONS_ACCESSOR
+            = new Function<MailToolConfiguration, Iterable<String>>() {
+
+        public Iterable<String> apply(MailToolConfiguration f)
+        {
+            return f.getFileLocations();
+        }
+                
+            };
     public Iterable<String> getFileLocations()
     {
         // we want the iterators to report files as they are added by other files
-        return new LazyCombinedIterable();
+        return new LazyCombinedIterable(FILE_LOCATIONS_ACCESSOR);
     }
 
     public int getOperationLimit()
@@ -68,32 +78,63 @@ class CompositeConfiguration implements MailToolConfiguration
     {
         return (String) first("getMinAge");
     }
-    
-    private class LazyCombinedIterable implements Iterable<String>
-    {
 
-        public Iterator<String> iterator()
+    private boolean isPrimitiveDefault(Object result)
+    {
+        return result instanceof Number && ((Number) result).intValue() == PRIMITIVE_DEFAULT;
+    }
+
+        private static Function<MailToolConfiguration, Iterable<FileConfigurationHandler>> FILE_HANDLERS_ACCESSOR
+            = new Function<MailToolConfiguration, Iterable<FileConfigurationHandler>>() {
+
+        public Iterable<FileConfigurationHandler> apply(MailToolConfiguration f)
         {
-            return new LazyCombinedIterator();
+            return f.getFileHandlers();
+        }
+                
+            };
+    public Iterable<FileConfigurationHandler> getFileHandlers()
+    {
+        return new LazyCombinedIterable(FILE_HANDLERS_ACCESSOR);
+    }
+    
+    private class LazyCombinedIterable<T> implements Iterable<T>
+    {
+        private final Function<MailToolConfiguration, Iterable<T>> accessor;
+        
+        LazyCombinedIterable(Function<MailToolConfiguration, Iterable<T>> accessor)
+        {
+            this.accessor = accessor;
+        }
+
+        public Iterator<T> iterator()
+        {
+            return new LazyCombinedIterator<T>(accessor);
         }
         
     }
     
-    private class LazyCombinedIterator implements Iterator<String>
+    private class LazyCombinedIterator<T> implements Iterator<T>
     {
+        private final Function<MailToolConfiguration, Iterable<T>> accessor;
         int cindex = 0;
-        Iterator<String> current;
+        Iterator<T> current;
+        
+        LazyCombinedIterator(Function<MailToolConfiguration, Iterable<T>> accessor)
+        {
+            this.accessor = accessor;
+        }
 
         public boolean hasNext()
         {
             while((current == null || !current.hasNext()) && cindex < configs.size())
             {
-                current = configs.get(cindex++).getFileLocations().iterator();
+                current = accessor.apply(configs.get(cindex++)).iterator();
             }
             return current == null ? false : current.hasNext();
         }
 
-        public String next()
+        public T next()
         {
             if(hasNext())
             {
@@ -129,7 +170,7 @@ class CompositeConfiguration implements MailToolConfiguration
                 try
                 {
                     Object result = m.invoke(subConf, args);
-                    if(result != null)
+                    if(result != null && !isPrimitiveDefault(result))
                     {
                         return result;
                     }

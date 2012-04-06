@@ -53,14 +53,15 @@ public class Main implements MailToolContext
                 System.exit(1);
             }
             
+            SystemPropertiesConfiguration spc = new SystemPropertiesConfiguration();
+            
             DefaultConfiguration dc = new DefaultConfiguration();
             
-            CompositeConfiguration temp = new CompositeConfiguration(clc, dc);
+            CompositeConfiguration temp = new CompositeConfiguration(clc, spc, dc);
             
             for(String fileLocation: config.getFileLocations())
             {
-                MailToolConfiguration fileConfig = loadFileConfiguration(fileLocation);
-                temp.insert(fileConfig);
+                FileConfigurationHelper.loadFileConfiguration(temp, fileLocation);
             }
             
             config = temp;
@@ -127,11 +128,6 @@ public class Main implements MailToolContext
             p.setProperty(e.getKey(), e.getValue());
         }
         return p;
-    }
-
-    private MailToolConfiguration loadFileConfiguration(String fileLocation)
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     public void countOperation()
