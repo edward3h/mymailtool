@@ -4,6 +4,7 @@
       <root url="jar://$PROJECT_DIR$/dist/lib/mail.jar!/" />
       <root url="jar://$PROJECT_DIR$/dist/lib/args4j-2.0.8.jar!/" />
       <root url="jar://$PROJECT_DIR$/dist/lib/joda-time-1.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/dist/lib/guava-11.0.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

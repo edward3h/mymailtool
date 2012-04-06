@@ -1,9 +1,6 @@
 package org.ethelred.mymailtool2.propertiesfile;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
+import com.google.common.base.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -11,10 +8,7 @@ import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.mail.Message;
@@ -30,6 +24,7 @@ import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
+import org.ethelred.util.MapWithDefault;
 
 /**
  *
@@ -40,9 +35,8 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     private Properties delegate;
     private List<String> fileLocations = Lists.newArrayList();
     private List<FileConfigurationHandler> fileHandlers = Lists.newArrayList();
-    private Map<String, Map<String, String>> rulesTemp
-            = new MapMaker().makeComputingMap(new Function<String, Map<String, String>>() {
-        public Map<String, String> apply(String f)
+    private Map<String, Map<String, String>> rulesTemp = MapWithDefault.wrap(new HashMap<String, Map<String, String>>(), new Supplier<Map<String, String>>(){
+        public Map<String, String> get()
         {
             return Maps.newHashMap();
         }

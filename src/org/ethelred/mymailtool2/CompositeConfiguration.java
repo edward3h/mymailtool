@@ -71,7 +71,12 @@ class CompositeConfiguration implements MailToolConfiguration
 
     public int getOperationLimit()
     {
-        return (Integer) first("getOperationLimit");
+        Object v = first("getOperationLimit");
+        if(v instanceof Integer)
+        {
+            return ((Integer) v).intValue();
+        }
+        return 0;
     }
 
     public String getMinAge()

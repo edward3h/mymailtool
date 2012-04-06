@@ -59,7 +59,7 @@ public class Main implements MailToolContext
             
             CompositeConfiguration temp = new CompositeConfiguration(clc, spc, dc);
             
-            for(String fileLocation: config.getFileLocations())
+            for(String fileLocation: temp.getFileLocations())
             {
                 FileConfigurationHelper.loadFileConfiguration(temp, fileLocation);
             }
