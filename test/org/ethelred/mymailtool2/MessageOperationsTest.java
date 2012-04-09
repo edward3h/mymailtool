@@ -83,9 +83,11 @@ public class MessageOperationsTest
         try
         {
             context.checking(new Expectations(){{
+                oneOf(msg).getFolder(); will(returnValue(startingFolder));
+                oneOf(startingFolder).getSeparator(); will(returnValue('.'));
+                oneOf(startingFolder).getFullName(); will(returnValue("folder"));
                 oneOf(msg).getReceivedDate(); will(returnValue(new LocalDate(2012, 4, 8).toDate()));
-                oneOf(mailContext).getFolder("folder.04-Apr-2012"); will(returnValue(moveTo));
-                oneOf(startingFolder.getFullName()); will(returnValue("folder"));
+                oneOf(mailContext).getFolder("folder.2012.04-Apr-2012"); will(returnValue(moveTo));
                 //allowing(moveTo).getFullName(); will(returnValue("folder.04-Apr-2012"));
                 oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
                 oneOf(msg).setFlag(Flags.Flag.DELETED, true);
