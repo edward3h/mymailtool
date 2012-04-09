@@ -8,5 +8,5 @@ import javax.mail.Message;
  */
 public interface MessageOperation
 {
-    boolean apply(Message m);
+    boolean apply(MailToolContext context, Message m);
 }

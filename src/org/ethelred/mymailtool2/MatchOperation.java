@@ -20,7 +20,7 @@ public class MatchOperation
     
     void testApply(Message m, MailToolContext ctx)
     {
-        if(match.apply(m) && operation.apply(m))
+        if(match.apply(m) && operation.apply(ctx, m))
         {
             ctx.countOperation();
         }

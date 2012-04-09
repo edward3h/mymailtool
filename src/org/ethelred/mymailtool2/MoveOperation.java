@@ -14,7 +14,7 @@ public class MoveOperation implements MessageOperation
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public boolean apply(Message m)
+    public boolean apply(MailToolContext context, Message m)
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }

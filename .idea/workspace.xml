@@ -2,23 +2,31 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="e1c75031-0c14-4840-8ebc-0f5a916ed68e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/guava-11.0.1.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/ethelred/util" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred/mymailtool2" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred/util" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/ant.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/ethelred/util/MapWithDefault.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred/util/MapWithDefaultTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/bsh-core-2.0b4.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/cglib-2.1_3-src.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/cglib-nodep-2.1_3.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/hamcrest-core-1.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/hamcrest-library-1.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/jmock-2.5.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/jmock-junit3-2.5.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/jmock-junit4-2.5.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/jmock-legacy-2.5.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/jmock-script-2.5.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1/objenesis-1.0.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/jmock-2.5.1" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dist/lib/joda-time-2.1.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/testlib.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred/mymailtool2/MessageOperationsTest.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/org/ethelred/util/TestUtil.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Mailtool.iml" afterPath="$PROJECT_DIR$/Mailtool.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/CompositeConfiguration.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/CompositeConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/Main.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/propertiesfile/PropertiesFileConfiguration.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/propertiesfile/PropertiesFileConfiguration.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/DeleteOperation.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/DeleteOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MatchOperation.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MatchOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MessageOperation.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MessageOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MoveOperation.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MoveOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/SplitOperation.java" afterPath="$PROJECT_DIR$/src/org/ethelred/mymailtool2/SplitOperation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java" afterPath="$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java" />
     </list>
     <ignored path="mailtool.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -76,73 +84,55 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="JavascriptFileConfiguration.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/javascript/JavascriptFileConfiguration.java">
+      <file leaf-file-name="MessageOperation.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MessageOperation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="6" selection-start="775" selection-end="775" vertical-scroll-proportion="0.0">
+            <state line="10" column="43" selection-start="171" selection-end="171" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TaskBase.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/TaskBase.java">
+      <file leaf-file-name="MatchOperation.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MatchOperation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="15" selection-start="79" selection-end="79" vertical-scroll-proportion="0.0">
+            <state line="22" column="50" selection-start="522" selection-end="522" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Task.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/Task.java">
+      <file leaf-file-name="MoveOperation.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MoveOperation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="17" selection-start="81" selection-end="81" vertical-scroll-proportion="0.0">
+            <state line="16" column="50" selection-start="322" selection-end="322" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MapWithDefault.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/util/MapWithDefault.java">
+      <file leaf-file-name="SplitOperation.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/SplitOperation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="32" selection-start="961" selection-end="961" vertical-scroll-proportion="0.0">
+            <state line="11" column="50" selection-start="201" selection-end="201" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Main.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/Main.java">
+      <file leaf-file-name="DeleteOperation.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/DeleteOperation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="81" column="32" selection-start="2318" selection-end="2318" vertical-scroll-proportion="0.0">
+            <state line="11" column="50" selection-start="202" selection-end="202" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CommandLineConfiguration.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/CommandLineConfiguration.java">
+      <file leaf-file-name="MessageOperationsTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/org/ethelred/mymailtool2/MessageOperationsTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="6" selection-start="338" selection-end="338" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CompositeConfiguration.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/CompositeConfiguration.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="83" column="41" selection-start="2234" selection-end="2234" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CompositeConfigurationTest.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="0" selection-start="258" selection-end="258" vertical-scroll-proportion="0.40394974">
+            <state line="85" column="74" selection-start="2381" selection-end="2381" vertical-scroll-proportion="0.7001795">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -150,19 +140,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MapWithDefaultTest.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/org/ethelred/util/MapWithDefaultTest.java">
+      <file leaf-file-name="MailToolContext.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MailToolContext.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="8" selection-start="669" selection-end="669" vertical-scroll-proportion="0.0">
+            <state line="10" column="10" selection-start="166" selection-end="166" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MailToolConfiguration.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MailToolConfiguration.java">
+      <file leaf-file-name="ApplyMessageRulesTask.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool/ApplyMessageRulesTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="0" selection-start="756" selection-end="756" vertical-scroll-proportion="0.0">
+            <state line="66" column="39" selection-start="2178" selection-end="2178" vertical-scroll-proportion="-9.692307">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DateSplitTask.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool/DateSplitTask.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="19" column="6" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MessageOpTask.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool/MessageOpTask.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="41" column="21" selection-start="1031" selection-end="1031" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -182,8 +190,15 @@
         <option value="$PROJECT_DIR$/src/org/ethelred/util/MapWithDefault.java" />
         <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/Main.java" />
         <option value="$PROJECT_DIR$/test/org/ethelred/util/MapWithDefaultTest.java" />
-        <option value="$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java" />
         <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/CompositeConfiguration.java" />
+        <option value="$PROJECT_DIR$/test/org/ethelred/util/TestUtil.java" />
+        <option value="$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java" />
+        <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MessageOperation.java" />
+        <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MatchOperation.java" />
+        <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/MoveOperation.java" />
+        <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/SplitOperation.java" />
+        <option value="$PROJECT_DIR$/src/org/ethelred/mymailtool2/DeleteOperation.java" />
+        <option value="$PROJECT_DIR$/test/org/ethelred/mymailtool2/MessageOperationsTest.java" />
       </list>
     </option>
   </component>
@@ -360,29 +375,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mymailtool2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="javascript" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mailtool" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="mailtool" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ethelred" />
+              <option name="myItemId" value="mymailtool" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -391,7 +384,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.15" />
@@ -408,7 +401,7 @@
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="dynamic.classpath" value="false" />
   </component>
-  <component name="RunManager" selected="JUnit.CompositeConfigurationTest">
+  <component name="RunManager" selected="JUnit.MessageOperationsTest">
     <configuration default="false" name="MapWithDefaultTest" type="JUnit" factoryName="JUnit" temporary="true">
       <module name="Mailtool" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -437,6 +430,28 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PACKAGE_NAME" value="org.ethelred.mymailtool2" />
       <option name="MAIN_CLASS_NAME" value="org.ethelred.mymailtool2.CompositeConfigurationTest" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="MessageOperationsTest" type="JUnit" factoryName="JUnit" temporary="true">
+      <module name="Mailtool" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="org.ethelred.mymailtool2" />
+      <option name="MAIN_CLASS_NAME" value="org.ethelred.mymailtool2.MessageOperationsTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -527,9 +542,10 @@
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="JUnit.MapWithDefaultTest" />
       <item index="1" class="java.lang.String" itemvalue="JUnit.CompositeConfigurationTest" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.MessageOperationsTest" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -671,58 +687,9 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/propertiesfile/PropertiesFileConfiguration.java">
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/CompositeConfiguration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="99" column="16" selection-start="3118" selection-end="3118" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/javascript/JavascriptFileConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="6" selection-start="775" selection-end="775" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/TaskBase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="15" selection-start="79" selection-end="79" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/Task.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="17" selection-start="81" selection-end="81" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/util/MapWithDefault.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="32" selection-start="961" selection-end="961" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="32" selection-start="2318" selection-end="2318" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/CommandLineConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="6" selection-start="338" selection-end="338" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/org/ethelred/util/MapWithDefaultTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="8" selection-start="669" selection-end="669" vertical-scroll-proportion="0.0">
+        <state line="83" column="41" selection-start="2234" selection-end="2234" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -734,16 +701,104 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/CompositeConfiguration.java">
+    <entry file="file://$PROJECT_DIR$/test/org/ethelred/util/TestUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="83" column="41" selection-start="2234" selection-end="2234" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="19" column="91" selection-start="452" selection-end="452" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/org/ethelred/mymailtool2/CompositeConfigurationTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="0" selection-start="258" selection-end="258" vertical-scroll-proportion="0.40394974">
+        <state line="83" column="28" selection-start="2094" selection-end="2094" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/dist/lib/mail.jar!/javax/mail/Message.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="22" selection-start="157" selection-end="157" vertical-scroll-proportion="0.11278196">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/dist/lib/mail.jar!/javax/mail/Folder.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="22" selection-start="157" selection-end="157" vertical-scroll-proportion="0.11278196">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool/MessageOpTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="21" selection-start="1031" selection-end="1031" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MailToolContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="10" selection-start="166" selection-end="166" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MatchOperation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="50" selection-start="522" selection-end="522" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MessageOperation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="43" selection-start="171" selection-end="171" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/MoveOperation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="50" selection-start="322" selection-end="322" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/DeleteOperation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="50" selection-start="202" selection-end="202" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool/ApplyMessageRulesTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="39" selection-start="2178" selection-end="2178" vertical-scroll-proportion="-9.692307">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool2/SplitOperation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="50" selection-start="201" selection-end="201" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/ethelred/mymailtool/DateSplitTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="6" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/org/ethelred/mymailtool2/MessageOperationsTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="85" column="74" selection-start="2381" selection-end="2381" vertical-scroll-proportion="0.7001795">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

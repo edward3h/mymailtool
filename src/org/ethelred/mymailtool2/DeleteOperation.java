@@ -9,7 +9,7 @@ import javax.mail.Message;
 public class DeleteOperation implements MessageOperation
 {
 
-    public boolean apply(Message m)
+    public boolean apply(MailToolContext context, Message m)
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
