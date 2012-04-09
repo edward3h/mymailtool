@@ -1,6 +1,11 @@
 package org.ethelred.mymailtool2;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.mail.Flags;
+import javax.mail.Folder;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 
 /**
  *
@@ -8,15 +13,28 @@ import javax.mail.Message;
  */
 public class MoveOperation implements MessageOperation
 {
+    private final String moveToFolderName;
 
-    public MoveOperation(String get)
+    public MoveOperation(String moveToFolderName)
     {
-        throw new UnsupportedOperationException("Not yet implemented");
+        this.moveToFolderName = moveToFolderName;
     }
 
     public boolean apply(MailToolContext context, Message m)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try
+        {
+            Folder startingFolder = m.getFolder();
+            Folder moveTo = context.getFolder(moveToFolderName);
+            startingFolder.copyMessages(new Message[]{m}, moveTo);
+            m.setFlag(Flags.Flag.DELETED, true);
+            return true;
+        }
+        catch(MessagingException e)
+        {
+            Logger.getLogger(MoveOperation.class.getName()).log(Level.SEVERE, "Error in MoveOperation", e);
+        }
+        return false;
     }
     
 }

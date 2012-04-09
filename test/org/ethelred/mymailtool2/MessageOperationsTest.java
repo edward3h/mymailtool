@@ -58,14 +58,16 @@ public class MessageOperationsTest
     public void testMove()
     {
         final Folder moveTo = context.mock(Folder.class, "moveTo");
+        final String moveToName = "MoveTo";
         try
         {
             context.checking(new Expectations(){{
-                allowing(moveTo).getFullName(); will(returnValue("MoveTo"));
+                oneOf(msg).getFolder(); will(returnValue(startingFolder));
+                oneOf(mailContext).getFolder(moveToName); will(returnValue(moveTo));
                 oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
                 oneOf(msg).setFlag(Flags.Flag.DELETED, true);
             }});
-            MessageOperation move = new MoveOperation(moveTo.getFullName());
+            MessageOperation move = new MoveOperation(moveToName);
             assertTrue(move.apply(mailContext, msg));
             context.assertIsSatisfied();
         }
