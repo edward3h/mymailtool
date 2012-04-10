@@ -1,7 +1,10 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.collect.ImmutableList;
+import org.ethelred.mymailtool2.propertiesfile.PropertiesFileConfigurationHandler;
+
 import java.io.File;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -10,10 +13,10 @@ import java.util.Map;
  */
 class DefaultConfiguration implements MailToolConfiguration
 {
-    private Iterable<String> defaultFileLocations = ImmutableList.of(new File(System.getProperty("user.home"), ".mymailtoolrc").getAbsolutePath(), "/etc/mymailtoolrc");
+    private Iterable<String> defaultFileLocations = ImmutableList.of(new File(System.getProperty("user.home"), ".mymailtoolrc.properties").getAbsolutePath(), "/etc/mymailtoolrc.properties");
 
     private Iterable<FileConfigurationHandler> defaultFileHandlers
-            = ImmutableList.of(); // TODO add handlers
+            = ImmutableList.of((FileConfigurationHandler) new PropertiesFileConfigurationHandler());
     
     public String getPassword()
     {
@@ -22,7 +25,7 @@ class DefaultConfiguration implements MailToolConfiguration
 
     public Map<String, String> getMailProperties()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Collections.emptyMap();
     }
 
     public String getUser()

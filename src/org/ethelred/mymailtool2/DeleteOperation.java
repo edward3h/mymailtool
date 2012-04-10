@@ -18,6 +18,7 @@ public class DeleteOperation implements MessageOperation
         try
         {
             m.setFlag(Flags.Flag.DELETED, true);
+            System.out.printf("Delete message %s%n", m);
             return true;
         }
         catch(MessagingException e)

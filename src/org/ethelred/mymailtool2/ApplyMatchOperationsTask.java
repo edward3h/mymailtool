@@ -37,7 +37,8 @@ public class ApplyMatchOperationsTask extends TaskBase
                 
                 if (folder != null && folder.exists()) {
                     folder.open(Folder.READ_WRITE);
-                    
+
+                    System.out.printf("Working on folder %s%n", folder.getFullName());
                 // for each message
                     for (Message m : folder.getMessages()) {
                         

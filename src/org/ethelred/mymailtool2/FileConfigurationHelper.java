@@ -72,6 +72,7 @@ public class FileConfigurationHelper
         {
             if(!handlers.containsKey(ext))
             {
+                Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.INFO, "register handler for " + ext + " " + h);
                 handlers.put(ext, h);
             }
         }

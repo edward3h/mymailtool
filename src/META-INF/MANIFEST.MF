@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Class-Path: jmock-2.5.1.jar bsh-core-2.0b4.jar cglib-nodep-2.1_3.jar h
+ amcrest-core-1.1.jar hamcrest-library-1.1.jar jmock-junit3-2.5.1.jar 
+ jmock-junit4-2.5.1.jar jmock-legacy-2.5.1.jar jmock-script-2.5.1.jar 
+ objenesis-1.0.jar mail.jar args4j-2.0.8.jar guava-11.0.1.jar joda-tim
+ e-2.1.jar
+Main-Class: org.ethelred.mymailtool2.Main
+

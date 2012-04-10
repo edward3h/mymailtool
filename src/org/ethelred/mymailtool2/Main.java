@@ -1,11 +1,12 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import java.io.Console;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Set;
+import java.util.logging.*;
 import javax.mail.Authenticator;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -13,6 +14,8 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
+
+import com.google.common.collect.Sets;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
@@ -41,10 +44,10 @@ public class Main implements MailToolContext
     private DateTime ageCompare;
     
     private void init(String[] args) {
+        CommandLineConfiguration clc = new CommandLineConfiguration();
+        CmdLineParser parser = new CmdLineParser(clc);
         try {
-            CommandLineConfiguration clc = new CommandLineConfiguration();
 
-            CmdLineParser parser = new CmdLineParser(clc);
             parser.parseArgument(args);
 
 
@@ -63,6 +66,8 @@ public class Main implements MailToolContext
             {
                 FileConfigurationHelper.loadFileConfiguration(temp, fileLocation);
             }
+
+            validateRequiredConfiguration(temp);
             
             config = temp;
             
@@ -71,10 +76,33 @@ public class Main implements MailToolContext
 */
         } catch (CmdLineException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            parser.printUsage(System.err);
+            System.exit(1);
         }
     }
-    
-       private void run() {
+
+    private void validateRequiredConfiguration(MailToolConfiguration configuration) throws CmdLineException
+    {
+        Map<String, String> mailProperties = configuration.getMailProperties();
+        if(mailProperties == null || mailProperties.isEmpty())
+        {
+            throw new CmdLineException("Missing mail properties - have you set up a config file?");
+        }
+        Set<String> missingProperties = Sets.newHashSet();
+        for(String key: MailToolConfiguration.ALL_MAIL_PROPERTIES)
+        {
+            if(!mailProperties.containsKey(key))
+            {
+                missingProperties.add(key);
+            }
+        }
+        if(!missingProperties.isEmpty())
+        {
+            throw new CmdLineException("Missing mail properties " + Joiner.on(',').join(missingProperties));
+        }
+    }
+
+    private void run() {
         try {
 
             connect();
@@ -82,6 +110,10 @@ public class Main implements MailToolContext
             Task t = config.getTask();
             t.init(this);
             t.run();
+        }
+        catch(OperationLimitException e)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Reached Operation Limit");
         }
         catch(Exception e)
         {
@@ -100,6 +132,7 @@ public class Main implements MailToolContext
             store.connect();
             
             folderCache = Maps.newHashMap();
+            System.out.printf("Connected to %s%n", config.getMailProperties().get(MailToolConfiguration.HOST));
 
         /*} catch (NoSuchProviderException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);*/
@@ -114,6 +147,7 @@ public class Main implements MailToolContext
         if (store != null) {
             try {
                 store.close();
+                System.out.printf("Disconnected%n");
             } catch (MessagingException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -210,6 +244,8 @@ public class Main implements MailToolContext
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        Logger root = Logger.getLogger("");
+        root.setLevel(Level.ALL);
         Main app = new Main();
         app.init(args);
         app.run();
