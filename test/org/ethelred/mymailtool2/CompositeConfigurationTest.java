@@ -5,8 +5,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.ethelred.util.TestUtil;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.junit.Test;
 
 import static org.ethelred.util.TestUtil.assertEmpty;
@@ -31,6 +36,7 @@ public class CompositeConfigurationTest
         assertEmpty(empty.getFileHandlers());
     }
 
+    @Test
     public void testSingleConfiguration()
     {
 
@@ -81,7 +87,7 @@ public class CompositeConfigurationTest
             @Override
             public Iterable<FileConfigurationHandler> getFileHandlers()
             {
-                return null;
+                return Collections.emptyList();
             }
         };
 
@@ -90,7 +96,42 @@ public class CompositeConfigurationTest
         assertEquals(mock.getUser(), comp.getUser());
         assertEquals(mock.getMinAge(), comp.getMinAge());
         assertEquals(mock.getPassword(), comp.getPassword());
-        assertEquals(mock.getFileLocations(), comp.getFileLocations());
-        assertEquals(mock.getFileHandlers(), comp.getFileHandlers());
+        TestUtil.assertEquals(mock.getFileLocations(), comp.getFileLocations());
+        TestUtil.assertEquals(mock.getFileHandlers(), comp.getFileHandlers());
+    }
+
+    @Test
+    public void testInsertion()
+    {
+        Mockery my = new Mockery();
+
+        final Iterable<String> testFileLocs = ImmutableList.of("loc1", "loc2");
+        final Iterable<String> testFileLocs2 = ImmutableList.of("ins1");
+        final MailToolConfiguration mockDefault = my.mock(MailToolConfiguration.class, "MTCdefault");
+        final MailToolConfiguration mockFile1 = my.mock(MailToolConfiguration.class, "MTCfile1");
+        final MailToolConfiguration mockFile2 = my.mock(MailToolConfiguration.class, "MTCfile2");
+        Map<String, MailToolConfiguration> mockFiles = ImmutableMap.of(
+                "loc1", mockFile1,
+                "ins1", mockFile2
+        );
+        CompositeConfiguration cmp = new CompositeConfiguration(mockDefault);
+
+        my.checking(new Expectations(){{
+            oneOf(mockDefault).getFileLocations(); will(returnValue(testFileLocs));
+            oneOf(mockFile1).getFileLocations(); will(returnValue(testFileLocs2));
+            oneOf(mockFile2).getFileLocations(); will(returnValue(Collections.emptyList()));
+        }});
+        int counter = 0;
+        for(String filename: cmp.getFileLocations())
+        {
+            MailToolConfiguration fileConf = mockFiles.get(filename);
+            if(fileConf != null)
+            {
+                cmp.insert(fileConf);
+            }
+            counter++;
+            assertTrue("excessive loop count", counter < 5);
+        }
+        my.assertIsSatisfied();
     }
 }

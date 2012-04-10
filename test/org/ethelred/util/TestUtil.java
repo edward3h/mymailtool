@@ -19,4 +19,9 @@ public class TestUtil
         assertTrue("not empty [" + Iterables.toString(value) + "]", Iterables.isEmpty(value));
 
     }
+
+    public static <T> void assertEquals(Iterable<T> expected, Iterable<T> actual)
+    {
+        assertTrue("Iterables do not match", Iterables.elementsEqual(expected, actual));
+    }
 }

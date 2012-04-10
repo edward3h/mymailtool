@@ -22,10 +22,12 @@ class CompositeConfiguration implements MailToolConfiguration
      * most important at the start of the list, least important (i.e. built in defaults) at the end
      */
     private List<MailToolConfiguration> configs;
+    private List<MailToolConfiguration> iterationConfigs; // same but inserts at end
 
     CompositeConfiguration(MailToolConfiguration... initial)
     {
         configs = Lists.newArrayList(initial);
+        iterationConfigs = Lists.newArrayList(initial);
     }
 
     public String getPassword()
@@ -52,6 +54,7 @@ class CompositeConfiguration implements MailToolConfiguration
     {
         // adds just above the bottom 
         configs.add(configs.size() - 1, fileConfig);
+        iterationConfigs.add(fileConfig); // adds at end
     }
 
     private static Function<MailToolConfiguration, Iterable<String>> FILE_LOCATIONS_ACCESSOR
@@ -132,9 +135,9 @@ class CompositeConfiguration implements MailToolConfiguration
 
         public boolean hasNext()
         {
-            while((current == null || !current.hasNext()) && cindex < configs.size())
+            while((current == null || !current.hasNext()) && cindex < iterationConfigs.size())
             {
-                current = accessor.apply(configs.get(cindex++)).iterator();
+                current = accessor.apply(iterationConfigs.get(cindex++)).iterator();
             }
             return current == null ? false : current.hasNext();
         }
