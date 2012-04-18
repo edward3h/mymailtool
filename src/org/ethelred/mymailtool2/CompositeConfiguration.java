@@ -1,7 +1,6 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.lang.reflect.InvocationTargetException;
@@ -30,11 +29,13 @@ class CompositeConfiguration implements MailToolConfiguration
         iterationConfigs = Lists.newArrayList(initial);
     }
 
+    @Override
     public String getPassword()
     {
         return (String) first("getPassword");
     }
 
+    @Override
     public Map<String, String> getMailProperties()
     {
         Map<String, String> combined = Maps.newHashMap();
@@ -45,6 +46,7 @@ class CompositeConfiguration implements MailToolConfiguration
         return combined;
     }
 
+    @Override
     public String getUser()
     {
         return (String) first("getUser");
@@ -60,28 +62,32 @@ class CompositeConfiguration implements MailToolConfiguration
     private static Function<MailToolConfiguration, Iterable<String>> FILE_LOCATIONS_ACCESSOR
             = new Function<MailToolConfiguration, Iterable<String>>() {
 
+        @Override
         public Iterable<String> apply(MailToolConfiguration f)
         {
             return f.getFileLocations();
         }
                 
             };
+    @Override
     public Iterable<String> getFileLocations()
     {
         // we want the iterators to report files as they are added by other files
         return new LazyCombinedIterable(FILE_LOCATIONS_ACCESSOR);
     }
 
+    @Override
     public int getOperationLimit()
     {
         Object v = first("getOperationLimit");
         if(v instanceof Integer)
         {
-            return ((Integer) v).intValue();
+            return (Integer) v;
         }
         return 0;
     }
 
+    @Override
     public String getMinAge()
     {
         return (String) first("getMinAge");
@@ -95,17 +101,25 @@ class CompositeConfiguration implements MailToolConfiguration
         private static Function<MailToolConfiguration, Iterable<FileConfigurationHandler>> FILE_HANDLERS_ACCESSOR
             = new Function<MailToolConfiguration, Iterable<FileConfigurationHandler>>() {
 
+        @Override
         public Iterable<FileConfigurationHandler> apply(MailToolConfiguration f)
         {
             return f.getFileHandlers();
         }
                 
             };
+    @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return new LazyCombinedIterable(FILE_HANDLERS_ACCESSOR);
     }
-    
+
+    @Override
+    public String getTimeLimit()
+    {
+        return (String) first("getTimeLimit");
+    }
+
     private class LazyCombinedIterable<T> implements Iterable<T>
     {
         private final Function<MailToolConfiguration, Iterable<T>> accessor;
@@ -115,6 +129,7 @@ class CompositeConfiguration implements MailToolConfiguration
             this.accessor = accessor;
         }
 
+        @Override
         public Iterator<T> iterator()
         {
             return new LazyCombinedIterator<T>(accessor);
@@ -133,15 +148,17 @@ class CompositeConfiguration implements MailToolConfiguration
             this.accessor = accessor;
         }
 
+        @Override
         public boolean hasNext()
         {
             while((current == null || !current.hasNext()) && cindex < iterationConfigs.size())
             {
                 current = accessor.apply(iterationConfigs.get(cindex++)).iterator();
             }
-            return current == null ? false : current.hasNext();
+            return current != null && current.hasNext();
         }
 
+        @Override
         public T next()
         {
             if(hasNext())
@@ -151,6 +168,7 @@ class CompositeConfiguration implements MailToolConfiguration
             return null;
         }
 
+        @Override
         public void remove()
         {
             throw new UnsupportedOperationException("Not supported yet.");
@@ -158,6 +176,7 @@ class CompositeConfiguration implements MailToolConfiguration
     
     }
 
+    @Override
     public Task getTask()
     {
         return (Task) first("getTask");

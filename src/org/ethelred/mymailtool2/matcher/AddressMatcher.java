@@ -21,6 +21,7 @@ abstract class AddressMatcher implements Predicate<Message>
         addressPattern = Pattern.compile(patternSpec);
     }
 
+    @Override
     public boolean apply(Message t)
     {
         try

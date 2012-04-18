@@ -1,6 +1,5 @@
 package org.ethelred.mymailtool2;
 
-import java.util.Date;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -66,6 +65,8 @@ public class MessageOperationsTest
                 oneOf(mailContext).getFolder(moveToName); will(returnValue(moveTo));
                 oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
                 oneOf(msg).setFlag(Flags.Flag.DELETED, true);
+                oneOf(startingFolder).getFullName(); will(returnValue("folder"));
+                oneOf(moveTo).getFullName(); will(returnValue(moveToName));
             }});
             MessageOperation move = new MoveOperation(moveToName);
             assertTrue(move.apply(mailContext, msg));
@@ -87,12 +88,13 @@ public class MessageOperationsTest
             context.checking(new Expectations(){{
                 oneOf(msg).getFolder(); will(returnValue(startingFolder));
                 oneOf(startingFolder).getSeparator(); will(returnValue('.'));
-                oneOf(startingFolder).getFullName(); will(returnValue("folder"));
+                exactly(2).of(startingFolder).getFullName(); will(returnValue("folder"));
                 oneOf(msg).getReceivedDate(); will(returnValue(new LocalDate(2012, 4, 8).toDate()));
                 oneOf(mailContext).getFolder("folder.2012.04-Apr-2012"); will(returnValue(moveTo));
                 //allowing(moveTo).getFullName(); will(returnValue("folder.04-Apr-2012"));
                 oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
                 oneOf(msg).setFlag(Flags.Flag.DELETED, true);
+                oneOf(moveTo).getFullName(); will(returnValue("folder.2012.04-Apr-2012"));
             }});
             MessageOperation split = new SplitOperation();
             assertTrue(split.apply(mailContext, msg));

@@ -12,11 +12,13 @@ import org.ethelred.mymailtool2.MailToolConfiguration;
 public class PropertiesFileConfigurationHandler extends BaseFileConfigurationHandler
 {
 
+    @Override
     public Iterable<String> getExtensions()
     {
         return ImmutableList.of("properties");
     }
 
+    @Override
     public MailToolConfiguration readConfiguration(File f)
     {
         try

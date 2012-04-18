@@ -13,6 +13,7 @@ import javax.mail.MessagingException;
 public class DeleteOperation implements MessageOperation
 {
 
+    @Override
     public boolean apply(MailToolContext context, Message m)
     {
         try

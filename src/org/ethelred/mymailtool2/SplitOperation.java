@@ -21,6 +21,7 @@ public class SplitOperation implements MessageOperation
     private final static DateTimeFormatter monthPart = new DateTimeFormatterBuilder().appendMonthOfYear(2).appendLiteral('-').appendMonthOfYearShortText().appendLiteral(
             '-').appendYear(4, 4).toFormatter();
 
+    @Override
     public boolean apply(MailToolContext context, Message m)
     {
         try

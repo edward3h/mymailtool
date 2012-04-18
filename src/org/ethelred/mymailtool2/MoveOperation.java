@@ -20,6 +20,7 @@ public class MoveOperation implements MessageOperation
         this.moveToFolderName = moveToFolderName;
     }
 
+    @Override
     public boolean apply(MailToolContext context, Message m)
     {
         try

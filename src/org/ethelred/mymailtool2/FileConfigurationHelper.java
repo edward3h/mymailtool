@@ -95,7 +95,10 @@ public class FileConfigurationHelper
         {
             try
             {
-                br.close();
+                if(br != null)
+                {
+                    br.close();
+                }
             }
             catch (IOException ex)
             {
@@ -146,8 +149,7 @@ public class FileConfigurationHelper
         {
             Class<? extends FileConfigurationHandler> klass = 
                     (Class<? extends FileConfigurationHandler>) Class.forName(className);
-            FileConfigurationHandler handler = klass.newInstance();
-            return handler;
+            return klass.newInstance();
         }
         catch (InstantiationException ex)
         {

@@ -1,11 +1,10 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
@@ -22,6 +21,8 @@ class CommandLineConfiguration implements MailToolConfiguration
     private boolean showUsage = false;
     
     private int limit;
+
+    private String runTimeLimit;
     
     
     @Option(name = "--min-age", usage = "Minimum age of mail to process", aliases = {"-t"})
@@ -35,6 +36,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     
     private TaskName tn;
 
+    @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return fileHandlers;
@@ -103,26 +105,31 @@ class CommandLineConfiguration implements MailToolConfiguration
         return showUsage;
     }
 
+    @Override
     public String getPassword()
     {
         return null;
     }
 
+    @Override
     public Map<String, String> getMailProperties()
     {
         return mailProperties;
     }
 
+    @Override
     public String getUser()
     {
         return user;
     }
 
+    @Override
     public Iterable<String> getFileLocations()
     {
         return fileLocations;
     }
 
+    @Override
     public Task getTask() throws CmdLineException
     {
         if(tn != null)
@@ -138,14 +145,22 @@ class CommandLineConfiguration implements MailToolConfiguration
         return null;
     }
 
+    @Override
     public int getOperationLimit()
     {
         return limit;
     }
 
+    @Override
     public String getMinAge()
     {
         return minAge;
     }
-    
+
+    @Override
+    public String getTimeLimit()
+    {
+        return runTimeLimit;
+    }
+
 }

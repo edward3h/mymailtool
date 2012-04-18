@@ -1,13 +1,10 @@
 package org.ethelred.mymailtool2;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.ethelred.util.TestUtil;
 import org.jmock.Expectations;
@@ -88,6 +85,12 @@ public class CompositeConfigurationTest
             public Iterable<FileConfigurationHandler> getFileHandlers()
             {
                 return Collections.emptyList();
+            }
+
+            @Override
+            public String getTimeLimit()
+            {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
         };
 

@@ -4,22 +4,16 @@
  */
 package org.ethelred.mymailtool2.javascript;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
+
+import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.Task;
-import sun.org.mozilla.javascript.internal.Scriptable;
 
 /**
  *
@@ -43,11 +37,13 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         
     }
 
+    @Override
     public String getPassword()
     {
         return topLevel.getString("mymailtool.password");
     }
 
+    @Override
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
@@ -62,34 +58,46 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         return builder.build();    
     }
 
+    @Override
     public String getUser()
     {
         return topLevel.getString(USER);
     }
 
+    @Override
     public Iterable<String> getFileLocations()
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Task getTask() throws Exception
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public int getOperationLimit()
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getMinAge()
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+    @Override
+    public String getTimeLimit()
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

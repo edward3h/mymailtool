@@ -11,11 +11,13 @@ import java.util.Map;
 class SystemPropertiesConfiguration implements MailToolConfiguration
 {
 
+    @Override
     public String getPassword()
     {
         return null;
     }
 
+    @Override
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
@@ -30,34 +32,46 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
         return builder.build();
     }
 
+    @Override
     public String getUser()
     {
         return System.getProperty(USER);
     }
 
+    @Override
     public Iterable<String> getFileLocations()
     {
         return Collections.emptyList();
     }
 
+    @Override
     public Task getTask() throws Exception
     {
         return null;
     }
 
+    @Override
     public int getOperationLimit()
     {
         return PRIMITIVE_DEFAULT;
     }
 
+    @Override
     public String getMinAge()
     {
         return null;
     }
 
+    @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return Collections.emptyList();
     }
-    
+
+    @Override
+    public String getTimeLimit()
+    {
+        return null;
+    }
+
 }

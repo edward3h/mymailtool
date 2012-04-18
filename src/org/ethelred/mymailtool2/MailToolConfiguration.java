@@ -32,5 +32,6 @@ public interface MailToolConfiguration
     public String getMinAge();
 
     Iterable<FileConfigurationHandler> getFileHandlers();
-    
+
+    public String getTimeLimit();
 }

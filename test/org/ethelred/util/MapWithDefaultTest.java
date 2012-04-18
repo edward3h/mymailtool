@@ -20,6 +20,7 @@ public class MapWithDefaultTest
         assertNull(ms.get("key"));
         Supplier<String> def = new Supplier<String>()
         {
+            @Override
             public String get()
             {
                 return "def";

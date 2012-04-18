@@ -18,44 +18,58 @@ class DefaultConfiguration implements MailToolConfiguration
     private Iterable<FileConfigurationHandler> defaultFileHandlers
             = ImmutableList.of((FileConfigurationHandler) new PropertiesFileConfigurationHandler());
     
+    @Override
     public String getPassword()
     {
         return null;
     }
 
+    @Override
     public Map<String, String> getMailProperties()
     {
         return Collections.emptyMap();
     }
 
+    @Override
     public String getUser()
     {
         return null;
     }
 
+    @Override
     public Iterable<String> getFileLocations()
     {
         return defaultFileLocations;
     }
 
+    @Override
     public Task getTask()
     {
         return ApplyMatchOperationsTask.create();
     }
 
+    @Override
     public int getOperationLimit()
     {
         return 100;
     }
 
+    @Override
     public String getMinAge()
     {
         return "1 month";
     }
 
+    @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return defaultFileHandlers;
     }
-    
+
+    @Override
+    public String getTimeLimit()
+    {
+        return null;
+    }
+
 }

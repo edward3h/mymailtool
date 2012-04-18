@@ -1,6 +1,7 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import java.io.Console;
 import java.util.Map;
@@ -32,8 +33,7 @@ public class Main implements MailToolContext
 {   
     
     private MailToolConfiguration config;
-    
-    private Session session;
+
     private Store store;
     
     private int opCount = 0;
@@ -42,8 +42,12 @@ public class Main implements MailToolContext
     
     protected static final ReadablePeriod DEFAULT_MIN_AGE = Days.days(30);
     private DateTime ageCompare;
-    
+    private long startTime;
+    private long timeLimit = -1;
+    private volatile boolean shutdown = false;
+
     private void init(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
         CommandLineConfiguration clc = new CommandLineConfiguration();
         CmdLineParser parser = new CmdLineParser(clc);
         try {
@@ -125,9 +129,9 @@ public class Main implements MailToolContext
 
     }
        
-           private void connect() {
+    private synchronized void connect() {
         try {
-            session = Session.getDefaultInstance(mapAsProperties(config.getMailProperties()), new MyAuthenticator());
+            Session session = Session.getDefaultInstance(mapAsProperties(config.getMailProperties()), new MyAuthenticator());
             store = session.getStore();
             store.connect();
             
@@ -143,10 +147,11 @@ public class Main implements MailToolContext
     }
            
            
-    private void disconnect() {
+    private synchronized void disconnect() {
         if (store != null) {
             try {
                 store.close();
+                store = null;
                 System.out.printf("Disconnected%n");
             } catch (MessagingException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -164,6 +169,7 @@ public class Main implements MailToolContext
         return p;
     }
 
+    @Override
     public void countOperation()
     {
         if(++opCount > config.getOperationLimit())
@@ -171,8 +177,36 @@ public class Main implements MailToolContext
             throw new OperationLimitException();
         }
 
+        if(getTimeLimit() > 0 && startTime > 0 && (System.currentTimeMillis() - startTime) > getTimeLimit())
+        {
+            throw new OperationLimitException();
+        }
+
+        if(shutdown)
+        {
+            throw new RuntimeException("Shutdown");
+        }
+
     }
 
+    private long getTimeLimit()
+    {
+        if(timeLimit > -1)
+        {
+            return timeLimit;
+        }
+        String timeLimitSpec = config.getTimeLimit();
+        long newTimeLimit = 0;
+        if(!(Strings.isNullOrEmpty(timeLimitSpec)))
+        {
+            Period p = PeriodFormat.getDefault().parsePeriod(timeLimitSpec);
+            newTimeLimit = p.toStandardDuration().getMillis();
+        }
+        timeLimit = newTimeLimit;
+        return timeLimit;
+    }
+
+    @Override
     public boolean isOldEnough(Message m) throws MessagingException {
         DateTime received = new DateTime(m.getReceivedDate());
         return received.isBefore(getAgeCompare());
@@ -208,18 +242,18 @@ public class Main implements MailToolContext
         }
 
         private String readPassword() {
-            Console cons = null;
+            Console cons;
             if ((cons = System.console()) != null) {
-                String password = new String(cons.readPassword("Please enter your password for %s at %s%n", config.getUser(), this.getRequestingSite()));
-                return password;
+                return new String(cons.readPassword("Please enter your password for %s at %s%n", config.getUser(), this.getRequestingSite()));
             }
             return null;
         }
     }
     
+    @Override
     public Folder getFolder(String folderName) {
         try {
-            Folder result = null;
+            Folder result;
             //try cache
             result = folderCache.get(folderName);
             if (result != null) {
@@ -250,5 +284,15 @@ public class Main implements MailToolContext
         app.init(args);
         app.run();
 
-    }    
+    }
+
+    private class ShutdownHook implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            disconnect();
+            shutdown = true;
+        }
+    }
 }

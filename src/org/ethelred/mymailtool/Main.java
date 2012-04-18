@@ -257,7 +257,7 @@ public class Main {
         }
 
         private String readPassword() {
-            Console cons = null;
+            Console cons;
             if ((cons = System.console()) != null) {
                 String password = new String(cons.readPassword("Please enter your password for %s at %s%n", props.getProperty(USER), this.getRequestingSite()));
                 return password;

@@ -9,7 +9,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Store;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 

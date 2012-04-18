@@ -4,7 +4,6 @@
  */
 package org.ethelred.mymailtool;
 
-import java.util.Map;
 import java.util.Properties;
 import javax.mail.Address;
 import javax.mail.Message;

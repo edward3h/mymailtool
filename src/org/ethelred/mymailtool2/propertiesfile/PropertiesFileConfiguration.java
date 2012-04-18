@@ -1,10 +1,5 @@
 package org.ethelred.mymailtool2.propertiesfile;
 
-import com.google.common.base.*;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,16 +7,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.mail.Message;
-import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
-import org.ethelred.mymailtool2.DeleteOperation;
-import org.ethelred.mymailtool2.FileConfigurationHandler;
-import org.ethelred.mymailtool2.FileConfigurationHelper;
-import org.ethelred.mymailtool2.MailToolConfiguration;
-import org.ethelred.mymailtool2.MatchOperation;
-import org.ethelred.mymailtool2.MessageOperation;
-import org.ethelred.mymailtool2.MoveOperation;
-import org.ethelred.mymailtool2.SplitOperation;
-import org.ethelred.mymailtool2.Task;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.ethelred.util.MapWithDefault;
@@ -36,6 +30,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     private List<String> fileLocations = Lists.newArrayList();
     private List<FileConfigurationHandler> fileHandlers = Lists.newArrayList();
     private Map<String, Map<String, String>> rulesTemp = MapWithDefault.wrap(new HashMap<String, Map<String, String>>(), new Supplier<Map<String, String>>(){
+        @Override
         public Map<String, String> get()
         {
             return Maps.newHashMap();
@@ -69,11 +64,13 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             }
     }
 
+    @Override
     public String getPassword()
     {
         return delegate.getProperty("mymailtool.password");
     }
 
+    @Override
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
@@ -87,16 +84,19 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         }
         return builder.build();    }
 
+    @Override
     public String getUser()
     {
         return delegate.getProperty(USER);
     }
 
+    @Override
     public Iterable<String> getFileLocations()
     {
         return fileLocations;
     }
 
+    @Override
     public Task getTask() throws Exception
     {
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
@@ -109,7 +109,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             String sourceFolder = entry.get("source");
             String type = entry.get("type");
             MessageOperation operation = null;
-            Predicate<Message> matcher = null;
+            Predicate<Message> matcher;
             if("split".equals(type))
             {
                 operation = new SplitOperation();
@@ -160,6 +160,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         return task;
     }
 
+    @Override
     public int getOperationLimit()
     {
         if(delegate.contains("operation.limit"))
@@ -178,14 +179,22 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         return PRIMITIVE_DEFAULT;
     }
 
+    @Override
     public String getMinAge()
     {
         return delegate.getProperty("mymailtool.minage");
     }
 
+    @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return fileHandlers;
+    }
+
+    @Override
+    public String getTimeLimit()
+    {
+        return delegate.getProperty("runtime.limit");
     }
 
     private void _addFileLocations(String filenames)

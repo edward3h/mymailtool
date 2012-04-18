@@ -1,9 +1,8 @@
 package org.ethelred.mymailtool2.javascript;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.MapMaker;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+
+import com.google.common.collect.MapMaker;
 import sun.org.mozilla.javascript.internal.NativeObject;
 
 /**

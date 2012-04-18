@@ -41,7 +41,7 @@ abstract class MessageOpTask extends Task {
 
     protected Folder getFolder(Store store, String folderName) {
         try {
-            Folder result = null;
+            Folder result;
             //try cache
             result = folderCache.get(folderName);
             if (result != null) {

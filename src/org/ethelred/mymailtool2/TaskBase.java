@@ -8,6 +8,7 @@ abstract class TaskBase implements Task
 {
     protected MailToolContext context;
 
+    @Override
     public void init(MailToolContext ctx)
     {
         this.context = ctx;
