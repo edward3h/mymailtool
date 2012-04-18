@@ -74,15 +74,19 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        for(String k: ALL_MAIL_PROPERTIES) 
+        for(String k: delegate.stringPropertyNames())
         {
-            String v = delegate.getProperty(k);
-            if(v != null)
+            if(MAIL_PROPERTY_PATTERN.matcher(k).matches())
             {
-                builder.put(k, v);
+                String v = delegate.getProperty(k);
+                if(v != null)
+                {
+                    builder.put(k, v);
+                }
             }
         }
-        return builder.build();    }
+        return builder.build();
+    }
 
     @Override
     public String getUser()

@@ -21,12 +21,15 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        for(String k: ALL_MAIL_PROPERTIES) 
+        for(String k: System.getProperties().stringPropertyNames())
         {
-            String v = System.getProperty(k);
-            if(v != null)
+            if(MAIL_PROPERTY_PATTERN.matcher(k).matches())
             {
-                builder.put(k, v);
+                String v = System.getProperty(k);
+                if(v != null)
+                {
+                    builder.put(k, v);
+                }
             }
         }
         return builder.build();

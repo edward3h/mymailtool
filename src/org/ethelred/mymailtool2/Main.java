@@ -164,6 +164,7 @@ public class Main implements MailToolContext
         Properties p = new Properties();
         for(Map.Entry<String, String> e: mailProperties.entrySet())
         {
+            System.out.printf("Mail property: %s => %s%n", e.getKey(), e.getValue());
             p.setProperty(e.getKey(), e.getValue());
         }
         return p;
