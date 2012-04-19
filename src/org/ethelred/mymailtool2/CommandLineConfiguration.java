@@ -19,8 +19,9 @@ class CommandLineConfiguration implements MailToolConfiguration
     
     @Option(name = "--help", usage = "Show help.", aliases = {"-h", "-?"})
     private boolean showUsage = false;
-    
-    private int limit;
+
+    @Option(name = "--limit", usage = "Operation limit count", aliases = {"-O"})
+    private int limit = PRIMITIVE_DEFAULT;
 
     private String runTimeLimit;
     

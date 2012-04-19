@@ -137,6 +137,8 @@ public class Main implements MailToolContext
             Session session = Session.getDefaultInstance(mapAsProperties(config.getMailProperties()), new MyAuthenticator());
             store = session.getStore();
             store.connect();
+
+            startTime = System.currentTimeMillis();
             
             folderCache = Maps.newHashMap();
             System.out.printf("Connected to %s%n", config.getMailProperties().get(MailToolConfiguration.HOST));
@@ -200,6 +202,7 @@ public class Main implements MailToolContext
             return operationLimit;
         }
 
+        System.out.printf("getOperationLimit%n");
         int result = config.getOperationLimit();
         System.out.printf("Operation limit %s%n", result);
         operationLimit = result;
@@ -219,6 +222,7 @@ public class Main implements MailToolContext
             Period p = PeriodFormat.getDefault().parsePeriod(timeLimitSpec);
             newTimeLimit = p.toStandardDuration().getMillis();
         }
+        System.out.printf("Time limit %sms%n", newTimeLimit);
         timeLimit = newTimeLimit;
         return timeLimit;
     }

@@ -84,7 +84,7 @@ class CompositeConfiguration implements MailToolConfiguration
         {
             return (Integer) v;
         }
-        return 0;
+        return PRIMITIVE_DEFAULT;
     }
 
     @Override
