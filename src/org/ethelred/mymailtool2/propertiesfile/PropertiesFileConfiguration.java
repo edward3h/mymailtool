@@ -167,7 +167,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     @Override
     public int getOperationLimit()
     {
-        if(delegate.contains("operation.limit"))
+        if(delegate.containsKey("operation.limit"))
         {
             String sValue = delegate.getProperty("operation.limit");
             try
@@ -221,7 +221,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         }
     }
 
-    private static Pattern ruleMatch = Pattern.compile("(rule.*)\\.([a-z]+)");
+    private static Pattern ruleMatch = Pattern.compile("(rule\\..*)\\.([a-z]+)");
     private void _addMessageRule(String key, String value)
     {
         Matcher m = ruleMatch.matcher(key);

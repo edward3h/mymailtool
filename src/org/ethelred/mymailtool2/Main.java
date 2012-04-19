@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -31,8 +32,9 @@ import org.kohsuke.args4j.CmdLineParser;
  */
 public class Main implements MailToolContext
 {   
-    
-    private MailToolConfiguration config;
+
+    @VisibleForTesting
+    MailToolConfiguration config;
 
     private Store store;
     
@@ -45,6 +47,7 @@ public class Main implements MailToolContext
     private long startTime;
     private long timeLimit = -1;
     private volatile boolean shutdown = false;
+    private int operationLimit = -1;
 
     private void init(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
@@ -173,7 +176,7 @@ public class Main implements MailToolContext
     @Override
     public void countOperation()
     {
-        if(++opCount > config.getOperationLimit())
+        if(++opCount > getOperationLimit())
         {
             throw new OperationLimitException();
         }
@@ -188,6 +191,19 @@ public class Main implements MailToolContext
             throw new RuntimeException("Shutdown");
         }
 
+    }
+
+    private int getOperationLimit()
+    {
+        if(operationLimit > -1)
+        {
+            return operationLimit;
+        }
+
+        int result = config.getOperationLimit();
+        System.out.printf("Operation limit %s%n", result);
+        operationLimit = result;
+        return operationLimit;
     }
 
     private long getTimeLimit()
@@ -212,8 +228,9 @@ public class Main implements MailToolContext
         DateTime received = new DateTime(m.getReceivedDate());
         return received.isBefore(getAgeCompare());
     }
-    
-    private DateTime getAgeCompare()
+
+    @VisibleForTesting
+    DateTime getAgeCompare()
     {
         if(ageCompare != null)
         {

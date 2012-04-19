@@ -28,6 +28,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     public void run()
     {
+        System.out.printf("Starting task with %s rules%n", rules.size());
         // for each folder
         for(String folderName: rules.keySet())
         {
