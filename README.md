@@ -5,6 +5,8 @@ version 1
 The original code is under the package org.ethelred.mymailtool. I used this for quite a while, but it was not as flexible
 as I would like, so I wrote the version 2 tool.
 
+I'll probably remove this package soon since I am transitioning my own usage.
+
 version 2
 ---------
 This rewrite is intended to be flexible in terms of how messages are processed. It is designed to support different
