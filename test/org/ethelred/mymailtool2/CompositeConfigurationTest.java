@@ -25,7 +25,7 @@ public class CompositeConfigurationTest
     public void testEmptyConfiguration()
     {
         MailToolConfiguration empty = new CompositeConfiguration();
-        assertEquals(0, empty.getOperationLimit());
+        assertEquals(-1, empty.getOperationLimit());
         assertNull(empty.getUser());
         assertNull(empty.getMinAge());
         assertNull(empty.getPassword());
