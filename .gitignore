@@ -5,6 +5,8 @@
 *.war
 *.ear
 
+dist/*.jar
+
 # idea workspace
 .idea/workspace.xml
 
