@@ -19,6 +19,7 @@ import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.ethelred.util.MapWithDefault;
+import sun.net.idn.StringPrep;
 
 /**
  *
@@ -132,18 +133,18 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             String test = entry.get("match");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
-                matchers.add(new FromAddressMatcher(true, test));
+                matchers.add(new FromAddressMatcher(true, _first(test), _rest(test)));
             }
             test = entry.get("from");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
-                matchers.add(new FromAddressMatcher(true, test));
+                matchers.add(new FromAddressMatcher(true,  _first(test), _rest(test)));
             }
             
             test = entry.get("to");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
-                matchers.add(new ToAddressMatcher(true, test));
+                matchers.add(new ToAddressMatcher(true,  _first(test), _rest(test)));
             }
             
             
@@ -163,6 +164,27 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         
         return task;
     }
+
+    private String _first(String test)
+    {
+        String[] parts = test.split("\\,\\s*");
+        if(parts.length > 0)
+        {
+            return parts[0];
+        }
+        throw new IllegalArgumentException("Expected a match with at least one value");
+    }
+
+    private String[] _rest(String test)
+    {
+        String[] parts = test.split("\\,\\s*");
+        if(parts.length < 2)
+        {
+            return new String[0];
+        }
+        return Arrays.copyOfRange(parts, 1, parts.length);
+    }
+
 
     @Override
     public int getOperationLimit()
