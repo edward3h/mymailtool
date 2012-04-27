@@ -44,7 +44,7 @@ public class MatchersTest
                 oneOf(msg2).getAllRecipients(); will(returnValue(add2));
             }});
 
-            Predicate<Message> matcher = new ToAddressMatcher("edward\\@foobar\\.com");
+            Predicate<Message> matcher = new ToAddressMatcher(true, "edward@foobar.com");
             assertTrue(matcher.apply(msg));
 
             assertFalse(matcher.apply(msg2));

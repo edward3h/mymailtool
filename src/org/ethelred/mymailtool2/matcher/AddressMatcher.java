@@ -1,6 +1,10 @@
 package org.ethelred.mymailtool2.matcher;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.mail.Address;
@@ -14,11 +18,22 @@ import javax.mail.MessagingException;
 abstract class AddressMatcher implements Predicate<Message>
 {
 
-    private final Pattern addressPattern;
+    private final Iterable<Pattern> addressPatterns;
 
-    protected AddressMatcher(String patternSpec)
+    protected AddressMatcher(boolean bLiteral, String patternSpec, String... morePatterns)
     {
-        addressPattern = Pattern.compile(patternSpec);
+        int nFlags = Pattern.CASE_INSENSITIVE;
+        if(bLiteral)
+        {
+            nFlags = nFlags | Pattern.LITERAL;
+        }
+        List<Pattern> patterns = Lists.newArrayListWithCapacity(morePatterns.length + 1);
+        patterns.add(Pattern.compile(patternSpec, nFlags));
+        for(String pattern: morePatterns)
+        {
+            patterns.add(Pattern.compile(pattern, nFlags));
+        }
+        addressPatterns = ImmutableList.copyOf(patterns);
     }
 
     @Override
@@ -29,10 +44,13 @@ abstract class AddressMatcher implements Predicate<Message>
             Address[] addresses = getAddresses(t);
             for (Address a : addresses)
             {
-                Matcher m = addressPattern.matcher(a.toString());
-                if (m.matches())
+                for(Pattern addressPattern: addressPatterns)
                 {
-                    return true;
+                    Matcher m = addressPattern.matcher(a.toString());
+                    if (m.matches())
+                    {
+                        return true;
+                    }
                 }
             }
             return false;

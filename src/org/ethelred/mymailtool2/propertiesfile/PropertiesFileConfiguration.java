@@ -132,18 +132,18 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             String test = entry.get("match");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
-                matchers.add(new FromAddressMatcher(test));
+                matchers.add(new FromAddressMatcher(true, test));
             }
             test = entry.get("from");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
-                matchers.add(new FromAddressMatcher(test));
+                matchers.add(new FromAddressMatcher(true, test));
             }
             
             test = entry.get("to");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
-                matchers.add(new ToAddressMatcher(test));
+                matchers.add(new ToAddressMatcher(true, test));
             }
             
             

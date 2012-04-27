@@ -11,9 +11,9 @@ import javax.mail.MessagingException;
 public class ToAddressMatcher extends AddressMatcher
 {
 
-    public ToAddressMatcher(String patternSpec)
+    public ToAddressMatcher(boolean bLiteral, String patternSpec, String... morePatterns)
     {
-        super(patternSpec);
+        super(bLiteral, patternSpec, morePatterns);
     }
 
     @Override
