@@ -3,7 +3,7 @@ package org.ethelred.mymailtool2.javascript;
 import java.util.concurrent.ConcurrentMap;
 
 import com.google.common.collect.MapMaker;
-import sun.org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.NativeObject;
 
 /**
  * warning - uses undocumented internal classes
