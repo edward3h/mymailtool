@@ -1,17 +1,39 @@
 This is my back-dated mail processing application.
 
-version 1
----------
-The original code is under the package org.ethelred.mymailtool. I used this for quite a while, but it was not as flexible
-as I would like, so I wrote the version 2 tool.
+Background
+----------
+The idea is that I like to keep all my incoming email in the Inbox so I don't have to switch folders to see new stuff. However, later on I would like it to be sorted and filtered in some ways.
 
-I'll probably remove this package soon since I am transitioning my own usage.
+This program runs a set of filters against email, but only on messages older than a configured age. It is intended to be run regularly from cron.
 
-version 2
----------
-This rewrite is intended to be flexible in terms of how messages are processed. It is designed to support different
-languages for specifying the configuration. Currently the only finished one is 'PropertiesFileConfiguration', which is
-roughly compatible with my old code.
+It talks directly to the mail server so it does not require any particular client software. In theory it supports any mail server supported by Java Mail, but I have only tried it with IMAP servers.
 
-I have a 'work in progress' Javascript configuration which relies on the Javascript interpreter built in to recent versions
-of the JDK. The idea is that this will allow additional logic to be specified as JS functions.
+Configuration Languages
+-----------------------
+The program is designed to support different languages for specifying the configuration. Currently the only finished one is 'PropertiesFileConfiguration', which uses a Java properties file to provide settings.
+
+TODO add sample configuration
+
+I have a 'work in progress' Javascript configuration. The idea is that this will allow additional logic to be specified as JS functions.
+
+Requirements
+------------
+MyMailtool is developed against Java 6 and has a build script which uses Bash.
+
+I have been developing in Intellij Idea but that is optional.
+
+Installation
+------------
+
+	git clone git://github.com/edward3h/mymailtool.git
+	cd mymailtool
+	./build.sh
+
+Setup
+-----
+MyMailtool can be run with command line options, but it is expected that most users will use a configuration file or files.
+
+By default it will try and read `.mymailtoolrc.properties` in the user's home directory.
+
+To run, use the `bin/mymailtool2` script. Pass `--help` to see command line options.
+
