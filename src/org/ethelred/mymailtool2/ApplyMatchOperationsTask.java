@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Folder;
+import javax.mail.FolderClosedException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -28,7 +29,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     public void run()
     {
-        System.out.printf("Starting task with %s rules%n", rules.size());
+        System.out.printf("Starting task with %s folders%n", rules.size());
         // for each folder
         for(String folderName: rules.keySet())
         {
@@ -43,14 +44,22 @@ public class ApplyMatchOperationsTask extends TaskBase
                     System.out.printf("Working on folder %s%n", folder.getFullName());
                 // for each message
                     for (Message m : folder.getMessages()) {
-                        
-                    // match/operation
-                        if (context.isOldEnough(m)) {
-                            for(MatchOperation mo: rules.get(folderName))
-                            {
-                                mo.testApply(m, context);
-                            }
 
+                        try
+                        {
+                        // match/operation
+                            if (context.isOldEnough(m)) {
+                                for(MatchOperation mo: rules.get(folderName))
+                                {
+                                    mo.testApply(m, context);
+                                }
+
+                            }
+                        }
+                        catch(FolderClosedException e)
+                        {
+                            Logger.getLogger(ApplyMatchOperationsTask.class.getName()).log(Level.SEVERE, "Folder " + folderName + " closed during processing", e);
+                            folder.open(Folder.READ_WRITE);
                         }
                     }
                     folder.close(true);

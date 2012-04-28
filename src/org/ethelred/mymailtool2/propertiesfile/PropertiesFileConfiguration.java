@@ -19,7 +19,6 @@ import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.ethelred.util.MapWithDefault;
-import sun.net.idn.StringPrep;
 
 /**
  *
@@ -159,6 +158,11 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             if(sourceFolder != null && matcher != null && operation != null)
             {
                 task.addRule(sourceFolder, new MatchOperation(matcher, operation));
+                System.out.printf("Adding rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
+            }
+            else
+            {
+                System.out.printf("Skipping rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
             }
         }
         

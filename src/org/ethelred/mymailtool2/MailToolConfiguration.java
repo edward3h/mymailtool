@@ -16,7 +16,7 @@ public interface MailToolConfiguration
     public final static String PORT = "mail.port";
     public final static Pattern MAIL_PROPERTY_PATTERN = Pattern.compile("mail\\..+");
     public final static Iterable<String> ALL_MAIL_PROPERTIES = 
-          ImmutableList.of(PROTOCOL, USER, HOST, PORT);  
+          ImmutableList.of(PROTOCOL, USER, HOST);
     public final static int PRIMITIVE_DEFAULT = -1; // this is nasty :-)
 
     public String getPassword();
