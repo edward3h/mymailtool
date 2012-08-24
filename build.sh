@@ -19,7 +19,7 @@ find $prdsrc -name '*.java' | xargs javac -sourcepath $prdsrc -classpath "$libdi
 find $tstsrc -name '*.java' | xargs javac -sourcepath "$tstsrc" -classpath "$prddir:$libdir/*:$libdir/jmock-2.5.1/*" -d $tstdir
 
 # 3. run tests
-# TODO
+ack -l --java '\@Test' test/ | cut -d '/' -f 2- | sed 's/\.java//' | sed 's/\//./g' | xargs java -classpath "$tstdir:$prddir:$libdir/*:$libdir/jmock-2.5.1/*" org.junit.runner.JUnitCore
 
 # 4. build jar
 jar cmfe manifest.mf $myroot/dist/Mailtool.jar org.ethelred.mymailtool2.Main -C $prddir org
