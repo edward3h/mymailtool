@@ -1,4 +1,4 @@
-{
+config({
     mail: {
         store: {
             protocol: "imap"
@@ -12,12 +12,12 @@
     minage: "3 months",
     operations: 300
 
-
+/*
 rule.1.source Inbox
 rule.1.type move
 rule.1.match *
 rule.1.dest archive
 
 rule.2.source archive
-rule.2.type split
-}
+rule.2.type split*/
+});

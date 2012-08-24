@@ -1,38 +1,27 @@
 package org.ethelred.mymailtool2.javascript;
 
-import java.util.concurrent.ConcurrentMap;
-
-import com.google.common.collect.MapMaker;
 import org.mozilla.javascript.NativeObject;
 
 /**
  * warning - uses undocumented internal classes
  * @author edward
  */
-class JSObjectAdapter
+class MozillaObjectAdapter implements IJSObject
 {
-    private static ConcurrentMap<NativeObject, JSObjectAdapter> cache = 
-            new MapMaker().makeMap();
     
-    static JSObjectAdapter wrap(Object obj)
+    static IJSObject wrap(Object obj)
     {
         return wrap((NativeObject) obj);
     }
     
-    static synchronized JSObjectAdapter wrap(NativeObject no)
+    static MozillaObjectAdapter wrap(NativeObject no)
     {
-        JSObjectAdapter result = cache.get(no);
-        if(result == null)
-        {
-            result = new JSObjectAdapter(no);
-            result = cache.putIfAbsent(no, result);
-        }
-        return result;
+        return new MozillaObjectAdapter(no);
     }
     
     private final NativeObject no;
     
-    private JSObjectAdapter(NativeObject no)
+    private MozillaObjectAdapter(NativeObject no)
     {
         this.no = no;
     }
@@ -50,7 +39,7 @@ class JSObjectAdapter
                 {
                     nested.append(parts[i]);
                 }
-                return JSObjectAdapter.wrap((NativeObject) o).get(nested.toString());
+                return MozillaObjectAdapter.wrap((NativeObject) o).get(nested.toString());
             }
             else
             {
@@ -63,7 +52,8 @@ class JSObjectAdapter
         }
     }
 
-    String getString(String propertyName)
+    @Override
+    public String getString(String propertyName)
     {
         Object obj = get(propertyName);
         return obj == null ? null : String.valueOf(obj);

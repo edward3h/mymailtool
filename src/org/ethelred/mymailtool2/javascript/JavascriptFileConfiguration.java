@@ -8,12 +8,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
-import javax.script.*;
 
 import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.Task;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  *
@@ -21,26 +23,42 @@ import org.ethelred.mymailtool2.Task;
  */
 class JavascriptFileConfiguration implements MailToolConfiguration
 {
-    private final static String TLON = "xyzTopLevelObjzyx";
-    private final JSObjectAdapter topLevel;
+    private IJSObject config;
 
-    private final static String INIT_SCRIPT = "";
-    
-    public JavascriptFileConfiguration(File f) throws ScriptException, IOException
+    private Context ctx;
+    private static final String SETUP_CALLBACK = "for(var fn in callback) {\n" +
+            "  if(typeof callback[fn] === 'function') {\n" +
+            "    this[fn] = (function() {\n" +
+            "      var method = callback[fn];\n" +
+            "      return function() {\n" +
+            "         return method.apply(callback,arguments);\n" +
+            "      };\n" +
+            "    })();\n" +
+            "  }\n" +
+            "}";
+
+    public JavascriptFileConfiguration(File f) throws IOException
     {
-            ScriptEngine se = new ScriptEngineManager().getEngineByName("JavaScript");
-            Bindings bindings = se.getBindings(ScriptContext.ENGINE_SCOPE);
-            se.eval(INIT_SCRIPT);
-            se.eval(new FileReader(f));
-            se.eval("var " + TLON + " = {}; for(p in this){if(p != '" + TLON + "'){" + TLON + "[p] = this[p];}};"); // copy top level properties into an object we can access
-            topLevel = JSObjectAdapter.wrap(bindings.get(TLON));
-        
+        ctx = Context.enter();
+        Scriptable scope = ctx.initStandardObjects();
+        ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));
+        ctx.evaluateString(scope, SETUP_CALLBACK, "setup", 1, null);
+        ctx.evaluateReader(scope, new FileReader(f), f.getName(), 1, null);
+    }
+
+    public class Callback
+    {
+        @SuppressWarnings("UnusedDeclaration")
+        public void config(Object conf)
+        {
+            config = JSObjectWrapper.wrap(conf);
+        }
     }
 
     @Override
     public String getPassword()
     {
-        return topLevel.getString("mymailtool.password");
+        return config.getString("mymailtool.password");
     }
 
     @Override
@@ -49,7 +67,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         for(String k: ALL_MAIL_PROPERTIES) 
         {
-            String v = topLevel.getString(k);
+            String v = config.getString(k);
             if(v != null)
             {
                 builder.put(k, v);
@@ -61,7 +79,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public String getUser()
     {
-        return topLevel.getString(USER);
+        return config.getString(USER);
     }
 
     @Override
@@ -85,7 +103,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public String getMinAge()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return config.getString("minage");
     }
 
     @Override

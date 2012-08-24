@@ -28,7 +28,7 @@ public class JavascriptFileConfigurationHandler extends BaseFileConfigurationHan
         }
         catch(Exception e)
         {
-            return null;
+            throw new RuntimeException(e);
         }
     }
     
