@@ -1,5 +1,7 @@
 package org.ethelred.mymailtool2;
 
+import java.util.Calendar;
+import java.util.Date;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -26,13 +28,22 @@ public class MessageOperationsTest
     Message msg;
     Folder startingFolder;
     MailToolContext mailContext;
+    private Date sentDate;
 
     @Before
-    public void setup()
+    public void setup() throws MessagingException
     {
         msg = context.mock(Message.class);
         startingFolder = context.mock(Folder.class);
         mailContext = context.mock(MailToolContext.class);
+        Calendar c = Calendar.getInstance();
+        c.set(2012, Calendar.APRIL, 17);
+        sentDate = c.getTime();
+
+        context.checking(new Expectations(){{
+            allowing(msg).getSentDate(); will(returnValue(sentDate));
+            allowing(msg).getSubject(); will(returnValue("test subject"));
+        }});
     }
 
     @Test
