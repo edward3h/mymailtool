@@ -17,7 +17,7 @@ public abstract class StringMatcher implements Predicate<Message>
 
     protected StringMatcher(String patternSpec)
     {
-        stringPattern = Pattern.compile(patternSpec);
+        stringPattern = Pattern.compile(patternSpec, Pattern.CASE_INSENSITIVE);
     }
 
     @Override
@@ -25,7 +25,8 @@ public abstract class StringMatcher implements Predicate<Message>
     {
         try
         {
-            return stringPattern.matcher(getString(message)).matches();
+            CharSequence s = getString(message);
+            return s != null && stringPattern.matcher(s).matches();
         }
         catch(MessagingException e)
         {

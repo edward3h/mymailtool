@@ -5,6 +5,9 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.SubjectMatcher;
+import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
@@ -35,19 +38,14 @@ class CommandLineConfiguration implements MailToolConfiguration
 
     private List<FileConfigurationHandler> fileHandlers = Lists.newArrayList();
     
-    private TaskName tn;
+    private Task task;
 
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return fileHandlers;
     }
-    
-    private static enum TaskName
-    {
-        LIST, FROM_COUNT, TO_COUNT, APPLY
-        
-    }
+
 
     
     @Option(name = "--config", usage = "Specify config file. (default $HOME/.mymailtoolrc)", aliases = {"-c"})
@@ -66,23 +64,59 @@ class CommandLineConfiguration implements MailToolConfiguration
     }
     
     @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
-    private void taskListFolders(boolean fake) {
-        tn = TaskName.LIST;
+    private void taskListFolders(boolean fake) throws CmdLineException
+    {
+        throw new CmdLineException("Task List Folders is not supported yet");
     }
 
     @Option(name = "--fromCount", usage = "Count occurrences of from addresses", aliases = {"-f"})
-    private void taskFromCount(String folderName) {
-        tn = TaskName.FROM_COUNT;
+    private void taskFromCount(String folderName) throws CmdLineException
+    {
+        throw new CmdLineException("Task FromCount is not supported yet");
     }
 
         @Option(name = "--toCount", usage = "Count occurrences of to (and CC) addresses", aliases = {"-o"})
-    private void taskToCount(String folderName) {
-        tn = TaskName.TO_COUNT;
+    private void taskToCount(String folderName) throws CmdLineException
+        {
+            throw new CmdLineException("Task ToCount is not supported yet");
     }
 
     @Option(name = "--apply", usage = "Apply rules - define rules in config file", aliases = {"-a"})
-    private void taskApplyRules(String folderName) {
-        tn = TaskName.APPLY;
+    private void taskApplyRules(String folderName) throws CmdLineException
+    {
+        throw new CmdLineException("Task Apply is not supported from command line, please use config file");
+    }
+
+    @Option(name = "--search", usage = "Search for matching messages", aliases = {"-s"})
+    private void taskSearch(String folderName) {
+        task = SearchTask.create(folderName);
+    }
+
+    @Option(name = "--to", usage = "Search messages matching To address")
+    private void searchTo(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(new ToAddressMatcher(false, searchSpec));
+        }
+    }
+
+    @Option(name = "--from", usage = "Search messages matching From address")
+    private void searchFrom(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(new FromAddressMatcher(false, searchSpec));
+        }
+    }
+
+    @Option(name = "--subject", usage = "Search messages matching Subject")
+    private void searchSubject(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(new SubjectMatcher(searchSpec));
+        }
     }
 
     @Option(name = "--host", usage = "mail hostname", aliases = {"-H"})
@@ -133,17 +167,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Override
     public Task getTask() throws CmdLineException
     {
-        if(tn != null)
-        {
-            switch(tn)
-            {
-                case APPLY:
-                    throw new CmdLineException("Apply is not currently supported from command line, please set up with config file");
-                default:
-                    throw new CmdLineException("Task " + tn + " is not supported yet");
-            }
-        }
-        return null;
+        return task;
     }
 
     @Override

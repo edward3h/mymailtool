@@ -56,6 +56,26 @@ public class MatchersTest
         }
     }
 
+    @Test
+    public void testSubjectMatcher()
+    {
+        try
+        {
+            context.checking(new Expectations(){{
+                oneOf(msg).getSubject(); will(returnValue("test Subject"));
+                oneOf(msg2).getSubject(); will(returnValue(null));
+            }});
+
+            Predicate<Message> matcher = new SubjectMatcher(".*subject.*");
+            assertTrue(matcher.apply(msg));
+            assertFalse(matcher.apply(msg2));
+        }
+        catch(MessagingException e)
+        {
+            fail("unexpected exception");
+        }
+    }
+
 
     private Address[] mockAddresses(String... addresses)
     {
