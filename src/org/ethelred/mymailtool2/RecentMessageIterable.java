@@ -1,10 +1,13 @@
 package org.ethelred.mymailtool2;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import javax.mail.FetchProfile;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+
+import com.google.common.base.Joiner;
 
 /**
  * iterate over messages in a folder in reverse order (most recent first)
@@ -137,6 +140,7 @@ public class RecentMessageIterable implements Iterable<Message>
             }
             try
             {
+                System.err.println("Reading messages " + Arrays.toString(ids));
                 messages = folder.getMessages(ids);
                 folder.fetch(messages, fp);
             }
@@ -157,7 +161,7 @@ public class RecentMessageIterable implements Iterable<Message>
         {
             int arrayIndex = messageNumber++ % MAX_CHUNK;
             Message result = messages[arrayIndex];
-            if(arrayIndex >= messages.length)
+            if(arrayIndex == messages.length - 1)
             {
                 _loadChunk();
             }

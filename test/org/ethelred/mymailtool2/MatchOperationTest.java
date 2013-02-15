@@ -28,7 +28,7 @@ public class MatchOperationTest
             oneOf(operation).apply(mailContext, m); will(returnValue(true));
             oneOf(mailContext).countOperation();
         }});
-        MatchOperation test = new MatchOperation(matcher, operation);
+        MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
         context.assertIsSatisfied();
     }
@@ -46,7 +46,7 @@ public class MatchOperationTest
             oneOf(matcher).apply(m); will(returnValue(true));
             oneOf(operation).apply(mailContext, m); will(returnValue(false));
         }});
-        MatchOperation test = new MatchOperation(matcher, operation);
+        MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
         context.assertIsSatisfied();
     }
@@ -62,7 +62,7 @@ public class MatchOperationTest
         context.checking(new Expectations(){{
             oneOf(matcher).apply(m); will(returnValue(false));
         }});
-        MatchOperation test = new MatchOperation(matcher, operation);
+        MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
         context.assertIsSatisfied();
     }

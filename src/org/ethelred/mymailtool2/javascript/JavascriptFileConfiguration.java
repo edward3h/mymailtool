@@ -94,7 +94,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public MoveBuilder to(String destinationName)
         {
-            task.addRule(folderName, new MatchOperation(this, new MoveOperation(destinationName)), false);
+            task.addRule(folderName, new MatchOperation(this, new MoveOperation(destinationName), /* TODO */ 0), false);
             return this;
         }
 
@@ -195,7 +195,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public SplitBuilder(String folderName)
 
         {
-            task.addRule(folderName, new MatchOperation(this, new SplitOperation()), false);
+            task.addRule(folderName, new MatchOperation(this, new SplitOperation(), /* TODO */ 0), false);
         }
     }
 }

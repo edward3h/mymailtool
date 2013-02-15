@@ -114,6 +114,8 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             String sourceFolder = entry.get("source");
             String type = entry.get("type");
             MessageOperation operation = null;
+
+            int specificity = 0;
             Predicate<Message> matcher;
             if("split".equals(type))
             {
@@ -134,23 +136,27 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
                 matchers.add(new FromAddressMatcher(true, _first(test), _rest(test)));
+                specificity++;
             }
             test = entry.get("from");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
                 matchers.add(new FromAddressMatcher(true,  _first(test), _rest(test)));
+                specificity++;
             }
             
             test = entry.get("to");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
                 matchers.add(new ToAddressMatcher(true,  _first(test), _rest(test)));
+                specificity++;
             }
 
             test = entry.get("subject");
             if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
             {
                 matchers.add(new SubjectMatcher(test));
+                specificity++;
             }
 
             boolean includeSubFolders = false;
@@ -171,7 +177,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             }
             if(sourceFolder != null && matcher != null && operation != null)
             {
-                task.addRule(sourceFolder, new MatchOperation(matcher, operation), includeSubFolders);
+                task.addRule(sourceFolder, new MatchOperation(matcher, operation, specificity), includeSubFolders);
                 System.out.printf("Adding rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
             }
             else

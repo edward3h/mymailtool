@@ -1,11 +1,17 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -16,6 +22,15 @@ import javax.mail.MessagingException;
  */
 public class ApplyMatchOperationsTask extends TaskBase
 {
+    private static final Comparator<? super MatchOperation> SPECIFIC_OPS = Ordering.natural().reverse().onResultOf(new Function<MatchOperation, Comparable>()
+    {
+        @Override
+        public Comparable apply(@Nullable MatchOperation matchOperation)
+        {
+            return matchOperation == null ? 0 : matchOperation.getSpecificity();
+        }
+    });
+
     private static class ApplyKey
     {
         private final String folderName;
@@ -101,7 +116,10 @@ public class ApplyMatchOperationsTask extends TaskBase
         if (context.isOldEnough(m)) {
             for(MatchOperation mo: rules.get(new ApplyKey(f.getName(), includeSubFolders)))
             {
-                mo.testApply(m, context);
+                if(mo.testApply(m, context))
+                {
+                    break;
+                }
             }
 
         }
@@ -123,6 +141,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             rules.put(key, lmo);
         }
         lmo.add(mo);
+        Collections.sort(lmo, SPECIFIC_OPS);
         
     }
 
