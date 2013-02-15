@@ -31,7 +31,7 @@ public class SplitOperation implements MessageOperation
             Folder moveTo = context.getFolder(getSubFolderName(startingFolder, received));
             startingFolder.copyMessages(new Message[]{m}, moveTo);
             m.setFlag(Flags.Flag.DELETED, true);
-            System.out.printf("Move message %s from %s to %s%n", MailUtil.toString(m), startingFolder.getFullName(), moveTo.getFullName());
+            MailUtil.log("Move message %s from %s to %s", MailUtil.toString(m), startingFolder.getFullName(), moveTo.getFullName());
             return true;
         }
         catch(MessagingException e)

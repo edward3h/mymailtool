@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 public class JavascriptConfigurationTest
 {
     @Test
-    public void testLoadJavascript()
+    public void testLoadJavascript() throws Exception
     {
         FileConfigurationHandler h = new JavascriptFileConfigurationHandler();
 
@@ -29,5 +29,7 @@ public class JavascriptConfigurationTest
         assertNotNull(conf);
         assertEquals("edward", conf.getUser());
         assertEquals("3 months", conf.getMinAge());
+
+        assertNotNull(conf.getTask());
     }
 }

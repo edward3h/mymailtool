@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Folder;
-import javax.mail.FolderClosedException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -17,9 +16,54 @@ import javax.mail.MessagingException;
  */
 public class ApplyMatchOperationsTask extends TaskBase
 {
+    private static class ApplyKey
+    {
+        private final String folderName;
+        private final boolean includeSubFolders;
+
+        private ApplyKey(String folderName, boolean includeSubFolders)
+        {
+            this.folderName = folderName.toLowerCase();
+            this.includeSubFolders = includeSubFolders;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if(this == o)
+            {
+                return true;
+            }
+            if(o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
+
+            ApplyKey applyKey = (ApplyKey) o;
+
+            if(includeSubFolders != applyKey.includeSubFolders)
+            {
+                return false;
+            }
+            if(!folderName.equals(applyKey.folderName))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = folderName.hashCode();
+            result = 31 * result + (includeSubFolders ? 1 : 0);
+            return result;
+        }
+    }
+
     // order is important
-    // key is folder name
-    LinkedHashMap<String, List<MatchOperation>> rules = Maps.newLinkedHashMap();
+    LinkedHashMap<ApplyKey, List<MatchOperation>> rules = Maps.newLinkedHashMap();
 
     public static ApplyMatchOperationsTask create()
     {
@@ -31,41 +75,11 @@ public class ApplyMatchOperationsTask extends TaskBase
     {
         System.out.printf("Starting task with %s folders%n", rules.size());
         // for each folder
-        for(String folderName: rules.keySet())
+        for(ApplyKey k: rules.keySet())
         {
             try
             {
-                Folder folder = context.getFolder(folderName);
-                // does not traverse sub-folders - consider as future option
-                
-                if (folder != null && folder.exists()) {
-                    folder.open(Folder.READ_WRITE);
-
-                    System.out.printf("Working on folder %s%n", folder.getFullName());
-                // for each message
-                    for (Message m : folder.getMessages()) {
-
-                        try
-                        {
-                        // match/operation
-                            if (context.isOldEnough(m)) {
-                                for(MatchOperation mo: rules.get(folderName))
-                                {
-                                    mo.testApply(m, context);
-                                }
-
-                            }
-                        }
-                        catch(FolderClosedException e)
-                        {
-                            Logger.getLogger(ApplyMatchOperationsTask.class.getName()).log(Level.SEVERE, "Folder " + folderName + " closed during processing", e);
-                            folder.open(Folder.READ_WRITE);
-                        }
-                    }
-                    folder.close(true);
-                } else {
-                    System.out.printf("Folder %s was not found.%n", folderName);
-                }
+                traverseFolder(k.folderName, k.includeSubFolders);
             }
             catch (MessagingException ex)
             {
@@ -73,16 +87,48 @@ public class ApplyMatchOperationsTask extends TaskBase
             }
         }
     }
-    
-    public void addRule(String folder, MatchOperation mo)
+
+    @Override
+    protected int openMode()
     {
-        List<MatchOperation> lmo = rules.get(folder);
+        return Folder.READ_WRITE;
+    }
+
+    @Override
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException
+    {
+        // match/operation
+        if (context.isOldEnough(m)) {
+            for(MatchOperation mo: rules.get(new ApplyKey(f.getName(), includeSubFolders)))
+            {
+                mo.testApply(m, context);
+            }
+
+        }
+    }
+
+    @Override
+    protected void status(Folder f)
+    {
+        System.out.printf("Working on folder %s%n", f.getFullName());
+    }
+
+    public void addRule(String folder, MatchOperation mo, boolean includeSubFolders)
+    {
+        ApplyKey key = new ApplyKey(folder, includeSubFolders);
+        List<MatchOperation> lmo = rules.get(key);
         if(lmo == null)
         {
             lmo = Lists.newArrayList();
-            rules.put(folder, lmo);
+            rules.put(key, lmo);
         }
         lmo.add(mo);
         
+    }
+
+    @Override
+    protected boolean orderNewestFirst()
+    {
+        return false;
     }
 }

@@ -7,7 +7,6 @@ import javax.mail.MessagingException;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 
 /**
  * search in a folder and sub-folders
@@ -33,13 +32,7 @@ public class SearchTask extends TaskBase
 
         try
         {
-            Folder f = context.getFolder(folderName);
-            if(f == null || !f.exists())
-            {
-                throw new IllegalStateException("Could not open folder " + folderName);
-            }
-
-            _searchFolder(f);
+            traverseFolder(folderName, true);
         }
         catch(MessagingException e)
         {
@@ -47,38 +40,23 @@ public class SearchTask extends TaskBase
         }
     }
 
-    private void _searchFolder(Folder f) throws MessagingException
+    @Override
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException
     {
-        System.err.println("Searching " + f + " with " + matcher);
-
-        if((f.getType() & Folder.HOLDS_MESSAGES) > 0)
+        if(matcher.apply(m))
         {
-            f.open(Folder.READ_ONLY);
-            for(Message m: _readMessages(f))
-            {
-                if(matcher.apply(m))
-                {
-                    _printMatch(f, m);
-                }
-                else
-                {
-                    _debugPrintNoMatch(f, m);
-                }
-            }
+            _printMatch(f, m);
         }
-
-        if((f.getType() & Folder.HOLDS_FOLDERS) > 0)
+        else
         {
-            for(Folder child: f.list())
-            {
-                _searchFolder(child);
-            }
+            _debugPrintNoMatch(f, m);
         }
     }
 
-    private Iterable<? extends Message> _readMessages(Folder f)
+    @Override
+    protected void status(Folder f)
     {
-        return new RecentMessageIterable(f);
+        System.err.println("Searching " + f + " with " + matcher);
     }
 
     private void _printMatch(Folder f, Message m) throws MessagingException
@@ -104,7 +82,7 @@ public class SearchTask extends TaskBase
                 m.getSentDate(),
                 from,
                 m.getSubject()
-        );  */
+        );*/
     }
 
     public static Task create(String folderName)

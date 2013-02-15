@@ -12,10 +12,12 @@ import javax.mail.MessagingException;
 public class RecentMessageIterable implements Iterable<Message>
 {
     private final Folder folder;
+    private final boolean newestFirst;
 
-    public RecentMessageIterable(Folder f)
+    public RecentMessageIterable(Folder f, boolean newestFirst)
     {
         this.folder = f;
+        this.newestFirst = newestFirst;
     }
 
     @Override
@@ -23,7 +25,14 @@ public class RecentMessageIterable implements Iterable<Message>
     {
         try
         {
-            return new RecentMessageIterator(folder);
+            if(newestFirst)
+            {
+                return new NewestFirstRecentMessageIterator(folder);
+            }
+            else
+            {
+                return new OldestFirstRecentMessageIterator(folder);
+            }
         }
         catch(MessagingException e)
         {
@@ -31,7 +40,7 @@ public class RecentMessageIterable implements Iterable<Message>
         }
     }
 
-    private static class RecentMessageIterator implements Iterator<Message>
+    private static class NewestFirstRecentMessageIterator implements Iterator<Message>
     {
         private final static int MAX_CHUNK = 100;
         private final Folder folder;
@@ -40,7 +49,7 @@ public class RecentMessageIterable implements Iterable<Message>
         private Message[] messages;
         private FetchProfile fp;
 
-        public RecentMessageIterator(Folder folder) throws MessagingException
+        public NewestFirstRecentMessageIterator(Folder folder) throws MessagingException
         {
             this.folder = folder;
             this.messageNumber = this.folder.getMessageCount();
@@ -83,6 +92,71 @@ public class RecentMessageIterable implements Iterable<Message>
         public Message next()
         {
             Message result = messages[arrayIndex++];
+            if(arrayIndex >= messages.length)
+            {
+                _loadChunk();
+            }
+            return result;
+        }
+
+        @Override
+        public void remove()
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+
+    private static class OldestFirstRecentMessageIterator implements Iterator<Message>
+    {
+        private final static int MAX_CHUNK = 100;
+        private final Folder folder;
+        private int messageNumber;
+        private final int messageCount;
+        private Message[] messages;
+        private FetchProfile fp;
+
+        public OldestFirstRecentMessageIterator(Folder folder) throws MessagingException
+        {
+            this.folder = folder;
+            this.messageCount = folder.getMessageCount();
+            this.messageNumber = 0;
+            fp = new FetchProfile();
+            fp.add(FetchProfile.Item.ENVELOPE);
+            _loadChunk();
+        }
+
+        private void _loadChunk()
+        {
+            int chunkSize = Math.min(MAX_CHUNK, messageCount - messageNumber);
+            int[] ids = new int[chunkSize];
+            int filler = messageNumber;
+            for(int i = 0; i < chunkSize; i++)
+            {
+                ids[i] = filler++ + 1;
+            }
+            try
+            {
+                messages = folder.getMessages(ids);
+                folder.fetch(messages, fp);
+            }
+            catch(MessagingException e)
+            {
+                throw  new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return messageNumber < messageCount;
+        }
+
+        @Override
+        public Message next()
+        {
+            int arrayIndex = messageNumber++ % MAX_CHUNK;
+            Message result = messages[arrayIndex];
             if(arrayIndex >= messages.length)
             {
                 _loadChunk();

@@ -9,9 +9,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.mail.Message;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
+import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
 import org.ethelred.mymailtool2.MailToolConfiguration;
+import org.ethelred.mymailtool2.MatchOperation;
+import org.ethelred.mymailtool2.MoveOperation;
+import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -37,8 +45,11 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             "  }\n" +
             "}";
 
+    private ApplyMatchOperationsTask task;
+
     public JavascriptFileConfiguration(File f) throws IOException
     {
+        task = ApplyMatchOperationsTask.create();
         ctx = Context.enter();
         Scriptable scope = ctx.initStandardObjects();
         ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));
@@ -53,6 +64,40 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         {
             config = JSObjectWrapper.wrap(conf);
         }
+
+        @SuppressWarnings("UnusedDeclaration")
+        public MoveBuilder move(String folderName)
+        {
+            return new MoveBuilder(folderName);
+        }
+
+        public SplitBuilder split(String folderName)
+        {
+            return new SplitBuilder(folderName);
+        }
+
+        public Predicate<Message> isFrom(String regex)
+        {
+            return Predicates.alwaysTrue();
+        }
+    }
+
+    public class MoveBuilder extends OperationBuilder
+    {
+        private final String folderName;
+
+        public MoveBuilder(String folderName)
+        {
+            super();
+            this.folderName = folderName;
+        }
+
+        public MoveBuilder to(String destinationName)
+        {
+            task.addRule(folderName, new MatchOperation(this, new MoveOperation(destinationName)), false);
+            return this;
+        }
+
     }
 
     @Override
@@ -91,7 +136,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Task getTask() throws Exception
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return task;
     }
 
     @Override
@@ -118,4 +163,39 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    private class OperationBuilder implements Predicate<Message>
+    {
+        protected Predicate<Message> delegate;
+
+        private OperationBuilder()
+        {
+            this.delegate = Predicates.alwaysTrue();
+        }
+
+        public OperationBuilder ifIt(Predicate<Message> matcher)
+        {
+
+            return and(matcher);
+        }
+
+        private OperationBuilder and(Predicate<Message> matcher)
+        {
+            delegate = Predicates.and(delegate, matcher);
+            return this;
+        }
+
+        public boolean apply(@javax.annotation.Nullable Message message)
+        {
+            return delegate.apply(message);
+        }
+    }
+
+    private class SplitBuilder extends OperationBuilder
+    {
+        public SplitBuilder(String folderName)
+
+        {
+            task.addRule(folderName, new MatchOperation(this, new SplitOperation()), false);
+        }
+    }
 }

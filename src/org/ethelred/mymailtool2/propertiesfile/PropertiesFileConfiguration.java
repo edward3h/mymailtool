@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.ethelred.util.MapWithDefault;
 
@@ -145,6 +146,19 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             {
                 matchers.add(new ToAddressMatcher(true,  _first(test), _rest(test)));
             }
+
+            test = entry.get("subject");
+            if(!Strings.isNullOrEmpty(test) && !"*".equals(test.trim()))
+            {
+                matchers.add(new SubjectMatcher(test));
+            }
+
+            boolean includeSubFolders = false;
+            test = entry.get("includeSubFolders");
+            if("true".equalsIgnoreCase(test))
+            {
+                includeSubFolders = true;
+            }
             
             
             if(!matchers.isEmpty())
@@ -157,7 +171,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             }
             if(sourceFolder != null && matcher != null && operation != null)
             {
-                task.addRule(sourceFolder, new MatchOperation(matcher, operation));
+                task.addRule(sourceFolder, new MatchOperation(matcher, operation), includeSubFolders);
                 System.out.printf("Adding rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
             }
             else
