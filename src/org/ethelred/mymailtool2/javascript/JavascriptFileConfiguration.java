@@ -7,6 +7,7 @@ package org.ethelred.mymailtool2.javascript;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.Message;
@@ -14,6 +15,7 @@ import javax.mail.Message;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.DeleteOperation;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
@@ -23,6 +25,7 @@ import org.ethelred.mymailtool2.MoveOperation;
 import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.SpecificityMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -49,6 +52,8 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             "}";
 
     private ApplyMatchOperationsTask task;
+
+    private List<String> fileLocations = Lists.newArrayList();
 
     public JavascriptFileConfiguration(File f) throws IOException
     {
@@ -107,7 +112,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public MoveBuilder to(String destinationName)
         {
-            task.addRule(folderName, new MatchOperation(this, new MoveOperation(destinationName), /* TODO */ 0), false);
+            task.addRule(folderName, new MatchOperation(this, new MoveOperation(destinationName), -1), false);
             return this;
         }
 
@@ -143,7 +148,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Iterable<String> getFileLocations()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return fileLocations;
     }
 
     @Override
@@ -173,12 +178,13 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public String getTimeLimit()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 
-    private class OperationBuilder implements Predicate<Message>
+    private class OperationBuilder implements Predicate<Message>, SpecificityMatcher
     {
         protected Predicate<Message> delegate;
+        protected int specificity = 0;
 
         private OperationBuilder()
         {
@@ -194,12 +200,19 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         private OperationBuilder and(Predicate<Message> matcher)
         {
             delegate = Predicates.and(delegate, matcher);
+            specificity++;
             return this;
         }
 
         public boolean apply(@javax.annotation.Nullable Message message)
         {
             return delegate.apply(message);
+        }
+
+        @Override
+        public int getSpecificity()
+        {
+            return specificity;
         }
     }
 
@@ -208,7 +221,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public SplitBuilder(String folderName)
 
         {
-            task.addRule(folderName, new MatchOperation(this, new SplitOperation(), /* TODO */ 0), false);
+            task.addRule(folderName, new MatchOperation(this, new SplitOperation(), -1), false);
         }
     }
 
@@ -216,7 +229,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     {
         public DeleteBuilder(String folderName)
         {
-            task.addRule(folderName, new MatchOperation(this, new DeleteOperation(), /* TODO */ 0), false);
+            task.addRule(folderName, new MatchOperation(this, new DeleteOperation(), -1), false);
         }
     }
 }

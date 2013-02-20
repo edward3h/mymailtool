@@ -48,8 +48,9 @@ public class Main implements MailToolContext
     private long timeLimit = -1;
     private volatile boolean shutdown = false;
     private int operationLimit = -1;
+    private volatile MailToolConfiguration defaultConfiguration;
 
-    private void init(String[] args) {
+    @VisibleForTesting public void init(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownHook()));
         CommandLineConfiguration clc = new CommandLineConfiguration();
         CmdLineParser parser = new CmdLineParser(clc);
@@ -65,7 +66,7 @@ public class Main implements MailToolContext
             
             SystemPropertiesConfiguration spc = new SystemPropertiesConfiguration();
             
-            DefaultConfiguration dc = new DefaultConfiguration();
+            MailToolConfiguration dc = getDefaultConfiguration();
             
             CompositeConfiguration temp = new CompositeConfiguration(clc, spc, dc);
             
@@ -86,6 +87,20 @@ public class Main implements MailToolContext
             parser.printUsage(System.err);
             System.exit(1);
         }
+    }
+
+    private synchronized MailToolConfiguration getDefaultConfiguration()
+    {
+        if(defaultConfiguration == null)
+        {
+            defaultConfiguration = new DefaultConfiguration();
+        }
+        return defaultConfiguration;
+    }
+
+    @VisibleForTesting public synchronized void setDefaultConfiguration(MailToolConfiguration configuration)
+    {
+        defaultConfiguration = configuration;
     }
 
     private void validateRequiredConfiguration(MailToolConfiguration configuration) throws CmdLineException
@@ -109,7 +124,7 @@ public class Main implements MailToolContext
         }
     }
 
-    private void run() {
+    @VisibleForTesting public void run() {
         try {
 
             connect();

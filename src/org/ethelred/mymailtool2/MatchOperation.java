@@ -1,6 +1,8 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Predicate;
+import org.ethelred.mymailtool2.matcher.SpecificityMatcher;
+
 import javax.mail.Message;
 
 /**
@@ -33,6 +35,10 @@ public class MatchOperation
 
     public int getSpecificity()
     {
+        if(match instanceof SpecificityMatcher)
+        {
+            return ((SpecificityMatcher) match).getSpecificity();
+        }
         return specificity;
     }
 

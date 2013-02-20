@@ -27,7 +27,7 @@ find $prdsrc -name '*.java' | xargs javac -sourcepath $prdsrc -classpath "$libdi
 find $tstsrc -name '*.java' | xargs javac -sourcepath "$tstsrc" -classpath "$prddir:$libdir/*:$libdir/jmock-2.5.1/*" -d $tstdir
 
 # 2.5. copy test resources
-for f in $(find $tstsrc -name '*.js' -or -name '*.properties' -or -name 'javamail.providers' -printf '%P\n')
+for f in $(find $tstsrc \( -name '*.js' -o -name '*.properties' -o -name 'javamail.providers' \) -printf '%P\n')
 do
 RDIR="${tstdir}/$(dirname $f)"
 echo $RDIR

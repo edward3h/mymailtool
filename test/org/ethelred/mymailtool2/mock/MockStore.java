@@ -1,4 +1,4 @@
-package org.ethelred.mymailtool2;
+package org.ethelred.mymailtool2.mock;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -11,6 +11,10 @@ import javax.mail.URLName;
  */
 public class MockStore extends Store
 {
+    public final static String DEFAULT_FOLDER_NAME = "Inbox";
+
+    private static MockData data = MockData.getInstance();
+
     public MockStore(Session session, URLName urlname)
     {
         super(session, urlname);
@@ -19,18 +23,24 @@ public class MockStore extends Store
     @Override
     public Folder getDefaultFolder() throws MessagingException
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return getFolder(DEFAULT_FOLDER_NAME);
     }
 
     @Override
     public Folder getFolder(String s) throws MessagingException
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new MockFolder(this, data, s);
     }
 
     @Override
     public Folder getFolder(URLName urlName) throws MessagingException
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected boolean protocolConnect(String host, int port, String user, String password) throws MessagingException
+    {
+        return true;
     }
 }

@@ -1,6 +1,8 @@
-package org.ethelred.mymailtool2;
+package org.ethelred.mymailtool2.mock;
 
 import java.util.Properties;
+import javax.mail.Folder;
+import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -16,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class MockTest
 {
     @Test
-    public void testMockStore() throws NoSuchProviderException
+    public void testMockStore() throws MessagingException
     {
         Properties props = new Properties();
         props.setProperty("mail.store.protocol", "imap");
@@ -25,5 +27,8 @@ public class MockTest
         Store store = ss.getStore();
 
         assertEquals("MockStore", store.getClass().getSimpleName());
+
+        Folder f = store.getDefaultFolder();
+        assertEquals("Inbox", f.getName());
     }
 }

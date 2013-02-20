@@ -37,6 +37,10 @@ class MozillaObjectAdapter implements IJSObject
                 StringBuilder nested = new StringBuilder();
                 for(int i = 1; i < parts.length; i++)
                 {
+                    if(i > 1)
+                    {
+                        nested.append(".");
+                    }
                     nested.append(parts[i]);
                 }
                 return MozillaObjectAdapter.wrap((NativeObject) o).get(nested.toString());
