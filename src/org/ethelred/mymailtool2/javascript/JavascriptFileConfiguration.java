@@ -15,12 +15,15 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
+import org.ethelred.mymailtool2.DeleteOperation;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.MatchOperation;
 import org.ethelred.mymailtool2.MoveOperation;
 import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
+import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -76,9 +79,19 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             return new SplitBuilder(folderName);
         }
 
+        public DeleteBuilder deleteFrom(String folderName)
+        {
+            return new DeleteBuilder(folderName);
+        }
+
         public Predicate<Message> isFrom(String regex)
         {
-            return Predicates.alwaysTrue();
+            return new FromAddressMatcher(false, regex);
+        }
+
+        public Predicate<Message> matchesSubject(String regex)
+        {
+            return new SubjectMatcher(regex);
         }
     }
 
@@ -142,7 +155,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public int getOperationLimit()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+            return Integer.parseInt(config.getString("operations"));
     }
 
     @Override
@@ -190,12 +203,20 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         }
     }
 
-    private class SplitBuilder extends OperationBuilder
+    public class SplitBuilder extends OperationBuilder
     {
         public SplitBuilder(String folderName)
 
         {
             task.addRule(folderName, new MatchOperation(this, new SplitOperation(), /* TODO */ 0), false);
+        }
+    }
+
+    public class DeleteBuilder extends OperationBuilder
+    {
+        public DeleteBuilder(String folderName)
+        {
+            task.addRule(folderName, new MatchOperation(this, new DeleteOperation(), /* TODO */ 0), false);
         }
     }
 }

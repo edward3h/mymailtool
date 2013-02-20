@@ -15,6 +15,7 @@
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
       <entry name="?*.js" />
+      <entry name="javamail.providers" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">
