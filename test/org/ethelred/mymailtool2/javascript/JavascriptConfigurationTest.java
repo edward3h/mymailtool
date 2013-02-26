@@ -11,6 +11,7 @@ import org.ethelred.mymailtool2.Task;
 import org.ethelred.mymailtool2.mock.MockData;
 import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -23,6 +24,13 @@ import static org.junit.Assert.assertTrue;
  */
 public class JavascriptConfigurationTest
 {
+    @After
+    public void cleanup()
+    {
+        MockData.clear();
+    }
+
+
     @Test
     public void testLoadJavascript() throws Exception
     {

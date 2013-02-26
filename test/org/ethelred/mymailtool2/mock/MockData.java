@@ -83,6 +83,11 @@ public class MockData
         return false;  //To change body of created methods use File | Settings | File Templates.
     }
 
+    public static void clear()
+    {
+        getInstance().folderMessages.clear();
+    }
+
     private static class SingletonHolder
     {
         public static final MockData INSTANCE = new MockData();
