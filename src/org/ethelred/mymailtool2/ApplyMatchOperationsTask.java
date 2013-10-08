@@ -7,6 +7,7 @@ import com.google.common.collect.Ordering;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -111,12 +112,26 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
+    private List<MatchOperation> _getRules(Deque<String> nestedFolders, boolean includeSubFolders)
+    {
+        for(String folder: nestedFolders)
+        {
+            ApplyKey k = new ApplyKey(folder, includeSubFolders);
+            if(rules.containsKey(k))
+            {
+                return rules.get(k);
+            }
+        }
+        throw new IllegalStateException("No matching rules for " + nestedFolders + " with includeSubFolders = " + includeSubFolders);
+    }
+
+
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException
     {
         // match/operation
         if (context.isOldEnough(m)) {
-            for(MatchOperation mo: rules.get(new ApplyKey(f.getName(), includeSubFolders)))
+            for(MatchOperation mo: _getRules(nestedFolders, includeSubFolders))
             {
                 if(mo.testApply(m, context))
                 {
@@ -128,7 +143,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f)
+    protected void status(Folder f, Deque<String> nestedFolders)
     {
         System.out.printf("Working on folder %s%n", f.getFullName());
     }

@@ -1,8 +1,11 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.collect.Lists;
+
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import java.util.Deque;
 
 /**
  *
@@ -27,13 +30,18 @@ abstract class TaskBase implements Task
             throw new IllegalStateException("Could not open folder " + folderName);
         }
 
-        traverseFolder(f, includeSubFolders);
+        traverseFolder(f, includeSubFolders, null);
     }
 
-    protected void traverseFolder(Folder f, boolean includeSubFolders) throws MessagingException
+    protected void traverseFolder(Folder f, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException
     {
+        if(nestedFolders == null)
+        {
+            nestedFolders = Lists.newLinkedList();
+        }
+        nestedFolders.addFirst(f.getName());
 
-        status(f);
+        status(f, nestedFolders);
 
         if((f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
@@ -43,7 +51,7 @@ abstract class TaskBase implements Task
             {
                 for(Message m: _readMessages(f))
                 {
-                    runMessage(f, m, includeSubFolders);
+                    runMessage(f, m, includeSubFolders, nestedFolders);
                 }
             }
             finally {
@@ -58,19 +66,20 @@ abstract class TaskBase implements Task
         {
             for(Folder child: f.list())
             {
-                traverseFolder(child, includeSubFolders);
+                traverseFolder(child, includeSubFolders, nestedFolders);
             }
         }
+        nestedFolders.removeFirst();
     }
 
-    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException;
+    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException;
 
     protected int openMode()
     {
         return Folder.READ_ONLY;
     }
 
-    protected abstract void status(Folder f);
+    protected abstract void status(Folder f, Deque<String> nestedFolders);
 
     private Iterable<? extends Message> _readMessages(Folder f)
     {
