@@ -1,8 +1,11 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.collect.Lists;
+
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import java.util.Deque;
 
 /**
  *
@@ -27,13 +30,12 @@ abstract class TaskBase implements Task
             throw new IllegalStateException("Could not open folder " + folderName);
         }
 
-        traverseFolder(f, includeSubFolders);
+        traverseFolder(f, includeSubFolders, folderName);
     }
 
-    protected void traverseFolder(Folder f, boolean includeSubFolders) throws MessagingException
+    protected void traverseFolder(Folder f, boolean includeSubFolders, String originalName) throws MessagingException
     {
-
-        status(f);
+        status(f, originalName);
 
         if((f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
@@ -43,7 +45,7 @@ abstract class TaskBase implements Task
             {
                 for(Message m: _readMessages(f))
                 {
-                    runMessage(f, m, includeSubFolders);
+                    runMessage(f, m, includeSubFolders, originalName);
                 }
             }
             finally {
@@ -58,19 +60,19 @@ abstract class TaskBase implements Task
         {
             for(Folder child: f.list())
             {
-                traverseFolder(child, includeSubFolders);
+                traverseFolder(child, includeSubFolders, originalName);
             }
         }
     }
 
-    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException;
+    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException;
 
     protected int openMode()
     {
         return Folder.READ_ONLY;
     }
 
-    protected abstract void status(Folder f);
+    protected abstract void status(Folder f, String originalName);
 
     private Iterable<? extends Message> _readMessages(Folder f)
     {

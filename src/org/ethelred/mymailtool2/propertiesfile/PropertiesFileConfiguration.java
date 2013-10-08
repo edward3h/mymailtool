@@ -267,7 +267,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         }
     }
 
-    private static Pattern ruleMatch = Pattern.compile("(rule\\..*)\\.([a-z]+)");
+    private static Pattern ruleMatch = Pattern.compile("(rule\\..*)\\.([a-zA-Z]+)");
     private void _addMessageRule(String key, String value)
     {
         Matcher m = ruleMatch.matcher(key);

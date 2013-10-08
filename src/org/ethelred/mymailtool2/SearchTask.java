@@ -41,7 +41,7 @@ public class SearchTask extends TaskBase
     }
 
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
         if(matcher.apply(m))
         {
@@ -54,7 +54,7 @@ public class SearchTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f)
+    protected void status(Folder f, String originalName)
     {
         System.err.println("Searching " + f + " with " + matcher);
     }

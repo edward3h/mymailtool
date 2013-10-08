@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 
 /**
@@ -36,4 +37,12 @@ public abstract class StringMatcher implements Predicate<Message>
     }
 
     protected abstract CharSequence getString(Message m) throws MessagingException;
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper(this)
+                .add("stringPattern", stringPattern)
+                .toString();
+    }
 }

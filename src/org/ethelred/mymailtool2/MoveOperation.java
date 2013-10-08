@@ -1,5 +1,7 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Objects;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Flags;
@@ -38,5 +40,12 @@ public class MoveOperation implements MessageOperation
         }
         return false;
     }
-    
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper(this)
+                .add("moveToFolderName", moveToFolderName)
+                .toString();
+    }
 }

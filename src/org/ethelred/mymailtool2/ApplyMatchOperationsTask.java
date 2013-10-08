@@ -7,6 +7,7 @@ import com.google.common.collect.Ordering;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -111,12 +112,23 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
+    private List<MatchOperation> _getRules(String originalName, boolean includeSubFolders)
+    {
+        ApplyKey k = new ApplyKey(originalName, includeSubFolders);
+        if(rules.containsKey(k))
+        {
+            return rules.get(k);
+        }
+        throw new IllegalStateException("No matching rules for " + originalName + " with includeSubFolders = " + includeSubFolders);
+    }
+
+
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders) throws MessagingException
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
         // match/operation
         if (context.isOldEnough(m)) {
-            for(MatchOperation mo: rules.get(new ApplyKey(f.getName(), includeSubFolders)))
+            for(MatchOperation mo: _getRules(originalName, includeSubFolders))
             {
                 if(mo.testApply(m, context))
                 {
@@ -128,7 +140,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f)
+    protected void status(Folder f, String originalName)
     {
         System.out.printf("Working on folder %s%n", f.getFullName());
     }
