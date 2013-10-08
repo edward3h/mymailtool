@@ -94,6 +94,8 @@ public class ApplyMatchOperationsTask extends TaskBase
         {
             try
             {
+                List<MatchOperation> lmo = rules.get(k);
+                Collections.sort(lmo, SPECIFIC_OPS);
                 traverseFolder(k.folderName, k.includeSubFolders);
             }
             catch (MessagingException ex)
@@ -141,7 +143,6 @@ public class ApplyMatchOperationsTask extends TaskBase
             rules.put(key, lmo);
         }
         lmo.add(mo);
-        Collections.sort(lmo, SPECIFIC_OPS);
         
     }
 

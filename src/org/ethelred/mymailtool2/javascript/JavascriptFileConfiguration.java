@@ -7,6 +7,8 @@ package org.ethelred.mymailtool2.javascript;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.Message;
@@ -14,11 +16,13 @@ import javax.mail.Message;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.DeleteOperation;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.MatchOperation;
+import org.ethelred.mymailtool2.MessageOperation;
 import org.ethelred.mymailtool2.MoveOperation;
 import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
@@ -48,11 +52,11 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             "  }\n" +
             "}";
 
-    private ApplyMatchOperationsTask task;
+    private List<String> fileLocations = Lists.newArrayList();
+    private List<OperationBuilder> deferredRules = Lists.newArrayList();
 
     public JavascriptFileConfiguration(File f) throws IOException
     {
-        task = ApplyMatchOperationsTask.create();
         ctx = Context.enter();
         Scriptable scope = ctx.initStandardObjects();
         ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));
@@ -60,15 +64,24 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         ctx.evaluateReader(scope, new FileReader(f), f.getName(), 1, null);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public class Callback
     {
-        @SuppressWarnings("UnusedDeclaration")
         public void config(Object conf)
         {
             config = JSObjectWrapper.wrap(conf);
         }
 
-        @SuppressWarnings("UnusedDeclaration")
+        public void print(Object value)
+        {
+            System.out.println(value);
+        }
+
+        public void include(String fileName)
+        {
+            fileLocations.add(fileName);
+        }
+
         public MoveBuilder move(String folderName)
         {
             return new MoveBuilder(folderName);
@@ -97,17 +110,23 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
     public class MoveBuilder extends OperationBuilder
     {
-        private final String folderName;
+        private String destinationName;
 
         public MoveBuilder(String folderName)
         {
-            super();
+            super(folderName);
             this.folderName = folderName;
+        }
+
+        @Override
+        protected MessageOperation getOperation()
+        {
+            return new MoveOperation(destinationName);
         }
 
         public MoveBuilder to(String destinationName)
         {
-            task.addRule(folderName, new MatchOperation(this, new MoveOperation(destinationName), /* TODO */ 0), false);
+            this.destinationName = destinationName;
             return this;
         }
 
@@ -143,12 +162,17 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Iterable<String> getFileLocations()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return fileLocations;
     }
 
     @Override
     public Task getTask() throws Exception
     {
+        ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
+        for(OperationBuilder builder: deferredRules)
+        {
+            builder.addToTask(task);
+        }
         return task;
     }
 
@@ -167,22 +191,27 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Collections.emptyList();
     }
 
     @Override
     public String getTimeLimit()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return config.getString("runtime.limit");
     }
 
-    private class OperationBuilder implements Predicate<Message>
+    private abstract class OperationBuilder implements Predicate<Message>
     {
         protected Predicate<Message> delegate;
+        protected int specificity = 0;
+        protected String folderName;
+        protected boolean includeSubFolders = false;
 
-        private OperationBuilder()
+        private OperationBuilder(String folderName)
         {
             this.delegate = Predicates.alwaysTrue();
+            this.folderName = folderName;
+            deferredRules.add(this);
         }
 
         public OperationBuilder ifIt(Predicate<Message> matcher)
@@ -191,16 +220,31 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             return and(matcher);
         }
 
-        private OperationBuilder and(Predicate<Message> matcher)
+        public OperationBuilder and(Predicate<Message> matcher)
         {
             delegate = Predicates.and(delegate, matcher);
+            specificity++;
             return this;
         }
 
+        public OperationBuilder includeSubFolders()
+        {
+            includeSubFolders = true;
+            return this;
+        }
+
+        @Override
         public boolean apply(@javax.annotation.Nullable Message message)
         {
             return delegate.apply(message);
         }
+
+        public void addToTask(ApplyMatchOperationsTask task)
+        {
+            task.addRule(folderName, new MatchOperation(this, getOperation(), specificity), includeSubFolders);
+        }
+
+        protected abstract MessageOperation getOperation();
     }
 
     public class SplitBuilder extends OperationBuilder
@@ -208,15 +252,28 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public SplitBuilder(String folderName)
 
         {
-            task.addRule(folderName, new MatchOperation(this, new SplitOperation(), /* TODO */ 0), false);
+            super(folderName);
         }
+
+        @Override
+        protected MessageOperation getOperation()
+        {
+            return new SplitOperation();
+        }
+
     }
 
     public class DeleteBuilder extends OperationBuilder
     {
         public DeleteBuilder(String folderName)
         {
-            task.addRule(folderName, new MatchOperation(this, new DeleteOperation(), /* TODO */ 0), false);
+            super(folderName);
+        }
+
+        @Override
+        protected MessageOperation getOperation()
+        {
+            return new DeleteOperation();
         }
     }
 }
