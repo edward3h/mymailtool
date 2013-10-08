@@ -112,26 +112,23 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
-    private List<MatchOperation> _getRules(Deque<String> nestedFolders, boolean includeSubFolders)
+    private List<MatchOperation> _getRules(String originalName, boolean includeSubFolders)
     {
-        for(String folder: nestedFolders)
+        ApplyKey k = new ApplyKey(originalName, includeSubFolders);
+        if(rules.containsKey(k))
         {
-            ApplyKey k = new ApplyKey(folder, includeSubFolders);
-            if(rules.containsKey(k))
-            {
-                return rules.get(k);
-            }
+            return rules.get(k);
         }
-        throw new IllegalStateException("No matching rules for " + nestedFolders + " with includeSubFolders = " + includeSubFolders);
+        throw new IllegalStateException("No matching rules for " + originalName + " with includeSubFolders = " + includeSubFolders);
     }
 
 
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
         // match/operation
         if (context.isOldEnough(m)) {
-            for(MatchOperation mo: _getRules(nestedFolders, includeSubFolders))
+            for(MatchOperation mo: _getRules(originalName, includeSubFolders))
             {
                 if(mo.testApply(m, context))
                 {
@@ -143,7 +140,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f, Deque<String> nestedFolders)
+    protected void status(Folder f, String originalName)
     {
         System.out.printf("Working on folder %s%n", f.getFullName());
     }

@@ -8,8 +8,6 @@ import javax.mail.MessagingException;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
-import java.util.Deque;
-
 /**
  * search in a folder and sub-folders
  */
@@ -43,7 +41,7 @@ public class SearchTask extends TaskBase
     }
 
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException
+    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
         if(matcher.apply(m))
         {
@@ -56,7 +54,7 @@ public class SearchTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f, Deque<String> nestedFolders)
+    protected void status(Folder f, String originalName)
     {
         System.err.println("Searching " + f + " with " + matcher);
     }

@@ -30,18 +30,12 @@ abstract class TaskBase implements Task
             throw new IllegalStateException("Could not open folder " + folderName);
         }
 
-        traverseFolder(f, includeSubFolders, null);
+        traverseFolder(f, includeSubFolders, folderName);
     }
 
-    protected void traverseFolder(Folder f, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException
+    protected void traverseFolder(Folder f, boolean includeSubFolders, String originalName) throws MessagingException
     {
-        if(nestedFolders == null)
-        {
-            nestedFolders = Lists.newLinkedList();
-        }
-        nestedFolders.addFirst(f.getName());
-
-        status(f, nestedFolders);
+        status(f, originalName);
 
         if((f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
@@ -51,7 +45,7 @@ abstract class TaskBase implements Task
             {
                 for(Message m: _readMessages(f))
                 {
-                    runMessage(f, m, includeSubFolders, nestedFolders);
+                    runMessage(f, m, includeSubFolders, originalName);
                 }
             }
             finally {
@@ -66,20 +60,19 @@ abstract class TaskBase implements Task
         {
             for(Folder child: f.list())
             {
-                traverseFolder(child, includeSubFolders, nestedFolders);
+                traverseFolder(child, includeSubFolders, originalName);
             }
         }
-        nestedFolders.removeFirst();
     }
 
-    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, Deque<String> nestedFolders) throws MessagingException;
+    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException;
 
     protected int openMode()
     {
         return Folder.READ_ONLY;
     }
 
-    protected abstract void status(Folder f, Deque<String> nestedFolders);
+    protected abstract void status(Folder f, String originalName);
 
     private Iterable<? extends Message> _readMessages(Folder f)
     {
