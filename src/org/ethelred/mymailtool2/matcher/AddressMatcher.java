@@ -19,10 +19,12 @@ import javax.mail.MessagingException;
 abstract class AddressMatcher implements Predicate<Message>
 {
 
+    private final boolean bLiteral;
     private final Iterable<Pattern> addressPatterns;
 
     protected AddressMatcher(boolean bLiteral, String patternSpec, String... morePatterns)
     {
+        this.bLiteral = bLiteral;
         int nFlags = Pattern.CASE_INSENSITIVE;
         if(bLiteral)
         {
@@ -48,7 +50,7 @@ abstract class AddressMatcher implements Predicate<Message>
                 for(Pattern addressPattern: addressPatterns)
                 {
                     Matcher m = addressPattern.matcher(a.toString());
-                    if (m.matches())
+                    if ((bLiteral && m.find()) || (!bLiteral && m.matches()))
                     {
                         return true;
                     }
