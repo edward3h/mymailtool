@@ -66,7 +66,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
     private void taskListFolders(boolean fake) throws CmdLineException
     {
-        throw new CmdLineException("Task List Folders is not supported yet");
+        task = ListFoldersTask.create();
     }
 
     @Option(name = "--fromCount", usage = "Count occurrences of from addresses", aliases = {"-f"})

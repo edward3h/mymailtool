@@ -1,11 +1,8 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.collect.Lists;
-
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import java.util.Deque;
 
 /**
  *
@@ -43,7 +40,7 @@ abstract class TaskBase implements Task
 
             try
             {
-                for(Message m: _readMessages(f))
+                for(Message m: readMessages(f))
                 {
                     runMessage(f, m, includeSubFolders, originalName);
                 }
@@ -74,7 +71,7 @@ abstract class TaskBase implements Task
 
     protected abstract void status(Folder f, String originalName);
 
-    private Iterable<? extends Message> _readMessages(Folder f)
+    protected Iterable<? extends Message> readMessages(Folder f)
     {
         return new RecentMessageIterable(f, orderNewestFirst());
     }

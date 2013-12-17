@@ -15,6 +15,8 @@ interface MailToolContext
 
     public Folder getFolder(String folderName);
 
+    public Folder getDefaultFolder();
+
     public boolean isOldEnough(Message m) throws MessagingException;
     
 }

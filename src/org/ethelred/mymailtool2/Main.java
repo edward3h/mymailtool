@@ -310,7 +310,21 @@ public class Main implements MailToolContext
         }
         return null;
     }
-    
+
+    @Override
+    public Folder getDefaultFolder()
+    {
+        try
+        {
+            return store.getDefaultFolder();
+        }
+        catch (MessagingException e)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return null;
+    }
+
     /**
      * @param args the command line arguments
      */
