@@ -16,6 +16,11 @@ public class ListFoldersTask extends TaskBase
         // don't do anything
     }
 
+    /**
+     * overridden to avoid reading messages
+     * @param f
+     * @return
+     */
     @Override
     protected Iterable<? extends Message> readMessages(Folder f)
     {

@@ -135,7 +135,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public String getPassword()
     {
-        return config.getString("mymailtool.password");
+        return config.getString("password");
     }
 
     @Override

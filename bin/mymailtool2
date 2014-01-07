@@ -4,8 +4,8 @@ abspath="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
 
 myroot=$(dirname $abspath)/..
 libdir=$myroot/dist/lib
-CLASSPATH=$libdir/args4j-2.0.8.jar:$libdir/guava-11.0.1.jar:$libdir/joda-time-2.1.jar:$libdir/javax.mail.jar:$myroot/dist/Mailtool.jar
+CLASSPATH=$libdir/args4j-2.0.8.jar:$libdir/js.jar:$libdir/guava-11.0.1.jar:$libdir/joda-time-2.1.jar:$libdir/javax.mail.jar:$myroot/dist/Mailtool.jar
 
 export CLASSPATH
-
+echo $CLASSPATH
 java org.ethelred.mymailtool2.Main $*

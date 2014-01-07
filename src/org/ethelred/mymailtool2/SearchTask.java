@@ -4,6 +4,7 @@ import javax.mail.Address;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -62,14 +63,27 @@ public class SearchTask extends TaskBase
     private void _printMatch(Folder f, Message m) throws MessagingException
     {
         Address[] fromA = m.getFrom();
-        String from = fromA.length > 0 ? fromA[0].toString() : "[unknown]";
         System.out.printf(
-            "%n MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n%n",
+            "MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
                 f.getFullName(),
                 m.getSentDate(),
-                from,
+                _printAddress(fromA),
                 m.getSubject()
         );
+    }
+
+    private String _printAddress(Address[] from)
+    {
+        if(from == null || from.length < 1)
+        {
+            return "[unknown]";
+        }
+        Address f = from[0];
+        if(f instanceof InternetAddress)
+        {
+            return ((InternetAddress) f).toUnicodeString();
+        }
+        return f.toString();
     }
 
     private void _debugPrintNoMatch(Folder f, Message m) throws MessagingException
