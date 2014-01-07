@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
@@ -99,7 +100,7 @@ public class ApplyMatchOperationsTask extends TaskBase
                 Collections.sort(lmo, SPECIFIC_OPS);
                 traverseFolder(k.folderName, k.includeSubFolders);
             }
-            catch (MessagingException ex)
+            catch (MessagingException | IOException ex)
             {
                 Logger.getLogger(ApplyMatchOperationsTask.class.getName()).log(Level.SEVERE, null, ex);
             }

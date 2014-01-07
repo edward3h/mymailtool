@@ -3,6 +3,7 @@ package org.ethelred.mymailtool2;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import java.io.IOException;
 
 /**
  *
@@ -19,7 +20,7 @@ abstract class TaskBase implements Task
     }
 
 
-    protected void traverseFolder(String folderName, boolean includeSubFolders) throws MessagingException
+    protected void traverseFolder(String folderName, boolean includeSubFolders) throws MessagingException, IOException
     {
         Folder f = context.getFolder(folderName);
         if(f == null || !f.exists())
@@ -30,7 +31,7 @@ abstract class TaskBase implements Task
         traverseFolder(f, includeSubFolders, folderName);
     }
 
-    protected void traverseFolder(Folder f, boolean includeSubFolders, String originalName) throws MessagingException
+    protected void traverseFolder(Folder f, boolean includeSubFolders, String originalName) throws MessagingException, IOException
     {
         status(f, originalName);
 
@@ -62,7 +63,7 @@ abstract class TaskBase implements Task
         }
     }
 
-    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException;
+    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException, IOException;
 
     protected int openMode()
     {

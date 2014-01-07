@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.kohsuke.args4j.CmdLineException;
@@ -107,6 +108,24 @@ class CommandLineConfiguration implements MailToolConfiguration
         if(task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(new FromAddressMatcher(false, searchSpec));
+        }
+    }
+
+    @Option(name = "--attach", usage = "Search messages which have an attachment with filename matching this pattern")
+    private void searchAttachment(String pattern)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(new HasAttachmentMatcher(pattern));
+        }
+    }
+
+    @Option(name = "--non-recursive", usage = "Search defaults to reading sub-folders - this stops it")
+    private void searchNonRecursive(boolean set)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).setRecursive(false);
         }
     }
 

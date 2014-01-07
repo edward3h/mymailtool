@@ -3,6 +3,7 @@ package org.ethelred.mymailtool2;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -41,7 +42,7 @@ public class ListFoldersTask extends TaskBase
         {
             traverseFolder(root, true, "");
         }
-        catch (MessagingException e)
+        catch (MessagingException | IOException e)
         {
             e.printStackTrace();
         }
