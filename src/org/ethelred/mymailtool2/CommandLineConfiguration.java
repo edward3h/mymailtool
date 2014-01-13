@@ -3,14 +3,19 @@ package org.ethelred.mymailtool2;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
+import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
+
+import javax.mail.Message;
 
 /**
  *
@@ -40,6 +45,8 @@ class CommandLineConfiguration implements MailToolConfiguration
     private List<FileConfigurationHandler> fileHandlers = Lists.newArrayList();
     
     private Task task;
+
+    private boolean invertNextMatcher;
 
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
@@ -93,12 +100,31 @@ class CommandLineConfiguration implements MailToolConfiguration
         task = SearchTask.create(folderName);
     }
 
+    @Option(name = "--not", usage = "Invert the next matcher")
+    private void setInvertNextMatcher(boolean set)
+    {
+        invertNextMatcher = true;
+    }
+
     @Option(name = "--to", usage = "Search messages matching To address")
     private void searchTo(String searchSpec)
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new ToAddressMatcher(false, searchSpec));
+            ((SearchTask) task).addMatcher(nextMatcher(new ToAddressMatcher(false, searchSpec)));
+        }
+    }
+
+    private Predicate<Message> nextMatcher(Predicate<Message> matcher)
+    {
+        if(invertNextMatcher)
+        {
+            invertNextMatcher = false;
+            return Predicates.not(matcher);
+        }
+        else
+        {
+            return matcher;
         }
     }
 
@@ -107,7 +133,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new FromAddressMatcher(false, searchSpec));
+            ((SearchTask) task).addMatcher(nextMatcher(new FromAddressMatcher(false, searchSpec)));
         }
     }
 
@@ -116,7 +142,16 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new HasAttachmentMatcher(pattern));
+            ((SearchTask) task).addMatcher(nextMatcher(new HasAttachmentMatcher(pattern)));
+        }
+    }
+
+    @Option(name = "--flag", usage = "Search messages which have a flag with this name")
+    private void searchFlag(String pattern)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new HasFlagMatcher(pattern)));
         }
     }
 
@@ -134,7 +169,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new SubjectMatcher(searchSpec));
+            ((SearchTask) task).addMatcher(nextMatcher(new SubjectMatcher(searchSpec)));
         }
     }
 

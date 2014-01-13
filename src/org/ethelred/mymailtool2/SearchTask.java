@@ -2,6 +2,7 @@ package org.ethelred.mymailtool2;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
+import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -74,12 +75,13 @@ public class SearchTask extends TaskBase
     {
         Address[] fromA = m.getFrom();
         System.out.printf(
-            "MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
+                "MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
                 f.getFullName(),
                 m.getSentDate(),
                 _printAddress(fromA),
                 m.getSubject()
         );
+        _printFlags(m);
         if(printAttach)
         {
             Multipart mm = (Multipart) m.getContent();
@@ -92,6 +94,23 @@ public class SearchTask extends TaskBase
                 }
             }
         }
+    }
+
+    private void _printFlags(Message m) throws MessagingException
+    {
+        System.out.print(Strings.repeat(" ", 27));
+        Flags ff = m.getFlags();
+        for(Flags.Flag f: ff.getSystemFlags())
+        {
+            System.out.print(f);
+            System.out.print(" ");
+        }
+        for(String f: ff.getUserFlags())
+        {
+            System.out.print(f);
+            System.out.print(" ");
+        }
+        System.out.println();
     }
 
     private String _printAddress(Address[] from)
