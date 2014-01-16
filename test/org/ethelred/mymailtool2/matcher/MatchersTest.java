@@ -24,11 +24,14 @@ public class MatchersTest
 
     Message msg;
     Message msg2;
+    Message msg3;
+
     @Before
     public void setup()
     {
         msg = context.mock(Message.class);
         msg2 = context.mock(Message.class, "Message2");
+        msg3 = context.mock(Message.class, "Message3");
     }
 
     @Test
@@ -36,18 +39,21 @@ public class MatchersTest
     {
         final Address[] add1 = mockAddresses("edward@foobar.com");
         final Address[] add2 = mockAddresses();
+        final Address[] add3 = null;
 
         try
         {
             context.checking(new Expectations(){{
                 oneOf(msg).getAllRecipients(); will(returnValue(add1));
                 oneOf(msg2).getAllRecipients(); will(returnValue(add2));
+                oneOf(msg3).getAllRecipients(); will(returnValue(add3));
             }});
 
             Predicate<Message> matcher = new ToAddressMatcher(true, "edward@foobar.com");
             assertTrue(matcher.apply(msg));
 
             assertFalse(matcher.apply(msg2));
+            assertFalse(matcher.apply(msg3));
             context.assertIsSatisfied();
         }
         catch(MessagingException e)

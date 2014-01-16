@@ -20,14 +20,19 @@ import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.DeleteOperation;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
+import org.ethelred.mymailtool2.FlagOperation;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.MatchOperation;
 import org.ethelred.mymailtool2.MessageOperation;
 import org.ethelred.mymailtool2.MoveOperation;
 import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
+import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
+import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -97,15 +102,65 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             return new DeleteBuilder(folderName);
         }
 
-        public Predicate<Message> isFrom(String regex)
+        public FlagBuilder addFlag(String flagname)
         {
-            return new FromAddressMatcher(false, regex);
+            return new FlagBuilder(true, flagname);
+        }
+
+        public Predicate<Message> isFrom(String... regex)
+        {
+            return new FromAddressMatcher(false, _first(regex), _rest(regex));
         }
 
         public Predicate<Message> matchesSubject(String regex)
         {
             return new SubjectMatcher(regex);
         }
+
+        public Predicate<Message> isTo(String... regex)
+        {
+            return new ToAddressMatcher(false, _first(regex), _rest(regex));
+        }
+
+        public Predicate<Message> hasAttachment(String regex)
+        {
+            return new HasAttachmentMatcher(regex);
+        }
+
+        public Predicate<Message> hasFlag(String flag)
+        {
+            return new HasFlagMatcher(flag);
+        }
+
+        public Predicate<Message> isOlderThan(String age)
+        {
+            return new AgeMatcher(age, true);
+        }
+
+        public Predicate<Message> isNewerThan(String age)
+        {
+            return new AgeMatcher(age, false);
+        }
+    }
+
+    private String[] _rest(String[] strings)
+    {
+        if(strings.length > 1)
+        {
+            String[] result = new String[strings.length - 1];
+            System.arraycopy(strings, 1, result, 0, strings.length - 1);
+            return result;
+        }
+        return new String[0];
+    }
+
+    private String _first(String[] strings)
+    {
+        if(strings.length > 0)
+        {
+            return strings[0];
+        }
+        return null;
     }
 
     public class MoveBuilder extends OperationBuilder
@@ -135,7 +190,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public String getPassword()
     {
-        return config.getString("mymailtool.password");
+        return config.getString("password");
     }
 
     @Override
@@ -168,12 +223,13 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Task getTask() throws Exception
     {
+        System.out.println("getTask " + deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         for(OperationBuilder builder: deferredRules)
         {
             builder.addToTask(task);
         }
-        return task;
+        return task.hasRules() ? task : null;
     }
 
     @Override
@@ -203,6 +259,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     private abstract class OperationBuilder implements Predicate<Message>
     {
         protected Predicate<Message> delegate;
+        protected List<Predicate<Message>> predicates = Lists.newArrayList();
         protected int specificity = 0;
         protected String folderName;
         protected boolean includeSubFolders = false;
@@ -223,6 +280,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public OperationBuilder and(Predicate<Message> matcher)
         {
             delegate = Predicates.and(delegate, matcher);
+            predicates.add(matcher);
             specificity++;
             return this;
         }
@@ -241,7 +299,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public void addToTask(ApplyMatchOperationsTask task)
         {
-            task.addRule(folderName, new MatchOperation(this, getOperation(), specificity), includeSubFolders);
+            task.addRule(folderName, this, predicates, getOperation(), includeSubFolders);
         }
 
         protected abstract MessageOperation getOperation();
@@ -274,6 +332,31 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         protected MessageOperation getOperation()
         {
             return new DeleteOperation();
+        }
+    }
+
+    public class FlagBuilder extends OperationBuilder
+    {
+        private String userFlag;
+        private boolean add;
+
+        public FlagBuilder(boolean add, String flagname)
+        {
+            super("");
+            this.add = add;
+            this.userFlag = flagname;
+        }
+
+        public FlagBuilder inFolder(String folderName)
+        {
+            this.folderName = folderName;
+            return this;
+        }
+
+        @Override
+        protected MessageOperation getOperation()
+        {
+            return new FlagOperation(add, userFlag);
         }
     }
 }

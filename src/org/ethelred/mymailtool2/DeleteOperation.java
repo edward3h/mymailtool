@@ -28,5 +28,11 @@ public class DeleteOperation implements MessageOperation
         }
         return false;
     }
-    
+
+    @Override
+    public boolean finishApplying()
+    {
+        return true;
+    }
+
 }

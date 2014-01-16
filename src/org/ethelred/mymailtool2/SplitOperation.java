@@ -41,6 +41,12 @@ public class SplitOperation implements MessageOperation
         return false;
     }
 
+    @Override
+    public boolean finishApplying()
+    {
+        return true;
+    }
+
     private String getSubFolderName(Folder folder, LocalDate received) throws MessagingException
     {
         char sep = folder.getSeparator();

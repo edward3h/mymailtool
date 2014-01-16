@@ -18,6 +18,7 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 import com.google.common.collect.Sets;
+import org.ethelred.util.ClockFactory;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
@@ -30,24 +31,13 @@ import org.kohsuke.args4j.CmdLineParser;
  *
  * @author edward
  */
-public class Main implements MailToolContext
+public class Main
 {   
 
     @VisibleForTesting
     MailToolConfiguration config;
 
-    private Store store;
-    
-    private int opCount = 0;
-    
-    protected Map<String, Folder> folderCache;
-    
-    protected static final ReadablePeriod DEFAULT_MIN_AGE = Days.days(30);
-    private DateTime ageCompare;
-    private long startTime;
-    private long timeLimit = -1;
-    private volatile boolean shutdown = false;
-    private int operationLimit = -1;
+    private MailToolContext context;
     private volatile MailToolConfiguration defaultConfiguration;
 
     @VisibleForTesting public void init(String[] args) {
@@ -127,10 +117,12 @@ public class Main implements MailToolContext
     @VisibleForTesting public void run() {
         try {
 
-            connect();
-            
+            context = new DefaultContext(config);
+            context.connect();
+
+            System.out.println("About to get task from config " + config);
             Task t = config.getTask();
-            t.init(this);
+            t.init(context);
             t.run();
         }
         catch(OperationLimitException e)
@@ -142,175 +134,11 @@ public class Main implements MailToolContext
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
             
         } finally {
-            disconnect();
-        }
-
-    }
-       
-    private synchronized void connect() {
-        try {
-            Session session = Session.getDefaultInstance(mapAsProperties(config.getMailProperties()), new MyAuthenticator());
-            store = session.getStore();
-            store.connect();
-
-            startTime = System.currentTimeMillis();
-            
-            folderCache = Maps.newHashMap();
-            System.out.printf("Connected to %s%n", config.getMailProperties().get(MailToolConfiguration.HOST));
-
-        /*} catch (NoSuchProviderException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);*/
-        } catch (MessagingException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-
-        }
-    }
-           
-           
-    private synchronized void disconnect() {
-        if (store != null) {
-            try {
-                store.close();
-                store = null;
-                System.out.printf("Disconnected%n");
-            } catch (MessagingException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    private Properties mapAsProperties(Map<String, String> mailProperties)
-    {
-        Properties p = new Properties();
-        for(Map.Entry<String, String> e: mailProperties.entrySet())
-        {
-            System.out.printf("Mail property: %s => %s%n", e.getKey(), e.getValue());
-            p.setProperty(e.getKey(), e.getValue());
-        }
-        return p;
-    }
-
-    @Override
-    public void countOperation()
-    {
-        if(++opCount > getOperationLimit())
-        {
-            throw new OperationLimitException();
-        }
-
-        if(getTimeLimit() > 0 && startTime > 0 && (System.currentTimeMillis() - startTime) > getTimeLimit())
-        {
-            throw new OperationLimitException();
-        }
-
-        if(shutdown)
-        {
-            throw new RuntimeException("Shutdown");
+            context.disconnect();
         }
 
     }
 
-    private int getOperationLimit()
-    {
-        if(operationLimit > -1)
-        {
-            return operationLimit;
-        }
-
-        System.out.printf("getOperationLimit%n");
-        int result = config.getOperationLimit();
-        System.out.printf("Operation limit %s%n", result);
-        operationLimit = result;
-        return operationLimit;
-    }
-
-    private long getTimeLimit()
-    {
-        if(timeLimit > -1)
-        {
-            return timeLimit;
-        }
-        String timeLimitSpec = config.getTimeLimit();
-        long newTimeLimit = 0;
-        if(!(Strings.isNullOrEmpty(timeLimitSpec)))
-        {
-            Period p = PeriodFormat.getDefault().parsePeriod(timeLimitSpec);
-            newTimeLimit = p.toStandardDuration().getMillis();
-        }
-        System.out.printf("Time limit %sms%n", newTimeLimit);
-        timeLimit = newTimeLimit;
-        return timeLimit;
-    }
-
-    @Override
-    public boolean isOldEnough(Message m) throws MessagingException {
-        DateTime received = new DateTime(m.getReceivedDate());
-        return received.isBefore(getAgeCompare());
-    }
-
-    @VisibleForTesting
-    DateTime getAgeCompare()
-    {
-        if(ageCompare != null)
-        {
-            return ageCompare;
-        }
-        
-        try {
-            Period p = PeriodFormat.getDefault().parsePeriod(config.getMinAge());
-            ageCompare = new DateTime().minus(p);
-        } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            ageCompare = new DateTime().minus(DEFAULT_MIN_AGE);
-        }
-        
-        return ageCompare;
-    }
-
-    private class MyAuthenticator extends Authenticator {
-
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-            String password = config.getPassword();
-            if (password == null) {
-                password = readPassword();
-            }
-            return new PasswordAuthentication(config.getUser(), password);
-        }
-
-        private String readPassword() {
-            Console cons;
-            if ((cons = System.console()) != null) {
-                return new String(cons.readPassword("Please enter your password for %s at %s%n", config.getUser(), this.getRequestingSite()));
-            }
-            return null;
-        }
-    }
-    
-    @Override
-    public Folder getFolder(String folderName) {
-        try {
-            Folder result;
-            //try cache
-            result = folderCache.get(folderName);
-            if (result != null) {
-                return result;
-            }
-            //now store
-            result = store.getFolder(folderName);
-            if (result != null) {
-                if (!result.exists()) {
-                    result.create(Folder.HOLDS_FOLDERS | Folder.HOLDS_MESSAGES);
-                }
-                folderCache.put(folderName, result);
-                return result;
-            }
-        } catch (MessagingException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    
     /**
      * @param args the command line arguments
      */
@@ -328,8 +156,11 @@ public class Main implements MailToolContext
         @Override
         public void run()
         {
-            disconnect();
-            shutdown = true;
+            if(context != null)
+            {
+                context.disconnect();
+                context.shutdown();
+            }
         }
     }
 }

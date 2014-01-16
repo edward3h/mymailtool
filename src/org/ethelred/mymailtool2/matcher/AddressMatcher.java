@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2.matcher;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -8,6 +9,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.CheckForNull;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -45,6 +47,10 @@ abstract class AddressMatcher implements Predicate<Message>
         try
         {
             Address[] addresses = getAddresses(t);
+            if(addresses == null)
+            {
+                return false;
+            }
             for (Address a : addresses)
             {
                 for(Pattern addressPattern: addressPatterns)
@@ -64,13 +70,13 @@ abstract class AddressMatcher implements Predicate<Message>
         }
     }
 
-    protected abstract Address[] getAddresses(Message t) throws MessagingException;
+    protected abstract @CheckForNull Address[] getAddresses(Message t) throws MessagingException;
 
     @Override
     public String toString()
     {
         return Objects.toStringHelper(this)
-                .add("addressPatterns", addressPatterns)
+                .add("addressPatterns", Joiner.on("|").join(addressPatterns))
                 .toString();
     }
 }

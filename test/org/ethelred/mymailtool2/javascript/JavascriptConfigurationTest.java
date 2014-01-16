@@ -89,4 +89,33 @@ public class JavascriptConfigurationTest
         assertEquals(1, data.folderSize("test"));
         assertEquals(1, data.folderSize("repeated"));
     }
+
+
+
+    @Test
+    public void testOverloaded() throws Exception
+    {
+        MockDefaultConfiguration conf = new MockDefaultConfiguration();
+        conf.addFileHandler(new JavascriptFileConfigurationHandler());
+        conf.addFile(this.getClass().getResource("overloaded.js").getFile());
+
+        MockData data = MockData.getInstance();
+        data.addFolder("Inbox");
+        data.addFolder("archive");
+        data.addFolder("test");
+
+        data.addMessage("Inbox", MockMessage.create("2012-01-01", "from1@example.com", "Hello world"));
+        data.addMessage("Inbox", MockMessage.create("2012-01-01", "banana@fruit.com", "Hello subject1 world"));
+        data.addMessage("Inbox", MockMessage.create("2012-01-01", "cheddar@cheese.com", "Hello subject2 world"));
+
+        assertEquals(3, data.folderSize("Inbox"));
+
+        Main main = new Main();
+        main.setDefaultConfiguration(conf);
+        main.init(new String[]{});
+        main.run();
+
+
+        assertEquals(1, data.folderSize("Inbox"));
+    }
 }

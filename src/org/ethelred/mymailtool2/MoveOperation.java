@@ -42,6 +42,12 @@ public class MoveOperation implements MessageOperation
     }
 
     @Override
+    public boolean finishApplying()
+    {
+        return true;
+    }
+
+    @Override
     public String toString()
     {
         return Objects.toStringHelper(this)

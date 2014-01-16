@@ -3,13 +3,20 @@ package org.ethelred.mymailtool2;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
+import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
+
+import javax.mail.Message;
 
 /**
  *
@@ -40,6 +47,8 @@ class CommandLineConfiguration implements MailToolConfiguration
     
     private Task task;
 
+    private boolean invertNextMatcher;
+
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
@@ -66,7 +75,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
     private void taskListFolders(boolean fake) throws CmdLineException
     {
-        throw new CmdLineException("Task List Folders is not supported yet");
+        task = ListFoldersTask.create();
     }
 
     @Option(name = "--fromCount", usage = "Count occurrences of from addresses", aliases = {"-f"})
@@ -92,12 +101,31 @@ class CommandLineConfiguration implements MailToolConfiguration
         task = SearchTask.create(folderName);
     }
 
+    @Option(name = "--not", usage = "Invert the next matcher")
+    private void setInvertNextMatcher(boolean set)
+    {
+        invertNextMatcher = true;
+    }
+
     @Option(name = "--to", usage = "Search messages matching To address")
     private void searchTo(String searchSpec)
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new ToAddressMatcher(false, searchSpec));
+            ((SearchTask) task).addMatcher(nextMatcher(new ToAddressMatcher(false, searchSpec)));
+        }
+    }
+
+    private Predicate<Message> nextMatcher(Predicate<Message> matcher)
+    {
+        if(invertNextMatcher)
+        {
+            invertNextMatcher = false;
+            return Predicates.not(matcher);
+        }
+        else
+        {
+            return matcher;
         }
     }
 
@@ -106,7 +134,34 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new FromAddressMatcher(false, searchSpec));
+            ((SearchTask) task).addMatcher(nextMatcher(new FromAddressMatcher(false, searchSpec)));
+        }
+    }
+
+    @Option(name = "--attach", usage = "Search messages which have an attachment with filename matching this pattern")
+    private void searchAttachment(String pattern)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new HasAttachmentMatcher(pattern)));
+        }
+    }
+
+    @Option(name = "--flag", usage = "Search messages which have a flag with this name")
+    private void searchFlag(String pattern)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new HasFlagMatcher(pattern)));
+        }
+    }
+
+    @Option(name = "--non-recursive", usage = "Search defaults to reading sub-folders - this stops it")
+    private void searchNonRecursive(boolean set)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).setRecursive(false);
         }
     }
 
@@ -115,7 +170,25 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(new SubjectMatcher(searchSpec));
+            ((SearchTask) task).addMatcher(nextMatcher(new SubjectMatcher(searchSpec)));
+        }
+    }
+
+    @Option(name = "--newer", usage = "Search messages newer than age")
+    private void searchNewer(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, false)));
+        }
+    }
+
+    @Option(name = "--older", usage = "Search messages older than age")
+    private void searchOlder(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, true)));
         }
     }
 

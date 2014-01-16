@@ -26,8 +26,9 @@ public class MatchOperation
     {
         if(match.apply(m) && operation.apply(ctx, m))
         {
+            System.out.printf("Matched %s and applied %s to message %s%n", match, operation, m);
             ctx.countOperation();
-            return true;
+            return operation.finishApplying();
         }
         return false;
     }
