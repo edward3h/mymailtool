@@ -26,8 +26,12 @@ import org.ethelred.mymailtool2.MessageOperation;
 import org.ethelred.mymailtool2.MoveOperation;
 import org.ethelred.mymailtool2.SplitOperation;
 import org.ethelred.mymailtool2.Task;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
+import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
+import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
+import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -105,6 +109,31 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public Predicate<Message> matchesSubject(String regex)
         {
             return new SubjectMatcher(regex);
+        }
+
+        public Predicate<Message> isTo(String regex)
+        {
+            return new ToAddressMatcher(false, regex);
+        }
+
+        public Predicate<Message> hasAttachment(String regex)
+        {
+            return new HasAttachmentMatcher(regex);
+        }
+
+        public Predicate<Message> hasFlag(String flag)
+        {
+            return new HasFlagMatcher(flag);
+        }
+
+        public Predicate<Message> isOlderThan(String age)
+        {
+            return new AgeMatcher(age, true);
+        }
+
+        public Predicate<Message> isNewerThan(String age)
+        {
+            return new AgeMatcher(age, false);
         }
     }
 

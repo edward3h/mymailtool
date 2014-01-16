@@ -14,15 +14,25 @@ import javax.mail.internet.MimeMultipart;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * search in a folder and sub-folders
  */
 public class SearchTask extends TaskBase
 {
+    private static final Map<Flags.Flag, String> SYSTEM_FLAG_STRINGS = ImmutableMap.<Flags.Flag, String>builder()
+            .put(Flags.Flag.ANSWERED, "ANSWERED")
+            .put(Flags.Flag.DELETED, "DELETED")
+            .put(Flags.Flag.DRAFT, "DRAFT")
+            .put(Flags.Flag.FLAGGED, "FLAGGED")
+            .put(Flags.Flag.RECENT, "RECENT")
+            .put(Flags.Flag.SEEN, "SEEN")
+            .put(Flags.Flag.USER, "USER").build();
     private final String folderName;
     private Predicate<Message> matcher;
     private boolean recursive = true;
@@ -81,7 +91,7 @@ public class SearchTask extends TaskBase
                 _printAddress(fromA),
                 m.getSubject()
         );
-        //_printFlags(m);
+        _printFlags(m);
         if(printAttach)
         {
             Multipart mm = (Multipart) m.getContent();
@@ -102,7 +112,7 @@ public class SearchTask extends TaskBase
         Flags ff = m.getFlags();
         for(Flags.Flag f: ff.getSystemFlags())
         {
-            System.out.print(f);
+            System.out.print(_flagToString(f));
             System.out.print(" ");
         }
         for(String f: ff.getUserFlags())
@@ -111,6 +121,11 @@ public class SearchTask extends TaskBase
             System.out.print(" ");
         }
         System.out.println();
+    }
+
+    private String _flagToString(Flags.Flag f)
+    {
+        return SYSTEM_FLAG_STRINGS.get(f);
     }
 
     private String _printAddress(Address[] from)
