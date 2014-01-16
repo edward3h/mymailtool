@@ -208,7 +208,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             }
         }
         
-        return task;
+        return task.hasRules() ? task : null;
     }
 
     private String _first(String test)

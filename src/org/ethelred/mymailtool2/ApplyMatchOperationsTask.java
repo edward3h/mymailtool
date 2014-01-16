@@ -52,6 +52,11 @@ public class ApplyMatchOperationsTask extends TaskBase
         }
     };
 
+    public boolean hasRules()
+    {
+        return !rules.isEmpty();
+    }
+
     private static class ApplyKey
     {
         private final String folderName;
@@ -165,6 +170,7 @@ public class ApplyMatchOperationsTask extends TaskBase
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)
     {
+        System.out.printf("Adding rule against %s with operation %s matching %s%n", folder, operation, checkMatchers);
         ApplyKey key = new ApplyKey(folder, includeSubFolders);
         List<MatchOperation> lmo = rules.get(key);
         if(lmo == null)

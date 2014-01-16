@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.DeleteOperation;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
+import org.ethelred.mymailtool2.FlagOperation;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.MatchOperation;
 import org.ethelred.mymailtool2.MessageOperation;
@@ -99,6 +100,11 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public DeleteBuilder deleteFrom(String folderName)
         {
             return new DeleteBuilder(folderName);
+        }
+
+        public FlagBuilder addFlag(String flagname)
+        {
+            return new FlagBuilder(true, flagname);
         }
 
         public Predicate<Message> isFrom(String regex)
@@ -197,12 +203,13 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Task getTask() throws Exception
     {
+        System.out.println("getTask " + deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         for(OperationBuilder builder: deferredRules)
         {
             builder.addToTask(task);
         }
-        return task;
+        return task.hasRules() ? task : null;
     }
 
     @Override
@@ -305,6 +312,31 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         protected MessageOperation getOperation()
         {
             return new DeleteOperation();
+        }
+    }
+
+    public class FlagBuilder extends OperationBuilder
+    {
+        private String userFlag;
+        private boolean add;
+
+        public FlagBuilder(boolean add, String flagname)
+        {
+            super("");
+            this.add = add;
+            this.userFlag = flagname;
+        }
+
+        public FlagBuilder inFolder(String folderName)
+        {
+            this.folderName = folderName;
+            return this;
+        }
+
+        @Override
+        protected MessageOperation getOperation()
+        {
+            return new FlagOperation(add, userFlag);
         }
     }
 }
