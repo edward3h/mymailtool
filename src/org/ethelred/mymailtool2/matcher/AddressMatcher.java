@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2.matcher;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -75,7 +76,7 @@ abstract class AddressMatcher implements Predicate<Message>
     public String toString()
     {
         return Objects.toStringHelper(this)
-                .add("addressPatterns", addressPatterns)
+                .add("addressPatterns", Joiner.on("|").join(addressPatterns))
                 .toString();
     }
 }

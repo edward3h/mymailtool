@@ -107,9 +107,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             return new FlagBuilder(true, flagname);
         }
 
-        public Predicate<Message> isFrom(String regex)
+        public Predicate<Message> isFrom(String... regex)
         {
-            return new FromAddressMatcher(false, regex);
+            return new FromAddressMatcher(false, _first(regex), _rest(regex));
         }
 
         public Predicate<Message> matchesSubject(String regex)
@@ -117,9 +117,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
             return new SubjectMatcher(regex);
         }
 
-        public Predicate<Message> isTo(String regex)
+        public Predicate<Message> isTo(String... regex)
         {
-            return new ToAddressMatcher(false, regex);
+            return new ToAddressMatcher(false, _first(regex), _rest(regex));
         }
 
         public Predicate<Message> hasAttachment(String regex)
@@ -141,6 +141,26 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         {
             return new AgeMatcher(age, false);
         }
+    }
+
+    private String[] _rest(String[] strings)
+    {
+        if(strings.length > 1)
+        {
+            String[] result = new String[strings.length - 1];
+            System.arraycopy(strings, 1, result, 0, strings.length - 1);
+            return result;
+        }
+        return new String[0];
+    }
+
+    private String _first(String[] strings)
+    {
+        if(strings.length > 0)
+        {
+            return strings[0];
+        }
+        return null;
     }
 
     public class MoveBuilder extends OperationBuilder

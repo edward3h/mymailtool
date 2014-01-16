@@ -24,6 +24,13 @@ public class FlagOperation implements MessageOperation
         Flags ff = new Flags(userFlag);
         try
         {
+            Flags oldFlags = m.getFlags();
+            if(add == oldFlags.contains(userFlag))
+            {
+                // already in correct state
+                return false;
+            }
+
             m.setFlags(ff, add);
             return true;
         }
