@@ -8,4 +8,4 @@ CLASSPATH=$libdir/args4j-2.0.8.jar:$libdir/js.jar:$libdir/guava-11.0.1.jar:$libd
 
 export CLASSPATH
 echo $CLASSPATH
-java org.ethelred.mymailtool2.Main $*
+java org.ethelred.mymailtool2.Main "$@"
