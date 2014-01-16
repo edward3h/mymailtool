@@ -203,6 +203,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     private abstract class OperationBuilder implements Predicate<Message>
     {
         protected Predicate<Message> delegate;
+        protected List<Predicate<Message>> predicates = Lists.newArrayList();
         protected int specificity = 0;
         protected String folderName;
         protected boolean includeSubFolders = false;
@@ -223,6 +224,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         public OperationBuilder and(Predicate<Message> matcher)
         {
             delegate = Predicates.and(delegate, matcher);
+            predicates.add(matcher);
             specificity++;
             return this;
         }
@@ -241,7 +243,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public void addToTask(ApplyMatchOperationsTask task)
         {
-            task.addRule(folderName, new MatchOperation(this, getOperation(), specificity), includeSubFolders);
+            task.addRule(folderName, this, predicates, getOperation(), includeSubFolders);
         }
 
         protected abstract MessageOperation getOperation();

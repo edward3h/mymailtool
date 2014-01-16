@@ -33,7 +33,7 @@ public class ApplyMatchOperationsTaskTest
             }
         }, msgop, 0);
 
-        task.addRule("INBOX", mo, false);
+        //task.addRule("INBOX", mo, false);
     }
 
     private class TrackMatchMessageOperation implements MessageOperation
@@ -44,6 +44,12 @@ public class ApplyMatchOperationsTaskTest
         public boolean apply(MailToolContext context, Message m)
         {
             matches.add(m);
+            return true;
+        }
+
+        @Override
+        public boolean finishApplying()
+        {
             return true;
         }
     }

@@ -177,7 +177,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             }
             if(sourceFolder != null && matcher != null && operation != null)
             {
-                task.addRule(sourceFolder, new MatchOperation(matcher, operation, specificity), includeSubFolders);
+                task.addRule(sourceFolder, matcher, matchers, operation, includeSubFolders);
                 System.out.printf("Adding rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
             }
             else

@@ -27,7 +27,7 @@ public class MatchOperation
         if(match.apply(m) && operation.apply(ctx, m))
         {
             ctx.countOperation();
-            return true;
+            return operation.finishApplying();
         }
         return false;
     }

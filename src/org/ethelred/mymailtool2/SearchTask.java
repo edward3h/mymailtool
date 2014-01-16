@@ -81,7 +81,7 @@ public class SearchTask extends TaskBase
                 _printAddress(fromA),
                 m.getSubject()
         );
-        _printFlags(m);
+        //_printFlags(m);
         if(printAttach)
         {
             Multipart mm = (Multipart) m.getContent();

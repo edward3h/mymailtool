@@ -7,6 +7,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
@@ -170,6 +171,24 @@ class CommandLineConfiguration implements MailToolConfiguration
         if(task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new SubjectMatcher(searchSpec)));
+        }
+    }
+
+    @Option(name = "--newer", usage = "Search messages newer than age")
+    private void searchNewer(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, false)));
+        }
+    }
+
+    @Option(name = "--older", usage = "Search messages older than age")
+    private void searchOlder(String searchSpec)
+    {
+        if(task instanceof SearchTask)
+        {
+            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, true)));
         }
     }
 

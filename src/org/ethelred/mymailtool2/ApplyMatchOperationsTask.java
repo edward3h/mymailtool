@@ -1,14 +1,17 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,6 +35,22 @@ public class ApplyMatchOperationsTask extends TaskBase
             return matchOperation == null ? 0 : matchOperation.getSpecificity();
         }
     });
+
+    private final Predicate<? super Message> defaultMinAge = new Predicate<Message>()
+    {
+        @Override
+        public boolean apply(@Nullable Message message)
+        {
+            try
+            {
+                return message != null && context.isOldEnough(message);
+            }
+            catch (MessagingException e)
+            {
+                return false;
+            }
+        }
+    };
 
     private static class ApplyKey
     {
@@ -128,16 +147,14 @@ public class ApplyMatchOperationsTask extends TaskBase
     protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
         // match/operation
-        if (context.isOldEnough(m)) {
-            for(MatchOperation mo: _getRules(originalName, includeSubFolders))
+        for(MatchOperation mo: _getRules(originalName, includeSubFolders))
+        {
+            if(mo.testApply(m, context))
             {
-                if(mo.testApply(m, context))
-                {
-                    break;
-                }
+                break;
             }
-
         }
+
     }
 
     @Override
@@ -146,7 +163,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         System.out.printf("Working on folder %s%n", f.getFullName());
     }
 
-    public void addRule(String folder, MatchOperation mo, boolean includeSubFolders)
+    public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)
     {
         ApplyKey key = new ApplyKey(folder, includeSubFolders);
         List<MatchOperation> lmo = rules.get(key);
@@ -155,6 +172,18 @@ public class ApplyMatchOperationsTask extends TaskBase
             lmo = Lists.newArrayList();
             rules.put(key, lmo);
         }
+        if(!Iterables.any(checkMatchers, new Predicate<Predicate<Message>>()
+        {
+            @Override
+            public boolean apply(@Nullable Predicate<Message> messagePredicate)
+            {
+                return messagePredicate instanceof AgeMatcher;
+            }
+        }))
+        {
+            matcher = Predicates.and(defaultMinAge, matcher);
+        }
+        MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size());
         lmo.add(mo);
         
     }
