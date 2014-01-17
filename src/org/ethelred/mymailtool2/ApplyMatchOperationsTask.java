@@ -35,6 +35,21 @@ public class ApplyMatchOperationsTask extends TaskBase
             return matchOperation == null ? 0 : matchOperation.getSpecificity();
         }
     });
+    private static final Comparator<? super ApplyKey> FOLDER_PREFERENCE = Ordering.natural().onResultOf(new Function<ApplyKey, Integer>()
+    {
+        @Override
+        public Integer apply(@Nullable ApplyKey applyKey)
+        {
+            return "INBOX".equals(applyKey.folderName) ? 0 : 1;
+        }
+    }).compound(Ordering.natural().onResultOf(new Function<ApplyKey, Boolean>()
+    {
+        @Override
+        public Boolean apply(@Nullable ApplyKey applyKey)
+        {
+            return applyKey.includeSubFolders;
+        }
+    }));
 
     private final Predicate<? super Message> defaultMinAge = new Predicate<Message>()
     {
@@ -116,7 +131,9 @@ public class ApplyMatchOperationsTask extends TaskBase
     {
         System.out.printf("Starting task with %s folders%n", rules.size());
         // for each folder
-        for(ApplyKey k: rules.keySet())
+        List<ApplyKey> sortedFolders = Lists.newArrayList(rules.keySet());
+        Collections.sort(sortedFolders, FOLDER_PREFERENCE);
+        for(ApplyKey k: sortedFolders)
         {
             try
             {
