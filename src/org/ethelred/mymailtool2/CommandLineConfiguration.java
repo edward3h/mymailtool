@@ -33,6 +33,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--limit", usage = "Operation limit count", aliases = {"-O"})
     private int limit = PRIMITIVE_DEFAULT;
 
+    @Option(name = "--time-limit", usage = "Time limit for running app")
     private String runTimeLimit;
     
     
