@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2.matcher;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 
@@ -55,5 +56,13 @@ public class HasAttachmentMatcher implements Predicate<Message>
         }
 
         return false;
+    }
+
+    @Override
+    public String toString()
+    {
+        return Objects.toStringHelper(this)
+                .add("fileNamePattern", fileNamePattern)
+                .toString();
     }
 }

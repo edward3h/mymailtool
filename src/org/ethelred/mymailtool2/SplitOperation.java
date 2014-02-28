@@ -48,7 +48,7 @@ public class SplitOperation implements MessageOperation
     }
 
     @Override
-    public String getShortName()
+    public String toString()
     {
         return "Split";
     }

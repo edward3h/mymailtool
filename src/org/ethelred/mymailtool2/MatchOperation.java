@@ -41,7 +41,7 @@ public class MatchOperation
     @Override
     public String toString()
     {
-        return operation.getShortName() + specificity + '[' + match + ']';
+        return operation.toString() + specificity + '[' + match + ']';
     }
 
 }

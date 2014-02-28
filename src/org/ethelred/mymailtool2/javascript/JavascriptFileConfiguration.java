@@ -335,6 +335,11 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         }
 
         protected abstract MessageOperation getOperation();
+
+        public String toString()
+        {
+            return delegate.toString();
+        }
     }
 
     public class SplitBuilder extends OperationBuilder
