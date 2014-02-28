@@ -127,7 +127,7 @@ public class Main
         }
         catch(OperationLimitException e)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Reached Operation Limit");
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, e.toString());
         }
         catch(Exception e)
         {
