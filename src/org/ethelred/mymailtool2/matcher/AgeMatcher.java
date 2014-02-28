@@ -53,4 +53,9 @@ public class AgeMatcher implements Predicate<Message>
                 .add("comparisonTime", comparisonTime)
                 .toString();
     }
+
+    public boolean isOlder()
+    {
+        return older;
+    }
 }

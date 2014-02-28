@@ -29,7 +29,7 @@ public class MatchOperationTest
             allowing(operation).finishApplying(); will(returnValue(true));
             oneOf(mailContext).countOperation();
         }});
-        MatchOperation test = new MatchOperation(matcher, operation, 1);
+        MatchOperation test = new MatchOperation(matcher, operation, 1, false);
         test.testApply(m, mailContext);
         context.assertIsSatisfied();
     }
@@ -48,7 +48,7 @@ public class MatchOperationTest
             oneOf(operation).apply(mailContext, m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
         }});
-        MatchOperation test = new MatchOperation(matcher, operation, 1);
+        MatchOperation test = new MatchOperation(matcher, operation, 1, false);
         test.testApply(m, mailContext);
         context.assertIsSatisfied();
     }
@@ -65,7 +65,7 @@ public class MatchOperationTest
             oneOf(matcher).apply(m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
         }});
-        MatchOperation test = new MatchOperation(matcher, operation, 1);
+        MatchOperation test = new MatchOperation(matcher, operation, 1, false);
         test.testApply(m, mailContext);
         context.assertIsSatisfied();
     }
