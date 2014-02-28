@@ -70,12 +70,16 @@ public class JavascriptConfigurationTest
         data.addMessage("Inbox", MockMessage.create("2012-01-01", "from1@example.com", "Hello subject2 world"));
         data.addMessage("test", MockMessage.create("2012-01-01", "from1@example.com", "Hello subject1 world"));
         data.addMessage("test", MockMessage.create("2012-01-01", "from1@example.com", "Hello subject2 world world"));
+        data.addMessage("spamtest", MockMessage.create("2012-01-01", "from1@example.com", "Hello world").addHeader("X-Spam-Score", "1.5"));
+        data.addMessage("spamtest", MockMessage.create("2012-01-01", "from1@example.com", "Hello world 2").addHeader("X-Spam-Score", "2.6"));
 
         assertEquals(3, data.folderSize("Inbox"));
         assertEquals(0, data.folderSize("archive"));
         assertEquals(-1, data.folderSize("archive.2012.01-Jan-2012"));
         assertEquals(2, data.folderSize("test"));
         assertEquals(-1, data.folderSize("repeated"));
+        assertEquals(2, data.folderSize("spamtest"));
+        assertEquals(-1, data.folderSize("spamscore"));
 
         Main main = new Main();
         main.setDefaultConfiguration(conf);
@@ -88,6 +92,8 @@ public class JavascriptConfigurationTest
         assertEquals(1, data.folderSize("archive.2012.01-Jan-2012"));
         assertEquals(1, data.folderSize("test"));
         assertEquals(1, data.folderSize("repeated"));
+        assertEquals(1, data.folderSize("spamtest"));
+        assertEquals(1, data.folderSize("spamscore"));
     }
 
 

@@ -1,8 +1,11 @@
 package org.ethelred.mymailtool2.mock;
 
+import com.google.common.collect.Maps;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,6 +21,7 @@ public class MockMessage
     private String date;
     private String from;
     private String subject;
+    private Map<String, String> mockheaders = Maps.newHashMap();
 
     private MockMessage()
     {
@@ -41,6 +45,13 @@ public class MockMessage
         msg.subject = subject;
         return msg;
     }
+
+    public MockMessage addHeader(String header, String value)
+    {
+        mockheaders.put(header, value);
+        return this;
+    }
+
 
     public Message getMimeMessage(MockFolder mockFolder, int i) throws MessagingException
     {
@@ -78,6 +89,11 @@ public class MockMessage
             catch(ParseException e)
             {
                 throw new MessagingException("Parse exception", e);
+            }
+
+            for(Map.Entry<String, String> e: mockheaders.entrySet())
+            {
+                headers.addHeader(e.getKey(), e.getValue());
             }
 
         }

@@ -27,3 +27,16 @@ function repeatedWordSubject(msg) {
 }
 
 move("test").to("repeated").ifIt(repeatedWordSubject);
+
+function spamscore(msg) {
+  try {
+  var hdr = msg.getHeader("X-Spam-Score");
+  if(hdr.length > 0) {
+    var score = parseFloat(hdr[0]);
+    return score >= 2.5;
+  }
+  } catch(e) {}
+  return false;
+}
+
+move("spamtest").to("spamscore").ifIt(spamscore);
