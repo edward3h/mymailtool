@@ -1,6 +1,7 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -116,6 +117,15 @@ public class ApplyMatchOperationsTask extends TaskBase
             result = 31 * result + (includeSubFolders ? 1 : 0);
             return result;
         }
+
+        @Override
+        public String toString()
+        {
+            return Objects.toStringHelper(this)
+                    .add("folderName", folderName)
+                    .add("includeSubFolders", includeSubFolders)
+                    .toString();
+        }
     }
 
     // order is important
@@ -135,6 +145,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         Collections.sort(sortedFolders, FOLDER_PREFERENCE);
         for(ApplyKey k: sortedFolders)
         {
+            System.out.printf("Starting application: %s%n", k);
             try
             {
                 List<MatchOperation> lmo = rules.get(k);
@@ -165,9 +176,15 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
 
+    private int messageCounter;
+
     @Override
     protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
+        if(++messageCounter % 100 == 0)
+        {
+            System.err.print('.');
+        }
         // match/operation
         for(MatchOperation mo: _getRules(originalName, includeSubFolders))
         {
@@ -183,6 +200,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     protected void status(Folder f, String originalName)
     {
         System.out.printf("Working on folder %s%n", f.getFullName());
+        messageCounter = 0;
     }
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)
