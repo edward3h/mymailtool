@@ -38,4 +38,10 @@ public class MatchOperation
         return specificity;
     }
 
+    @Override
+    public String toString()
+    {
+        return operation.getShortName() + specificity + '[' + match + ']';
+    }
+
 }

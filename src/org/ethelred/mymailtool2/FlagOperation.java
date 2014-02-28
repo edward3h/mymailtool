@@ -46,4 +46,10 @@ public class FlagOperation implements MessageOperation
     {
         return false;
     }
+
+    @Override
+    public String getShortName()
+    {
+        return "Flag(" + (add ? "+" : "-") + userFlag + ")";
+    }
 }

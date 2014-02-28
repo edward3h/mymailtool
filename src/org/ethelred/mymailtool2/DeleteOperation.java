@@ -35,4 +35,10 @@ public class DeleteOperation implements MessageOperation
         return true;
     }
 
+    @Override
+    public String getShortName()
+    {
+        return "Delete";
+    }
+
 }
