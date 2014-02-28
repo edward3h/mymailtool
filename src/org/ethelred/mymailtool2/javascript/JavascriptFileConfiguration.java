@@ -22,6 +22,7 @@ import org.ethelred.mymailtool2.DeleteOperation;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
 import org.ethelred.mymailtool2.FlagOperation;
 import org.ethelred.mymailtool2.MailToolConfiguration;
+import org.ethelred.mymailtool2.MailToolContext;
 import org.ethelred.mymailtool2.MatchOperation;
 import org.ethelred.mymailtool2.MessageOperation;
 import org.ethelred.mymailtool2.MoveOperation;
@@ -59,6 +60,36 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
     private List<String> fileLocations = Lists.newArrayList();
     private List<OperationBuilder> deferredRules = Lists.newArrayList();
+
+    private static class DeferredTask implements Task
+    {
+        private Task delegate;
+
+        @Override
+        public void run()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void init(MailToolContext ctx)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean orderNewestFirst()
+        {
+            return delegate.orderNewestFirst();
+        }
+
+        public void setDelegate(ApplyMatchOperationsTask delegate)
+        {
+            this.delegate = delegate;
+        }
+    }
+
+    private DeferredTask deferredTask = new DeferredTask();
 
     public JavascriptFileConfiguration(File f) throws IOException
     {
@@ -134,12 +165,12 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public Predicate<Message> isOlderThan(String age)
         {
-            return new AgeMatcher(age, true);
+            return new AgeMatcher(age, true, deferredTask);
         }
 
         public Predicate<Message> isNewerThan(String age)
         {
-            return new AgeMatcher(age, false);
+            return new AgeMatcher(age, false, deferredTask);
         }
     }
 
@@ -225,10 +256,11 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     {
         System.out.println("getTask " + deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
-        for(OperationBuilder builder: deferredRules)
+        for (OperationBuilder builder : deferredRules)
         {
             builder.addToTask(task);
         }
+        deferredTask.setDelegate(task);
         return task.hasRules() ? task : null;
     }
 

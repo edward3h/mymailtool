@@ -2,11 +2,14 @@ package org.ethelred.mymailtool2.matcher;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+import org.ethelred.mymailtool2.ShortcutFolderScanException;
+import org.ethelred.mymailtool2.Task;
 import org.ethelred.util.ClockFactory;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.format.PeriodFormat;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,11 +21,13 @@ public class AgeMatcher implements Predicate<Message>
 {
     private final boolean older;
     private final DateTime comparisonTime;
+    private final Task task;
 
-    public AgeMatcher(String periodSpec, boolean older)
+    public AgeMatcher(String periodSpec, boolean older, @CheckForNull Task t)
     {
         this.older = older;
         this.comparisonTime = new DateTime(ClockFactory.getClock().currentTimeMillis()).minus(PeriodFormat.getDefault().parsePeriod(periodSpec));
+        this.task = t;
     }
 
     @Override
@@ -36,13 +41,24 @@ public class AgeMatcher implements Predicate<Message>
         try
         {
             DateTime received = new DateTime(message.getReceivedDate());
-            return older ? received.isBefore(comparisonTime)
+
+            if(task == null)
+            {
+                return older ? received.isBefore(comparisonTime)
                     : received.isAfter(comparisonTime);
+            }
+            else if((older && !task.orderNewestFirst() && received.isAfter(comparisonTime)) || (!older && task.orderNewestFirst() && received.isBefore(comparisonTime)))
+            {
+                throw new ShortcutFolderScanException();
+            }
+
         }
         catch (MessagingException e)
         {
             return false;
         }
+
+        return true;
     }
 
     @Override

@@ -180,7 +180,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, false)));
+            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, false, task)));
         }
     }
 
@@ -189,7 +189,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     {
         if(task instanceof SearchTask)
         {
-            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, true)));
+            ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, true, task)));
         }
     }
 
