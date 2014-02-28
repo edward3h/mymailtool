@@ -35,12 +35,12 @@ public class ApplyMatchOperationsTask extends TaskBase
             return matchOperation == null ? 0 : matchOperation.getSpecificity();
         }
     });
-    private static final Comparator<? super ApplyKey> FOLDER_PREFERENCE = Ordering.natural().onResultOf(new Function<ApplyKey, Integer>()
+    private final Comparator<? super ApplyKey> FOLDER_PREFERENCE = Ordering.natural().onResultOf(new Function<ApplyKey, Integer>()
     {
         @Override
         public Integer apply(@Nullable ApplyKey applyKey)
         {
-            return "INBOX".equals(applyKey.folderName) ? 0 : 1;
+            return context.getDefaultFolder().getName().equalsIgnoreCase(applyKey.folderName) ? 0 : 1;
         }
     }).compound(Ordering.natural().onResultOf(new Function<ApplyKey, Boolean>()
     {
@@ -139,6 +139,10 @@ public class ApplyMatchOperationsTask extends TaskBase
             {
                 List<MatchOperation> lmo = rules.get(k);
                 Collections.sort(lmo, SPECIFIC_OPS);
+                if(lmo.size() == 1)
+                {
+                    lmo.get(0).setSingleOp(true);
+                }
                 traverseFolder(k.folderName, k.includeSubFolders);
             }
             catch (MessagingException | IOException ex)
@@ -195,6 +199,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             lmo = Lists.newArrayList();
             rules.put(key, lmo);
         }
+        boolean addedDefaultMinAge = false;
         if(!Iterables.any(checkMatchers, new Predicate<Predicate<Message>>()
         {
             @Override
@@ -205,8 +210,11 @@ public class ApplyMatchOperationsTask extends TaskBase
         }))
         {
             matcher = Predicates.and(defaultMinAge, matcher);
+            addedDefaultMinAge = true;
         }
-        MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size());
+
+        boolean minAgeOnly = (checkMatchers.isEmpty() && addedDefaultMinAge) || (checkMatchers.size() == 1 && checkMatchers.get(0) instanceof AgeMatcher && ((AgeMatcher) checkMatchers.get(0)).isOlder());
+        MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size(), minAgeOnly);
         lmo.add(mo);
         
     }

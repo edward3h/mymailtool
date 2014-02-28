@@ -1,7 +1,6 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -31,7 +30,7 @@ public class ApplyMatchOperationsTaskTest
             {
                 return true;
             }
-        }, msgop, 0);
+        }, msgop, 0, false);
 
         //task.addRule("INBOX", mo, false);
     }

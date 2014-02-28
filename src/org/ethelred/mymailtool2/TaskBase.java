@@ -4,6 +4,8 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -45,6 +47,11 @@ abstract class TaskBase implements Task
                 {
                     runMessage(f, m, includeSubFolders, originalName);
                 }
+            }
+            catch (ShortcutFolderScanException sc)
+            {
+
+                Logger.getLogger(TaskBase.class.getName()).log(Level.INFO, "Short cut on folder " + f.getName());
             }
             finally {
                 if((openMode() & Folder.READ_WRITE) > 0) {
