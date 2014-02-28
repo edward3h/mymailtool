@@ -124,6 +124,7 @@ public class Main
             Task t = config.getTask();
             t.init(context);
             t.run();
+            System.out.println("Finished without hitting operation limits");
         }
         catch(OperationLimitException e)
         {
