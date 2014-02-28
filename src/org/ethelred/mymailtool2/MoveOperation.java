@@ -48,16 +48,8 @@ public class MoveOperation implements MessageOperation
     }
 
     @Override
-    public String getShortName()
-    {
-        return "Move(" + moveToFolderName + ")";
-    }
-
-    @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
-                .add("moveToFolderName", moveToFolderName)
-                .toString();
+        return "Move(" + moveToFolderName + ")";
     }
 }

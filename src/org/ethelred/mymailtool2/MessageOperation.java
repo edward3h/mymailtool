@@ -21,6 +21,4 @@ public interface MessageOperation
      * @return
      */
     boolean finishApplying();
-
-    String getShortName();
 }

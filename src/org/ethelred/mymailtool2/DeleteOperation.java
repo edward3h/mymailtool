@@ -36,7 +36,7 @@ public class DeleteOperation implements MessageOperation
     }
 
     @Override
-    public String getShortName()
+    public String toString()
     {
         return "Delete";
     }
