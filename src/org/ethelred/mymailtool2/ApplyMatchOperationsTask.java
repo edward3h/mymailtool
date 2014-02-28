@@ -1,6 +1,7 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -145,11 +146,11 @@ public class ApplyMatchOperationsTask extends TaskBase
         Collections.sort(sortedFolders, FOLDER_PREFERENCE);
         for(ApplyKey k: sortedFolders)
         {
-            System.out.printf("Starting application: %s%n", k);
             try
             {
                 List<MatchOperation> lmo = rules.get(k);
                 Collections.sort(lmo, SPECIFIC_OPS);
+                System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
                 traverseFolder(k.folderName, k.includeSubFolders);
             }
             catch (MessagingException | IOException ex)
