@@ -139,10 +139,6 @@ public class ApplyMatchOperationsTask extends TaskBase
             {
                 List<MatchOperation> lmo = rules.get(k);
                 Collections.sort(lmo, SPECIFIC_OPS);
-                if(lmo.size() == 1)
-                {
-                    lmo.get(0).setSingleOp(true);
-                }
                 traverseFolder(k.folderName, k.includeSubFolders);
             }
             catch (MessagingException | IOException ex)
@@ -199,7 +195,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             lmo = Lists.newArrayList();
             rules.put(key, lmo);
         }
-        boolean addedDefaultMinAge = false;
+
         if(!Iterables.any(checkMatchers, new Predicate<Predicate<Message>>()
         {
             @Override
@@ -210,17 +206,15 @@ public class ApplyMatchOperationsTask extends TaskBase
         }))
         {
             matcher = Predicates.and(defaultMinAge, matcher);
-            addedDefaultMinAge = true;
         }
 
-        boolean minAgeOnly = (checkMatchers.isEmpty() && addedDefaultMinAge) || (checkMatchers.size() == 1 && checkMatchers.get(0) instanceof AgeMatcher && ((AgeMatcher) checkMatchers.get(0)).isOlder());
-        MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size(), minAgeOnly);
+        MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size());
         lmo.add(mo);
         
     }
 
     @Override
-    protected boolean orderNewestFirst()
+    public boolean orderNewestFirst()
     {
         return false;
     }

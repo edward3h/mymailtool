@@ -30,7 +30,7 @@ public class ApplyMatchOperationsTaskTest
             {
                 return true;
             }
-        }, msgop, 0, false);
+        }, msgop, 0);
 
         //task.addRule("INBOX", mo, false);
     }

@@ -172,13 +172,13 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             test = entry.get("newer");
             if(!Strings.isNullOrEmpty(test))
             {
-                matchers.add(new AgeMatcher(test, false));
+                matchers.add(new AgeMatcher(test, false, task));
             }
 
             test = entry.get("older");
             if(!Strings.isNullOrEmpty(test))
             {
-                matchers.add(new AgeMatcher(test, true));
+                matchers.add(new AgeMatcher(test, true, task));
             }
 
             boolean includeSubFolders = false;

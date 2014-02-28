@@ -84,7 +84,8 @@ abstract class TaskBase implements Task
         return new RecentMessageIterable(f, orderNewestFirst());
     }
 
-    protected boolean orderNewestFirst()
+    @Override
+    public boolean orderNewestFirst()
     {
         return true;
     }

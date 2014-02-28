@@ -14,26 +14,12 @@ public class MatchOperation
     private final MessageOperation operation;
 
     private final int specificity;
-    private final boolean minAgeOnly;
 
-    public boolean isSingleOp()
-    {
-        return singleOp;
-    }
-
-    public void setSingleOp(boolean singleOp)
-    {
-        this.singleOp = singleOp;
-    }
-
-    private boolean singleOp = false;
-
-    public MatchOperation(Predicate<Message> match, MessageOperation operation, int specificity, boolean minAgeOnly)
+    public MatchOperation(Predicate<Message> match, MessageOperation operation, int specificity)
     {
         this.match = match;
         this.operation = operation;
         this.specificity = specificity;
-        this.minAgeOnly = minAgeOnly;
     }
     
     boolean testApply(Message m, MailToolContext ctx)
@@ -43,11 +29,6 @@ public class MatchOperation
             System.out.printf("Matched %s and applied %s to message %s%n", match, operation, m);
             ctx.countOperation();
             return operation.finishApplying();
-        }
-
-        if(minAgeOnly && singleOp)
-        {
-            throw new ShortcutFolderScanException();
         }
         return false;
     }

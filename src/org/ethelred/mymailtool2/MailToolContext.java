@@ -8,7 +8,7 @@ import javax.mail.MessagingException;
  *
  * @author edward
  */
-interface MailToolContext
+public interface MailToolContext
 {
 
     public void countOperation();
