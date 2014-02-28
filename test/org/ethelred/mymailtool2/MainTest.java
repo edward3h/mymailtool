@@ -49,8 +49,9 @@ public class MainTest
     {
         final MailToolConfiguration conf = my.mock(MailToolConfiguration.class);
 
+        ClockFactory.setClock(new DateMidnight(2014, 1, 1).getMillis());
         my.checking(new Expectations(){{
-            exactly(1).of(conf).getOperationLimit(); will(returnValue(3));
+            exactly(2).of(conf).getOperationLimit(); will(returnValue(3));
             exactly(1).of(conf).getTimeLimit(); will(returnValue("50 days"));
         }});
 

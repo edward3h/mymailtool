@@ -96,12 +96,12 @@ public class DefaultContext implements MailToolContext
     {
         if(++opCount > getOperationLimit())
         {
-            throw new OperationLimitException();
+            throw new OperationLimitException(String.format("Hit operation limit %s (ops %s)", config.getOperationLimit(), opCount));
         }
 
-        if(getTimeLimit() > 0 && startTime > 0 && (System.currentTimeMillis() - startTime) > getTimeLimit())
+        if(getTimeLimit() > 0 && startTime > 0 && (ClockFactory.getClock().currentTimeMillis() - startTime) > getTimeLimit())
         {
-            throw new OperationLimitException();
+            throw new OperationLimitException(String.format("Hit time limit %s (ops %s)", config.getTimeLimit(), opCount));
         }
 
         if(shutdown)

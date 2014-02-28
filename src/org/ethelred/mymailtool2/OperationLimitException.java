@@ -8,8 +8,9 @@ package org.ethelred.mymailtool2;
 class OperationLimitException extends RuntimeException
 {
 
-    public OperationLimitException()
+    public OperationLimitException(String message)
     {
+        super(message);
     }
     
 }
