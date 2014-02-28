@@ -127,7 +127,8 @@ public class Main
         }
         catch(OperationLimitException e)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.INFO, e.toString());
+            //Logger.getLogger(Main.class.getName()).log(Level.INFO, e.toString());
+            System.out.println(e.toString());
         }
         catch(Exception e)
         {

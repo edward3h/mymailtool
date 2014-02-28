@@ -51,11 +51,5 @@ public class ApplyMatchOperationsTaskTest
         {
             return true;
         }
-
-        @Override
-        public String getShortName()
-        {
-            return "test";
-        }
     }
 }
