@@ -141,7 +141,7 @@ public class RecentMessageIterable implements Iterable<Message>
             }
             try
             {
-                System.err.println("Reading messages " + Arrays.toString(ids));
+                //System.err.println("Reading messages " + Arrays.toString(ids));
                 messages = folder.getMessages(ids);
                 folder.fetch(messages, fp);
             }

@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
+import org.ethelred.mymailtool2.matcher.FolderMatcher;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -49,7 +50,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         @Override
         public Boolean apply(@Nullable ApplyKey applyKey)
         {
-            return applyKey.includeSubFolders;
+            return true;// applyKey.includeSubFolders;
         }
     }));
 
@@ -94,10 +95,10 @@ public class ApplyMatchOperationsTask extends TaskBase
 
             ApplyKey applyKey = (ApplyKey) o;
 
-            if(includeSubFolders != applyKey.includeSubFolders)
-            {
-                return false;
-            }
+//            if(includeSubFolders != applyKey.includeSubFolders)
+//            {
+//                return false;
+//            }
             if(!folderName.equals(applyKey.folderName))
             {
                 return false;
@@ -110,7 +111,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         public int hashCode()
         {
             int result = folderName.hashCode();
-            result = 31 * result + (includeSubFolders ? 1 : 0);
+            //result = 31 * result + (includeSubFolders ? 1 : 0);
             return result;
         }
 
@@ -153,7 +154,7 @@ public class ApplyMatchOperationsTask extends TaskBase
                 List<MatchOperation> lmo = rules.get(k);
                 Collections.sort(lmo, SPECIFIC_OPS);
                 System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
-                traverseFolder(k.folderName, k.includeSubFolders);
+                traverseFolder(k.folderName, true/*k.includeSubFolders*/);
             }
             catch (MessagingException | IOException ex)
             {
@@ -235,6 +236,11 @@ public class ApplyMatchOperationsTask extends TaskBase
         }))
         {
             matcher = Predicates.and(deferredDefaultMinAge, matcher);
+        }
+
+        if(!includeSubFolders)
+        {
+            matcher = Predicates.and(new FolderMatcher(folder), matcher);
         }
 
         MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size());
