@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2;
 
+import javax.annotation.CheckForNull;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -24,4 +25,8 @@ public interface MailToolContext
     void disconnect();
 
     void shutdown();
+
+    void logCompletion(@CheckForNull OperationLimitException e);
+
+    void countMessage();
 }

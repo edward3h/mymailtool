@@ -45,7 +45,7 @@ public class MockData
         folder = _checkName(folder);
         addFolder(folder);
         folderMessages.get(folder).add(message);
-        System.err.println(folder + " add message " + message);
+        //System.err.println(folder + " add message " + message);
     }
 
     public boolean hasFolder(String name)
