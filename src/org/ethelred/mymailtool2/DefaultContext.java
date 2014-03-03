@@ -42,7 +42,7 @@ public class DefaultContext implements MailToolContext
     private int operationLimit = -1;
     private volatile boolean shutdown = false;
 
-    private int messageCheckedCount = 0;
+    int messageCheckedCount = 0;
 
     public DefaultContext(MailToolConfiguration config)
     {

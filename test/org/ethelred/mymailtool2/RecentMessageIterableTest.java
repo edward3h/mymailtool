@@ -36,7 +36,7 @@ public class RecentMessageIterableTest
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
-        c.set(2013, 1, 1);
+        c.set(2013, Calendar.JANUARY, 1);
         for(int i = 1; i <= 202; i++)
         {
             c.add(Calendar.DATE, 1);

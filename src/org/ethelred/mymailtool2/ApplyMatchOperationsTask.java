@@ -181,12 +181,27 @@ public class ApplyMatchOperationsTask extends TaskBase
     {
         context.countMessage();
         // match/operation
+        int ruleCount = 0;
+        int shortcutCount = 0;
         for(MatchOperation mo: _getRules(originalName, includeSubFolders))
         {
-            if(mo.testApply(m, context))
+            ruleCount++;
+            try
             {
-                break;
+                if(mo.testApply(m, context))
+                {
+                    break;
+                }
             }
+            catch (ShortcutFolderScanException e)
+            {
+                shortcutCount++;
+            }
+        }
+
+        if(ruleCount == shortcutCount)
+        {
+            throw new ShortcutFolderScanException();
         }
 
     }
