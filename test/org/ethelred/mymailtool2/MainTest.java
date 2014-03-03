@@ -25,26 +25,6 @@ public class MainTest
     Mockery my = new Mockery(){{setImposteriser(ClassImposteriser.INSTANCE);}};
 
     @Test
-    public void testAgeCompare() throws MessagingException
-    {
-        final MailToolConfiguration conf = my.mock(MailToolConfiguration.class);
-        final Message m = my.mock(Message.class);
-
-        ClockFactory.setClock(new DateMidnight(2014, 1, 1).getMillis());
-        my.checking(new Expectations(){{
-            oneOf(conf).getMinAge(); will(returnValue("3 months"));
-            oneOf(m).getReceivedDate(); will(returnValue(new Date(new DateMidnight(2013,9,30).getMillis())));
-            oneOf(m).getReceivedDate(); will(returnValue(new Date(new DateMidnight(2013,10,2).getMillis())));
-        }});
-        MailToolContext app = new DefaultContext(conf);
-
-        assertTrue("First date is not old enough", app.isOldEnough(m));
-        assertFalse("Second date is too old", app.isOldEnough(m));
-
-        my.assertIsSatisfied();
-    }
-
-    @Test
     public void testOperationLimit()
     {
         final MailToolConfiguration conf = my.mock(MailToolConfiguration.class);

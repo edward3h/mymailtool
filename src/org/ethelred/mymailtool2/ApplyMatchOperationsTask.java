@@ -53,19 +53,14 @@ public class ApplyMatchOperationsTask extends TaskBase
         }
     }));
 
-    private final Predicate<? super Message> defaultMinAge = new Predicate<Message>()
+
+    Predicate<Message> defaultMinAgeDelegate;
+    private Predicate<? super Message> deferredDefaultMinAge = new Predicate<Message>()
     {
         @Override
         public boolean apply(@Nullable Message message)
         {
-            try
-            {
-                return message != null && context.isOldEnough(message);
-            }
-            catch (MessagingException e)
-            {
-                return false;
-            }
+            return defaultMinAgeDelegate.apply(message);
         }
     };
 
@@ -135,6 +130,13 @@ public class ApplyMatchOperationsTask extends TaskBase
     public static ApplyMatchOperationsTask create()
     {
         return new ApplyMatchOperationsTask();
+    }
+
+    @Override
+    public void init(MailToolContext ctx)
+    {
+        super.init(ctx);
+        defaultMinAgeDelegate = ctx.defaultMinAge(this);
     }
 
     @Override
@@ -232,7 +234,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             }
         }))
         {
-            matcher = Predicates.and(defaultMinAge, matcher);
+            matcher = Predicates.and(deferredDefaultMinAge, matcher);
         }
 
         MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size());
