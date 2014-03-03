@@ -232,5 +232,10 @@ public class DefaultContext implements MailToolContext
     public void countMessage()
     {
         messageCheckedCount++;
+
+        if(getTimeLimit() > 0 && startTime > 0 && (ClockFactory.getClock().currentTimeMillis() - startTime) > getTimeLimit())
+        {
+            throw new OperationLimitException(String.format("Hit time limit %s (ops %s)", config.getTimeLimit(), opCount));
+        }
     }
 }
