@@ -1,8 +1,10 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.util.ClockFactory;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -147,28 +149,9 @@ public class DefaultContext implements MailToolContext
     }
 
     @Override
-    public boolean isOldEnough(Message m) throws MessagingException {
-        DateTime received = new DateTime(m.getReceivedDate());
-        return received.isBefore(getAgeCompare());
-    }
-
-    @VisibleForTesting
-    DateTime getAgeCompare()
+    public Predicate<Message> defaultMinAge(Task t)
     {
-        if(ageCompare != null)
-        {
-            return ageCompare;
-        }
-
-        try {
-            Period p = PeriodFormat.getDefault().parsePeriod(config.getMinAge());
-            ageCompare = new DateTime(startTime).minus(p);
-        } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            ageCompare = new DateTime(startTime).minus(DEFAULT_MIN_AGE);
-        }
-
-        return ageCompare;
+        return new AgeMatcher(config.getMinAge(), true, t);
     }
 
     private class MyAuthenticator extends Authenticator

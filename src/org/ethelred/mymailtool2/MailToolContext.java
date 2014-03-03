@@ -1,5 +1,7 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Predicate;
+
 import javax.annotation.CheckForNull;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -18,7 +20,7 @@ public interface MailToolContext
 
     public Folder getDefaultFolder();
 
-    public boolean isOldEnough(Message m) throws MessagingException;
+    public Predicate<Message> defaultMinAge(Task t);
 
     void connect();
 
