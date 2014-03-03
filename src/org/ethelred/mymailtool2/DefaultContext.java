@@ -10,6 +10,7 @@ import org.joda.time.Period;
 import org.joda.time.ReadablePeriod;
 import org.joda.time.format.PeriodFormat;
 
+import javax.annotation.CheckForNull;
 import javax.mail.Authenticator;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -40,6 +41,8 @@ public class DefaultContext implements MailToolContext
     private long timeLimit = -1;
     private int operationLimit = -1;
     private volatile boolean shutdown = false;
+
+    int messageCheckedCount = 0;
 
     public DefaultContext(MailToolConfiguration config)
     {
@@ -231,5 +234,20 @@ public class DefaultContext implements MailToolContext
     public void shutdown()
     {
         shutdown = true;
+    }
+
+    @Override
+    public void logCompletion(@CheckForNull OperationLimitException e)
+    {
+        System.out.printf("Checked %d messages, performed %d operations. %s. %n",
+                          messageCheckedCount,
+                          opCount,
+                          e == null ? "Finished successfully." : e.toString());
+    }
+
+    @Override
+    public void countMessage()
+    {
+        messageCheckedCount++;
     }
 }

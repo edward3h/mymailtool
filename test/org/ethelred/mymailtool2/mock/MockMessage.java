@@ -74,6 +74,11 @@ public class MockMessage
         return null;
     }
 
+    public Comparable getDate() throws ParseException
+    {
+        return dateFormat.parse(date);
+    }
+
     private class MockMimeMessage extends MimeMessage
     {
         public MockMimeMessage(MockFolder mockFolder, int i) throws MessagingException

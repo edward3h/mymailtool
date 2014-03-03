@@ -1,18 +1,43 @@
 package org.ethelred.mymailtool2.mock;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import org.ethelred.util.ClockFactory;
 import org.ethelred.util.MapWithDefault;
+
+import javax.annotation.Nullable;
 
 /**
  * singleton to configure mock folders + messages
  */
 public class MockData
 {
+    private static final Comparator<? super MockMessage> DATE_SORT = Ordering.natural().onResultOf(new Function<MockMessage, Comparable>()
+    {
+        @Override
+        public Comparable apply(@Nullable MockMessage mockMessage)
+        {
+            try
+            {
+                return mockMessage.getDate();
+            }
+            catch(Exception e)
+            {
+                throw new IllegalStateException("Bad date in message " + mockMessage);
+            }
+
+        }
+    });
+
     public static MockData getInstance()
     {
         return SingletonHolder.INSTANCE;
@@ -45,7 +70,8 @@ public class MockData
         folder = _checkName(folder);
         addFolder(folder);
         folderMessages.get(folder).add(message);
-        System.err.println(folder + " add message " + message);
+        Collections.sort(folderMessages.get(folder), DATE_SORT);
+                        //System.err.println(folder + " add message " + message);
     }
 
     public boolean hasFolder(String name)
@@ -59,7 +85,7 @@ public class MockData
         {
             return MockStore.DEFAULT_FOLDER_NAME;
         }
-        return name;
+        return name.toLowerCase();
     }
 
     public MockMessage getMessage(String folderName, int index)

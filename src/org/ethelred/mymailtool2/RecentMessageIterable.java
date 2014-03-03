@@ -88,7 +88,7 @@ public class RecentMessageIterable implements Iterable<Message>
         @Override
         public boolean hasNext()
         {
-            return messageNumber > 0;
+            return messageNumber > 0 || arrayIndex < messages.length;
         }
 
         @Override
@@ -99,6 +99,7 @@ public class RecentMessageIterable implements Iterable<Message>
             {
                 _loadChunk();
             }
+
             return result;
         }
 

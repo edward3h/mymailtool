@@ -176,23 +176,32 @@ public class ApplyMatchOperationsTask extends TaskBase
         throw new IllegalStateException("No matching rules for " + originalName + " with includeSubFolders = " + includeSubFolders);
     }
 
-
-    private int messageCounter;
-
     @Override
     protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
-        if(++messageCounter % 100 == 0)
-        {
-            System.err.print('.');
-        }
+        context.countMessage();
         // match/operation
+        int ruleCount = 0;
+        int shortcutCount = 0;
         for(MatchOperation mo: _getRules(originalName, includeSubFolders))
         {
-            if(mo.testApply(m, context))
+            ruleCount++;
+            try
             {
-                break;
+                if(mo.testApply(m, context))
+                {
+                    break;
+                }
             }
+            catch (ShortcutFolderScanException e)
+            {
+                shortcutCount++;
+            }
+        }
+
+        if(ruleCount == shortcutCount)
+        {
+            throw new ShortcutFolderScanException();
         }
 
     }
@@ -201,7 +210,6 @@ public class ApplyMatchOperationsTask extends TaskBase
     protected void status(Folder f, String originalName)
     {
         System.out.printf("Working on folder %s%n", f.getFullName());
-        messageCounter = 0;
     }
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)

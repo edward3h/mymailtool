@@ -124,12 +124,13 @@ public class Main
             Task t = config.getTask();
             t.init(context);
             t.run();
-            System.out.println("Finished without hitting operation limits");
+            context.logCompletion(null);
         }
         catch(OperationLimitException e)
         {
             //Logger.getLogger(Main.class.getName()).log(Level.INFO, e.toString());
-            System.out.println(e.toString());
+            //System.out.println(e.toString());
+            context.logCompletion(e);
         }
         catch(Exception e)
         {
@@ -145,8 +146,11 @@ public class Main
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        LogManager lm = LogManager.getLogManager();
+        lm.reset();
         Logger root = Logger.getLogger("");
         root.setLevel(Level.ALL);
+        root.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
         Main app = new Main();
         app.init(args);
         app.run();

@@ -50,7 +50,6 @@ abstract class TaskBase implements Task
             }
             catch (ShortcutFolderScanException sc)
             {
-
                 Logger.getLogger(TaskBase.class.getName()).log(Level.INFO, "Short cut on folder " + f.getName());
             }
             finally {
