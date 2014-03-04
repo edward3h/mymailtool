@@ -3,10 +3,16 @@ package org.ethelred.mymailtool2.matcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
@@ -21,8 +27,20 @@ import javax.mail.MessagingException;
 abstract class AddressMatcher implements Predicate<Message>
 {
 
+    private static final Address[] EMPTY_ADDRESSES = new Address[0];
     private final boolean bLiteral;
     private final Iterable<Pattern> addressPatterns;
+
+    private final Cache<Message, Address[]> addressCache =
+            CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Message, Address[]>()
+            {
+                @Override
+                public Address[] load(Message message) throws Exception
+                {
+                    Address[] r = getAddresses(message);
+                    return r == null ? EMPTY_ADDRESSES : r;
+                }
+            });
 
     protected AddressMatcher(boolean bLiteral, String patternSpec, String... morePatterns)
     {
@@ -46,7 +64,7 @@ abstract class AddressMatcher implements Predicate<Message>
     {
         try
         {
-            Address[] addresses = getAddresses(t);
+            Address[] addresses = addressCache.get(t);
             if(addresses == null)
             {
                 return false;
@@ -64,8 +82,13 @@ abstract class AddressMatcher implements Predicate<Message>
             }
             return false;
         }
-        catch (MessagingException e)
+//        catch (MessagingException e)
+//        {
+//            return false;
+//        }
+        catch (ExecutionException e)
         {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Exception in getAddresses", e);
             return false;
         }
     }

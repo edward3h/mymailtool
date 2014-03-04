@@ -19,7 +19,8 @@ public class ToAddressMatcher extends AddressMatcher
     @Override
     protected Address[] getAddresses(Message t) throws MessagingException
     {
-        return t.getAllRecipients();
+        //return t.getAllRecipients();
+        return t.getRecipients(Message.RecipientType.TO);
     }
     
 }

@@ -44,9 +44,12 @@ public class MatchersTest
         try
         {
             context.checking(new Expectations(){{
-                oneOf(msg).getAllRecipients(); will(returnValue(add1));
-                oneOf(msg2).getAllRecipients(); will(returnValue(add2));
-                oneOf(msg3).getAllRecipients(); will(returnValue(add3));
+//                oneOf(msg).getAllRecipients(); will(returnValue(add1));
+//                oneOf(msg2).getAllRecipients(); will(returnValue(add2));
+//                oneOf(msg3).getAllRecipients(); will(returnValue(add3));
+                oneOf(msg).getRecipients(Message.RecipientType.TO); will(returnValue(add1));
+                oneOf(msg2).getRecipients(Message.RecipientType.TO); will(returnValue(add2));
+                oneOf(msg3).getRecipients(Message.RecipientType.TO); will(returnValue(add3));
             }});
 
             Predicate<Message> matcher = new ToAddressMatcher(true, "edward@foobar.com");
