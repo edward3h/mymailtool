@@ -1,6 +1,7 @@
 package org.ethelred.mymailtool2.javascript;
 
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * warning - uses undocumented internal classes
@@ -52,7 +53,8 @@ class MozillaObjectAdapter implements IJSObject
         }
         else
         {
-            return NativeObject.getProperty(no, propertyName);
+            Object o = NativeObject.getProperty(no, propertyName);
+            return o == Scriptable.NOT_FOUND ? null : o;
         }
     }
 
