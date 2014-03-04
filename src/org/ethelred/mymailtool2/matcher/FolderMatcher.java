@@ -26,7 +26,8 @@ public class FolderMatcher implements Predicate<Message>
             return false;
         }
 
-        System.err.println("FolderMatcher " + folder + " check " + message.getFolder().getFullName());
+//        if(!folder.equalsIgnoreCase(message.getFolder().getFullName()))
+//        System.err.println("FolderMatcher " + folder + " check " + message.getFolder().getFullName());
 
         return folder.equalsIgnoreCase(message.getFolder().getFullName());
     }
