@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FolderMatcher;
 
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
@@ -45,14 +47,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         {
             return context.getDefaultFolder().getName().equalsIgnoreCase(applyKey.folderName) ? 0 : 1;
         }
-    }).compound(Ordering.natural().onResultOf(new Function<ApplyKey, Boolean>()
-    {
-        @Override
-        public Boolean apply(@Nullable ApplyKey applyKey)
-        {
-            return true;// applyKey.includeSubFolders;
-        }
-    }));
+    });
 
 
     Predicate<Message> defaultMinAgeDelegate;
@@ -73,12 +68,10 @@ public class ApplyMatchOperationsTask extends TaskBase
     private static class ApplyKey
     {
         private final String folderName;
-        private final boolean includeSubFolders;
 
-        private ApplyKey(String folderName, boolean includeSubFolders)
+        private ApplyKey(String folderName)
         {
             this.folderName = folderName.toLowerCase();
-            this.includeSubFolders = includeSubFolders;
         }
 
         @Override
@@ -95,10 +88,6 @@ public class ApplyMatchOperationsTask extends TaskBase
 
             ApplyKey applyKey = (ApplyKey) o;
 
-//            if(includeSubFolders != applyKey.includeSubFolders)
-//            {
-//                return false;
-//            }
             if(!folderName.equals(applyKey.folderName))
             {
                 return false;
@@ -111,7 +100,6 @@ public class ApplyMatchOperationsTask extends TaskBase
         public int hashCode()
         {
             int result = folderName.hashCode();
-            //result = 31 * result + (includeSubFolders ? 1 : 0);
             return result;
         }
 
@@ -120,13 +108,13 @@ public class ApplyMatchOperationsTask extends TaskBase
         {
             return Objects.toStringHelper(this)
                     .add("folderName", folderName)
-                    .add("includeSubFolders", includeSubFolders)
                     .toString();
         }
     }
 
     // order is important
     LinkedHashMap<ApplyKey, List<MatchOperation>> rules = Maps.newLinkedHashMap();
+    Set<ApplyKey> includeSubFolders = Sets.newHashSet();
 
     public static ApplyMatchOperationsTask create()
     {
@@ -154,7 +142,7 @@ public class ApplyMatchOperationsTask extends TaskBase
                 List<MatchOperation> lmo = rules.get(k);
                 Collections.sort(lmo, SPECIFIC_OPS);
                 System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
-                traverseFolder(k.folderName, true/*k.includeSubFolders*/);
+                traverseFolder(k.folderName, includeSubFolders.contains(k));
             }
             catch (MessagingException | IOException ex)
             {
@@ -171,7 +159,7 @@ public class ApplyMatchOperationsTask extends TaskBase
 
     private List<MatchOperation> _getRules(String originalName, boolean includeSubFolders)
     {
-        ApplyKey k = new ApplyKey(originalName, includeSubFolders);
+        ApplyKey k = new ApplyKey(originalName);
         if(rules.containsKey(k))
         {
             return rules.get(k);
@@ -218,7 +206,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)
     {
         System.out.printf("Adding rule against %s with operation %s matching %s%n", folder, operation, checkMatchers);
-        ApplyKey key = new ApplyKey(folder, includeSubFolders);
+        ApplyKey key = new ApplyKey(folder);
         List<MatchOperation> lmo = rules.get(key);
         if(lmo == null)
         {
@@ -241,6 +229,10 @@ public class ApplyMatchOperationsTask extends TaskBase
         if(!includeSubFolders)
         {
             matcher = Predicates.and(new FolderMatcher(folder), matcher);
+        }
+        else
+        {
+            this.includeSubFolders.add(key);
         }
 
         MatchOperation mo = new MatchOperation(matcher, operation, checkMatchers.size());
