@@ -18,7 +18,7 @@ public class MailUtil
     public static String toString(Message m) throws MessagingException
     {
         return String.format(
-                "%tY-%<tm-%<td:%s", m.getSentDate(), m.getSubject()
+                "%tY-%<tm-%<td %<tR: %s", m.getSentDate(), m.getSubject()
         );
     }
 
