@@ -50,14 +50,21 @@ class CommandLineConfiguration implements MailToolConfiguration
 
     private boolean invertNextMatcher;
 
+    @Option(name = "--verbose", usage = "Verbose (debugging) output", aliases = {"-v"})
+    private boolean verbose = false;
+
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return fileHandlers;
     }
 
+    @Override
+    public boolean verbose()
+    {
+        return verbose;
+    }
 
-    
     @Option(name = "--config", usage = "Specify config file. (default $HOME/.mymailtoolrc)", aliases = {"-c"})
     private void setConfigFile(String fileName) {
         fileLocations.add(fileName);

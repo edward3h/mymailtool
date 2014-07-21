@@ -28,6 +28,7 @@ public class MatchOperationTest
             oneOf(operation).apply(mailContext, m); will(returnValue(true));
             allowing(operation).finishApplying(); will(returnValue(true));
             oneOf(mailContext).countOperation();
+            allowing(mailContext).debugF(with(any(String.class)), with(any(Object[].class)));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
@@ -47,6 +48,7 @@ public class MatchOperationTest
             oneOf(matcher).apply(m); will(returnValue(true));
             oneOf(operation).apply(mailContext, m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
+            allowing(mailContext).debugF(with(any(String.class)), with(any(Object[].class)));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
@@ -64,6 +66,7 @@ public class MatchOperationTest
         context.checking(new Expectations(){{
             oneOf(matcher).apply(m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
+            allowing(mailContext).debugF(with(any(String.class)), with(any(Object[].class)));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);

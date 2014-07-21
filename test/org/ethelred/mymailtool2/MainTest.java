@@ -33,6 +33,7 @@ public class MainTest
         my.checking(new Expectations(){{
             exactly(2).of(conf).getOperationLimit(); will(returnValue(3));
             exactly(1).of(conf).getTimeLimit(); will(returnValue("50 days"));
+            allowing(conf).verbose(); will(returnValue(false));
         }});
 
         MailToolContext app = new DefaultContext(conf);

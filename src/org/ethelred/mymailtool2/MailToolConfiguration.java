@@ -36,4 +36,6 @@ public interface MailToolConfiguration
     Iterable<FileConfigurationHandler> getFileHandlers();
 
     public String getTimeLimit();
+
+    boolean verbose();
 }

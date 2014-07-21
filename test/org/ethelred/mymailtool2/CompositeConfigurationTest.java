@@ -92,6 +92,12 @@ public class CompositeConfigurationTest
             {
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
+
+            @Override
+            public boolean verbose()
+            {
+                return false;
+            }
         };
 
         MailToolConfiguration comp = new CompositeConfiguration(mock);

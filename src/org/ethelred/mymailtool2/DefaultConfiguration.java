@@ -72,4 +72,10 @@ class DefaultConfiguration implements MailToolConfiguration
         return null;
     }
 
+    @Override
+    public boolean verbose()
+    {
+        return false;
+    }
+
 }
