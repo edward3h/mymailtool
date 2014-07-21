@@ -288,6 +288,12 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         return config.getString("runtime.limit");
     }
 
+    @Override
+    public boolean verbose()
+    {
+        return false;
+    }
+
     private abstract class OperationBuilder implements Predicate<Message>
     {
         protected Predicate<Message> delegate;

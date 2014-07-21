@@ -25,7 +25,27 @@ public class MailUtil
     public static void log(String format, Object... args)
     {
         System.out.printf("%tF %<tT ", ClockFactory.getClock().currentTimeMillis());
-        System.out.printf(format, args);
+        System.out.printf(format, _replaceMailInterfaces(args));
         System.out.println();
+    }
+
+
+    private static Object[] _replaceMailInterfaces(Object[] objects)
+    {
+        for(int i = 0; i < objects.length; i++)
+        {
+            if(objects[i] instanceof Message)
+            {
+                try
+                {
+                    objects[i] = MailUtil.toString((Message) objects[i]);
+                }
+                catch (MessagingException e)
+                {
+                    // ignore - will use default representation
+                }
+            }
+        }
+        return objects;
     }
 }

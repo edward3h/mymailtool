@@ -269,6 +269,12 @@ class PropertiesFileConfiguration implements MailToolConfiguration
         return delegate.getProperty("runtime.limit");
     }
 
+    @Override
+    public boolean verbose()
+    {
+        return false;
+    }
+
     private void _addFileLocations(String filenames)
     {
         for(String fn: filenames.split(","))

@@ -43,12 +43,14 @@ public class DefaultContext implements MailToolContext
     private long timeLimit = -1;
     private int operationLimit = -1;
     private volatile boolean shutdown = false;
+    private final boolean verbose;
 
     int messageCheckedCount = 0;
 
     public DefaultContext(MailToolConfiguration config)
     {
         this.config = config;
+        this.verbose = config.verbose();
     }
 
     @Override
@@ -238,4 +240,14 @@ public class DefaultContext implements MailToolContext
             throw new OperationLimitException(String.format("Hit time limit %s (ops %s)", config.getTimeLimit(), opCount));
         }
     }
+
+    @Override
+    public void debugF(String format, Object... messageArgs)
+    {
+        if(verbose)
+        {
+            MailUtil.log(format, messageArgs);
+        }
+    }
+
 }

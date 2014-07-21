@@ -120,6 +120,19 @@ class CompositeConfiguration implements MailToolConfiguration
         return (String) first("getTimeLimit");
     }
 
+    @Override
+    public boolean verbose()
+    {
+        for(MailToolConfiguration subConf: configs)
+        {
+            if(subConf.verbose())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class LazyCombinedIterable<T> implements Iterable<T>
     {
         private final Function<MailToolConfiguration, Iterable<T>> accessor;
