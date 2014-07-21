@@ -170,6 +170,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
     {
+        context.debugF("Checking %s", m);
         context.countMessage();
         // match/operation
         int ruleCount = 0;
@@ -200,7 +201,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void status(Folder f, String originalName)
     {
-        System.out.printf("Working on folder %s%n", f.getFullName());
+        context.debugF("Working on folder %s%n", f.getFullName());
     }
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)

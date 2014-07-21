@@ -24,10 +24,9 @@ public class MatchOperation
     
     boolean testApply(Message m, MailToolContext ctx)
     {
-        ctx.debugF("Checking %s%n", m);
         if(match.apply(m) && operation.apply(ctx, m))
         {
-            ctx.debugF("Matched %s and applied %s to message %s%n", match, operation, m);
+            ctx.debugF("Matched %s and applied %s to message %s", match, operation, m);
             ctx.countOperation();
             return operation.finishApplying();
         }
