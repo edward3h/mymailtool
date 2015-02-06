@@ -53,6 +53,15 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--verbose", usage = "Verbose (debugging) output", aliases = {"-v"})
     private boolean verbose = false;
 
+    @Option(name = "--chunk", usage = "How many messages to grab in a batch")
+    private int chunkSize = PRIMITIVE_DEFAULT;
+
+    @Override
+    public int getChunkSize()
+    {
+        return chunkSize;
+    }
+
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {

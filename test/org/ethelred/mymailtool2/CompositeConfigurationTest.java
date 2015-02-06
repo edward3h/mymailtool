@@ -98,6 +98,12 @@ public class CompositeConfigurationTest
             {
                 return false;
             }
+
+            @Override
+            public int getChunkSize()
+            {
+                return PRIMITIVE_DEFAULT;
+            }
         };
 
         MailToolConfiguration comp = new CompositeConfiguration(mock);

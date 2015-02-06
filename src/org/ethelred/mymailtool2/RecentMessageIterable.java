@@ -21,7 +21,7 @@ public class RecentMessageIterable implements Iterable<Message>
     {
         this.folder = f;
         this.newestFirst = newestFirst;
-        this.chunkSize = chunkSize;
+        this.chunkSize = chunkSize <= 0 ? DEFAULT_CHUNK_SIZE : chunkSize;
     }
 
     public RecentMessageIterable(Folder folder, boolean newestFirst)

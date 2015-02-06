@@ -80,7 +80,7 @@ abstract class TaskBase implements Task
 
     protected Iterable<? extends Message> readMessages(Folder f)
     {
-        return new RecentMessageIterable(f, orderNewestFirst());
+        return new RecentMessageIterable(f, orderNewestFirst(), context.getChunkSize());
     }
 
     @Override

@@ -64,6 +64,12 @@ public class MockDefaultConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public int getChunkSize()
+    {
+        return PRIMITIVE_DEFAULT;
+    }
+
+    @Override
     public String getMinAge()
     {
         return "1 month";

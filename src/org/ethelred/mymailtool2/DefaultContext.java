@@ -250,4 +250,9 @@ public class DefaultContext implements MailToolContext
         }
     }
 
+    @Override
+    public int getChunkSize()
+    {
+        return config.getChunkSize();
+    }
 }

@@ -271,6 +271,12 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public int getChunkSize()
+    {
+        return Integer.parseInt(config.getString("chunk"));
+    }
+
+    @Override
     public String getMinAge()
     {
         return config.getString("minage");

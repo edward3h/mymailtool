@@ -83,4 +83,9 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
         return false;
     }
 
+    @Override
+    public int getChunkSize()
+    {
+        return PRIMITIVE_DEFAULT;
+    }
 }

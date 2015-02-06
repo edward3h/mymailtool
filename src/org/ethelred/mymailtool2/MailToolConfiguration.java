@@ -38,4 +38,6 @@ public interface MailToolConfiguration
     public String getTimeLimit();
 
     boolean verbose();
+
+    int getChunkSize();
 }
