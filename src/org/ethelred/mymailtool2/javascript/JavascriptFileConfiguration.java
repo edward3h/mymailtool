@@ -288,6 +288,11 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public String getMinAge()
     {
         return config.getString("minage");

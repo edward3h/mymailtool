@@ -22,7 +22,7 @@ abstract class TaskBase implements Task
     }
 
 
-    protected void traverseFolder(String folderName, boolean includeSubFolders) throws MessagingException, IOException
+    protected void traverseFolder(String folderName, boolean includeSubFolders, boolean readMessages) throws MessagingException, IOException
     {
         Folder f = context.getFolder(folderName);
         if(f == null || !f.exists())
@@ -30,14 +30,14 @@ abstract class TaskBase implements Task
             throw new IllegalStateException("Could not open folder " + folderName);
         }
 
-        traverseFolder(f, includeSubFolders);
+        traverseFolder(f, includeSubFolders, readMessages);
     }
 
-    protected void traverseFolder(Folder f, boolean includeSubFolders) throws MessagingException, IOException
+    protected void traverseFolder(Folder f, boolean includeSubFolders, boolean readMessages) throws MessagingException, IOException
     {
         status(f);
 
-        if((f.getType() & Folder.HOLDS_MESSAGES) > 0)
+        if(readMessages && (f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
             f.open(openMode());
 
@@ -64,7 +64,7 @@ abstract class TaskBase implements Task
         {
             for(Folder child: f.list())
             {
-                traverseFolder(child, includeSubFolders);
+                traverseFolder(child, includeSubFolders, readMessages);
             }
         }
     }

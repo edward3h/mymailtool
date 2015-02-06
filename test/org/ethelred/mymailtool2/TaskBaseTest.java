@@ -55,7 +55,7 @@ public class TaskBaseTest
     {
         MockTaskBase tb = new MockTaskBase();
         tb.init(mockContext);
-        tb.traverseFolder("Folder", false);
+        tb.traverseFolder("Folder", false, true);
         assertEquals(3, tb.messageCounter);
 
     }
@@ -67,7 +67,7 @@ public class TaskBaseTest
         MockTaskBase tb = new MockTaskBase();
         tb.giveUpAfter = Integer.MAX_VALUE;
         tb.init(mockContext);
-        tb.traverseFolder("Folder", false);
+        tb.traverseFolder("Folder", false, true);
         assertEquals(MockData.getInstance().folderSize("Folder"), tb.messageCounter);
 
     }

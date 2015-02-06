@@ -104,6 +104,11 @@ public class CompositeConfigurationTest
             {
                 return PRIMITIVE_DEFAULT;
             }
+
+            @Override
+            public boolean randomTraversal() {
+                return false;
+            }
         };
 
         MailToolConfiguration comp = new CompositeConfiguration(mock);

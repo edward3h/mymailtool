@@ -36,4 +36,6 @@ public interface MailToolContext
 
 
     int getChunkSize();
+
+    boolean randomTraversal();
 }

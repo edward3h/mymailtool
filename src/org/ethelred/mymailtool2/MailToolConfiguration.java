@@ -40,4 +40,6 @@ public interface MailToolConfiguration
     boolean verbose();
 
     int getChunkSize();
+
+    boolean randomTraversal();
 }

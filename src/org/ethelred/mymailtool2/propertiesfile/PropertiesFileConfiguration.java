@@ -111,6 +111,11 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public Task getTask() throws Exception
     {
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();

@@ -88,4 +88,9 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
     {
         return PRIMITIVE_DEFAULT;
     }
+
+    @Override
+    public boolean randomTraversal() {
+        return false;
+    }
 }

@@ -54,7 +54,7 @@ public class SearchTask extends TaskBase
 
         try
         {
-            traverseFolder(folderName, recursive);
+            traverseFolder(folderName, recursive, true);
         }
         catch(MessagingException | IOException e)
         {

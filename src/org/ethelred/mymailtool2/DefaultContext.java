@@ -255,4 +255,9 @@ public class DefaultContext implements MailToolContext
     {
         return config.getChunkSize();
     }
+
+    @Override
+    public boolean randomTraversal() {
+        return config.randomTraversal();
+    }
 }

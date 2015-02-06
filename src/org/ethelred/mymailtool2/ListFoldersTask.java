@@ -31,7 +31,7 @@ public class ListFoldersTask extends TaskBase
     @Override
     protected void status(Folder f)
     {
-        System.out.println(f.getFullName());
+        System.out.println(f.getFullName() + " " + (f.equals(context.getDefaultFolder()) ? "[default]" : ""));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ListFoldersTask extends TaskBase
         Folder root = context.getDefaultFolder();
         try
         {
-            traverseFolder(root, true);
+            traverseFolder(root, true, false);
         }
         catch (MessagingException | IOException e)
         {

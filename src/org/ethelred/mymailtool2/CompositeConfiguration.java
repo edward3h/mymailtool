@@ -133,6 +133,19 @@ class CompositeConfiguration implements MailToolConfiguration
         return false;
     }
 
+    @Override
+    public boolean randomTraversal() {
+
+        for(MailToolConfiguration subConf: configs)
+        {
+            if(subConf.randomTraversal())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class LazyCombinedIterable<T> implements Iterable<T>
     {
         private final Function<MailToolConfiguration, Iterable<T>> accessor;

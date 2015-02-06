@@ -70,6 +70,11 @@ public class MockDefaultConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public String getMinAge()
     {
         return "1 month";
