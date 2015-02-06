@@ -35,4 +35,7 @@ public interface MailToolContext
     void debugF(String format, Object... messageArgs);
 
 
+    int getChunkSize();
+
+    boolean randomTraversal();
 }

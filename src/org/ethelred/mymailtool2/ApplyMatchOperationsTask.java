@@ -14,11 +14,7 @@ import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FolderMatcher;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
@@ -40,12 +36,12 @@ public class ApplyMatchOperationsTask extends TaskBase
             return matchOperation == null ? 0 : matchOperation.getSpecificity();
         }
     });
-    private final Comparator<? super ApplyKey> FOLDER_PREFERENCE = Ordering.natural().onResultOf(new Function<ApplyKey, Integer>()
+    private final Comparator<? super Folder> FOLDER_PREFERENCE = Ordering.natural().onResultOf(new Function<Folder, Integer>()
     {
         @Override
-        public Integer apply(@Nullable ApplyKey applyKey)
+        public Integer apply(@Nullable Folder applyKey)
         {
-            return context.getDefaultFolder().getName().equalsIgnoreCase(applyKey.folderName) ? 0 : 1;
+            return context.getDefaultFolder().equals(applyKey) || "INBOX".equalsIgnoreCase(applyKey.getName()) ? 0 : 1;
         }
     });
 
@@ -59,6 +55,8 @@ public class ApplyMatchOperationsTask extends TaskBase
             return defaultMinAgeDelegate.apply(message);
         }
     };
+
+    private Random random = new Random();
 
     public boolean hasRules()
     {
@@ -131,24 +129,61 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     public void run()
     {
-        System.out.printf("Starting task with %s folders%n", rules.size());
-        // for each folder
-        List<ApplyKey> sortedFolders = Lists.newArrayList(rules.keySet());
-        Collections.sort(sortedFolders, FOLDER_PREFERENCE);
-        for(ApplyKey k: sortedFolders)
+        try
         {
-            try
+            System.out.printf("Starting task with %s folders%n", rules.size());
+            boolean randomTraversal = context.randomTraversal();
+            // for each folder
+            List<Folder> sortedFolders = _scanFolders(rules.keySet(), randomTraversal);
+            Collections.sort(sortedFolders, FOLDER_PREFERENCE);
+            if(randomTraversal)
             {
-                List<MatchOperation> lmo = rules.get(k);
-                Collections.sort(lmo, SPECIFIC_OPS);
-                System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
-                traverseFolder(k.folderName, includeSubFolders.contains(k));
+                context.debugF("Folder order...%n%s", Joiner.on("\n").join(sortedFolders));
             }
-            catch (MessagingException | IOException ex)
+            for(Folder k: sortedFolders)
             {
-                Logger.getLogger(ApplyMatchOperationsTask.class.getName()).log(Level.SEVERE, null, ex);
+                    List<MatchOperation> lmo = _getRules(k);
+                    Collections.sort(lmo, SPECIFIC_OPS);
+                    System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
+                    traverseFolder(k, !randomTraversal && includeSubFolders.contains(k), true);
+
             }
         }
+        catch (MessagingException | IOException ex)
+        {
+            Logger.getLogger(ApplyMatchOperationsTask.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private List<Folder> _scanFolders(Set<ApplyKey> applyKeys, boolean randomTraversal) throws IOException, MessagingException {
+        final List<Folder> result = Lists.newArrayList();
+        TaskBase scanner = new TaskBase(){
+
+            @Override
+            public void run() {
+
+            }
+
+            @Override
+            protected void runMessage(Folder f, Message m) throws MessagingException, IOException {
+
+            }
+
+            @Override
+            protected void status(Folder f) {
+                result.add(f);
+            }
+        };
+        scanner.init(context);
+        for(ApplyKey k: applyKeys)
+        {
+            scanner.traverseFolder(k.folderName, includeSubFolders.contains(k) && randomTraversal, false);
+        }
+        if(randomTraversal)
+        {
+            Collections.shuffle(result, random);
+        }
+        return result;
     }
 
     @Override
@@ -157,25 +192,28 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
-    private List<MatchOperation> _getRules(String originalName, boolean includeSubFolders)
-    {
-        ApplyKey k = new ApplyKey(originalName);
-        if(rules.containsKey(k))
+    private List<MatchOperation> _getRules(Folder of) throws MessagingException {
+        for(Folder f = of; f != null; f = f.getParent())
         {
-            return rules.get(k);
+            ApplyKey k = new ApplyKey(f.getFullName());
+            if(rules.containsKey(k))
+            {
+                return rules.get(k);
+            }
         }
-        throw new IllegalStateException("No matching rules for " + originalName + " with includeSubFolders = " + includeSubFolders);
+
+        throw new IllegalStateException("No matching rules for " + of.getFullName());
     }
 
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
+    protected void runMessage(Folder f, Message m) throws MessagingException
     {
         context.debugF("Checking %s", m);
         context.countMessage();
         // match/operation
         int ruleCount = 0;
         int shortcutCount = 0;
-        for(MatchOperation mo: _getRules(originalName, includeSubFolders))
+        for(MatchOperation mo: _getRules(f))
         {
             ruleCount++;
             try
@@ -199,7 +237,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f, String originalName)
+    protected void status(Folder f)
     {
         context.debugF("Working on folder %s%n", f.getFullName());
     }
@@ -244,6 +282,6 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     public boolean orderNewestFirst()
     {
-        return false;
+        return context.randomTraversal() && random.nextBoolean();
     }
 }

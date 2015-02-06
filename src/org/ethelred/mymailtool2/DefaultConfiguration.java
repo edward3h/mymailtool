@@ -78,4 +78,14 @@ class DefaultConfiguration implements MailToolConfiguration
         return false;
     }
 
+    @Override
+    public int getChunkSize()
+    {
+        return PRIMITIVE_DEFAULT;
+    }
+
+    @Override
+    public boolean randomTraversal() {
+        return false;
+    }
 }

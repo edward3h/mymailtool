@@ -271,6 +271,28 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public int getChunkSize()
+    {
+        String v = config.getString("chunk");
+        if(v == null)
+        {
+            return PRIMITIVE_DEFAULT;
+        }
+        try {
+            return Integer.parseInt(v);
+        }
+        catch (Exception e)
+        {
+            return PRIMITIVE_DEFAULT;
+        }
+    }
+
+    @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public String getMinAge()
     {
         return config.getString("minage");

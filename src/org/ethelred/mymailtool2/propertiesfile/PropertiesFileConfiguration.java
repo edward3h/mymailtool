@@ -105,6 +105,17 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public int getChunkSize()
+    {
+        return PRIMITIVE_DEFAULT;
+    }
+
+    @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public Task getTask() throws Exception
     {
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();

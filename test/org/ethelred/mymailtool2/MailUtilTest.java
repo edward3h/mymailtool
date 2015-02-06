@@ -24,7 +24,7 @@ public class MailUtilTest
     {
         final Message m = context.mock(Message.class);
         Calendar c = Calendar.getInstance();
-        c.set(2012, Calendar.APRIL, 17);
+        c.set(2012, Calendar.APRIL, 17, 11, 55);
         final Date sentDate = c.getTime();
 
         context.checking(new Expectations(){{
@@ -32,7 +32,7 @@ public class MailUtilTest
             allowing(m).getSubject(); will(returnValue("test subject"));
         }});
 
-        assertEquals("2012-04-17:test subject", MailUtil.toString(m));
+        assertEquals("2012-04-17 11:55: test subject", MailUtil.toString(m));
 
         context.assertIsSatisfied();
     }
