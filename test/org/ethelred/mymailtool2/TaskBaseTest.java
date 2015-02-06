@@ -77,7 +77,7 @@ public class TaskBaseTest
         int giveUpAfter = 1;
         int messageCounter = 0;
         @Override
-        protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException, IOException
+        protected void runMessage(Folder f, Message m) throws MessagingException, IOException
         {
             System.out.println("Check message " + messageCounter);
             if(messageCounter++ > giveUpAfter)
@@ -87,7 +87,7 @@ public class TaskBaseTest
         }
 
         @Override
-        protected void status(Folder f, String originalName)
+        protected void status(Folder f)
         {
 
             System.out.println("Status folder " + f);

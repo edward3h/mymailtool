@@ -12,7 +12,7 @@ import java.util.Collections;
 public class ListFoldersTask extends TaskBase
 {
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
+    protected void runMessage(Folder f, Message m) throws MessagingException
     {
         // don't do anything
     }
@@ -29,7 +29,7 @@ public class ListFoldersTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f, String originalName)
+    protected void status(Folder f)
     {
         System.out.println(f.getFullName());
     }
@@ -40,7 +40,7 @@ public class ListFoldersTask extends TaskBase
         Folder root = context.getDefaultFolder();
         try
         {
-            traverseFolder(root, true, "");
+            traverseFolder(root, true);
         }
         catch (MessagingException | IOException e)
         {

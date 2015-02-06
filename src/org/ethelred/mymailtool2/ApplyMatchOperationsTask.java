@@ -157,25 +157,28 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
-    private List<MatchOperation> _getRules(String originalName, boolean includeSubFolders)
-    {
-        ApplyKey k = new ApplyKey(originalName);
-        if(rules.containsKey(k))
+    private List<MatchOperation> _getRules(Folder of) throws MessagingException {
+        for(Folder f = of; f != null; f = f.getParent())
         {
-            return rules.get(k);
+            ApplyKey k = new ApplyKey(f.getFullName());
+            if(rules.containsKey(k))
+            {
+                return rules.get(k);
+            }
         }
-        throw new IllegalStateException("No matching rules for " + originalName + " with includeSubFolders = " + includeSubFolders);
+
+        throw new IllegalStateException("No matching rules for " + of.getFullName());
     }
 
     @Override
-    protected void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException
+    protected void runMessage(Folder f, Message m) throws MessagingException
     {
         context.debugF("Checking %s", m);
         context.countMessage();
         // match/operation
         int ruleCount = 0;
         int shortcutCount = 0;
-        for(MatchOperation mo: _getRules(originalName, includeSubFolders))
+        for(MatchOperation mo: _getRules(f))
         {
             ruleCount++;
             try
@@ -199,7 +202,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
     @Override
-    protected void status(Folder f, String originalName)
+    protected void status(Folder f)
     {
         context.debugF("Working on folder %s%n", f.getFullName());
     }

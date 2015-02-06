@@ -30,12 +30,12 @@ abstract class TaskBase implements Task
             throw new IllegalStateException("Could not open folder " + folderName);
         }
 
-        traverseFolder(f, includeSubFolders, folderName);
+        traverseFolder(f, includeSubFolders);
     }
 
-    protected void traverseFolder(Folder f, boolean includeSubFolders, String originalName) throws MessagingException, IOException
+    protected void traverseFolder(Folder f, boolean includeSubFolders) throws MessagingException, IOException
     {
-        status(f, originalName);
+        status(f);
 
         if((f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
@@ -45,7 +45,7 @@ abstract class TaskBase implements Task
             {
                 for(Message m: readMessages(f))
                 {
-                    runMessage(f, m, includeSubFolders, originalName);
+                    runMessage(f, m);
                 }
             }
             catch (ShortcutFolderScanException sc)
@@ -64,19 +64,19 @@ abstract class TaskBase implements Task
         {
             for(Folder child: f.list())
             {
-                traverseFolder(child, includeSubFolders, originalName);
+                traverseFolder(child, includeSubFolders);
             }
         }
     }
 
-    protected abstract void runMessage(Folder f, Message m, boolean includeSubFolders, String originalName) throws MessagingException, IOException;
+    protected abstract void runMessage(Folder f, Message m) throws MessagingException, IOException;
 
     protected int openMode()
     {
         return Folder.READ_ONLY;
     }
 
-    protected abstract void status(Folder f, String originalName);
+    protected abstract void status(Folder f);
 
     protected Iterable<? extends Message> readMessages(Folder f)
     {
