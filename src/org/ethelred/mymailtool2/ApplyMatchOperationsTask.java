@@ -282,6 +282,6 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     public boolean orderNewestFirst()
     {
-        return context.randomTraversal() && random.nextBoolean();
+        return false;
     }
 }
