@@ -273,7 +273,18 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public int getChunkSize()
     {
-        return Integer.parseInt(config.getString("chunk"));
+        String v = config.getString("chunk");
+        if(v == null)
+        {
+            return PRIMITIVE_DEFAULT;
+        }
+        try {
+            return Integer.parseInt(v);
+        }
+        catch (Exception e)
+        {
+            return PRIMITIVE_DEFAULT;
+        }
     }
 
     @Override
