@@ -50,14 +50,38 @@ class CommandLineConfiguration implements MailToolConfiguration
 
     private boolean invertNextMatcher;
 
+    @Option(name = "--verbose", usage = "Verbose (debugging) output", aliases = {"-v"})
+    private boolean verbose = false;
+
+    @Option(name = "--chunk", usage = "How many messages to grab in a batch")
+    private int chunkSize = PRIMITIVE_DEFAULT;
+
+    @Option(name = "--random", usage = "Traverse folders in random order")
+    private boolean random = false;
+
+    @Override
+    public int getChunkSize()
+    {
+        return chunkSize;
+    }
+
+    @Override
+    public boolean randomTraversal() {
+        return random;
+    }
+
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
         return fileHandlers;
     }
 
+    @Override
+    public boolean verbose()
+    {
+        return verbose;
+    }
 
-    
     @Option(name = "--config", usage = "Specify config file. (default $HOME/.mymailtoolrc)", aliases = {"-c"})
     private void setConfigFile(String fileName) {
         fileLocations.add(fileName);

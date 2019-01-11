@@ -120,6 +120,32 @@ class CompositeConfiguration implements MailToolConfiguration
         return (String) first("getTimeLimit");
     }
 
+    @Override
+    public boolean verbose()
+    {
+        for(MailToolConfiguration subConf: configs)
+        {
+            if(subConf.verbose())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean randomTraversal() {
+
+        for(MailToolConfiguration subConf: configs)
+        {
+            if(subConf.randomTraversal())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class LazyCombinedIterable<T> implements Iterable<T>
     {
         private final Function<MailToolConfiguration, Iterable<T>> accessor;
@@ -181,7 +207,18 @@ class CompositeConfiguration implements MailToolConfiguration
     {
         return (Task) first("getTask");
     }
-    
+
+    @Override
+    public int getChunkSize()
+    {
+        Object v = first("getChunkSize");
+        if(v instanceof Integer)
+        {
+            return (Integer) v;
+        }
+        return PRIMITIVE_DEFAULT;
+    }
+
     private Object first(String method)
     {
         return first(method, new Class[0], new Object[0]);

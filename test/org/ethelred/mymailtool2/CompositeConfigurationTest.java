@@ -92,6 +92,23 @@ public class CompositeConfigurationTest
             {
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
+
+            @Override
+            public boolean verbose()
+            {
+                return false;
+            }
+
+            @Override
+            public int getChunkSize()
+            {
+                return PRIMITIVE_DEFAULT;
+            }
+
+            @Override
+            public boolean randomTraversal() {
+                return false;
+            }
         };
 
         MailToolConfiguration comp = new CompositeConfiguration(mock);

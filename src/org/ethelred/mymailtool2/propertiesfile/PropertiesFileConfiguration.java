@@ -105,6 +105,17 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public int getChunkSize()
+    {
+        return PRIMITIVE_DEFAULT;
+    }
+
+    @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public Task getTask() throws Exception
     {
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
@@ -267,6 +278,12 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     public String getTimeLimit()
     {
         return delegate.getProperty("runtime.limit");
+    }
+
+    @Override
+    public boolean verbose()
+    {
+        return false;
     }
 
     private void _addFileLocations(String filenames)

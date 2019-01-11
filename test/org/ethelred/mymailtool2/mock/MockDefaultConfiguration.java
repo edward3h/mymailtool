@@ -64,6 +64,17 @@ public class MockDefaultConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public int getChunkSize()
+    {
+        return PRIMITIVE_DEFAULT;
+    }
+
+    @Override
+    public boolean randomTraversal() {
+        return false;
+    }
+
+    @Override
     public String getMinAge()
     {
         return "1 month";
@@ -79,6 +90,12 @@ public class MockDefaultConfiguration implements MailToolConfiguration
     public String getTimeLimit()
     {
         return null;
+    }
+
+    @Override
+    public boolean verbose()
+    {
+        return false;
     }
 
     public void addFileHandler(FileConfigurationHandler fileConfigurationHandler)

@@ -31,4 +31,11 @@ public interface MailToolContext
     void logCompletion(@CheckForNull OperationLimitException e);
 
     void countMessage();
+
+    void debugF(String format, Object... messageArgs);
+
+
+    int getChunkSize();
+
+    boolean randomTraversal();
 }
