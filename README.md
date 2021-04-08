@@ -10,24 +10,20 @@ It talks directly to the mail server so it does not require any particular clien
 
 Configuration Languages
 -----------------------
-The program is designed to support different languages for specifying the configuration. Currently the only finished one is 'PropertiesFileConfiguration', which uses a Java properties file to provide settings.
+The program is designed to support different languages for specifying the configuration. 
 
-TODO add sample configuration
-
-I have a 'work in progress' Javascript configuration. The idea is that this will allow additional logic to be specified as JS functions.
+Currently: Java properties files, or Javascript. (Javascript uses the Rhino engine since I wrote it years ago, so isn't that up to date)
 
 Requirements
 ------------
-MyMailtool is developed against Java 6 and has a build script which uses Bash.
-
-I have been developing in Intellij Idea but that is optional.
+Requires a recent Java JDK.
 
 Installation
 ------------
 
 	git clone git://github.com/edward3h/mymailtool.git
 	cd mymailtool
-	./build.sh
+	./gradlew install
 
 Setup
 -----
