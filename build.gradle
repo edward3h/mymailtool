@@ -6,6 +6,12 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
 application {
     mainClass = 'org.ethelred.mymailtool2.Main'
     applicationName = 'mymailtool2'
@@ -24,3 +30,17 @@ dependencies {
     testImplementation group: 'org.jmock', name: 'jmock-legacy', version: '2.5.1'
 
 }
+
+task install {
+    dependsOn installDist
+    doLast {
+        ant.mkdir(dir: "${rootDir}/bin")
+        ant.symlink(resource: "${(installDist.outputs.files as List).first()}/bin/${application.applicationName}", link: "${rootDir}/bin/${application.applicationName}")
+    }
+}
+
+task cleanBin(type: Delete) {
+    delete 'bin'
+}
+
+clean.dependsOn cleanBin
