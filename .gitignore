@@ -8,8 +8,8 @@
 dist/*.jar
 out
 
-# idea workspace
-.idea/workspace.xml
+# idea 
+.idea
 
 
 .swp
