@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id "com.avast.gradle.docker-compose" version "0.14.3"
 }
 
 repositories {
@@ -15,6 +16,18 @@ java {
 application {
     mainClass = 'org.ethelred.mymailtool2.Main'
     applicationName = 'mymailtool2'
+}
+
+sourceSets {
+    intTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    intTestImplementation.extendsFrom implementation
+    intTestRuntimeOnly.extendsFrom runtimeOnly
 }
 
 dependencies {
@@ -44,3 +57,16 @@ task cleanBin(type: Delete) {
 }
 
 clean.dependsOn cleanBin
+
+task integrationTest(type: Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.intTest.output.classesDirs
+    classpath = sourceSets.intTest.runtimeClasspath
+    shouldRunAfter test
+}
+
+check.dependsOn integrationTest
+
+dockerCompose.isRequiredBy(integrationTest)
