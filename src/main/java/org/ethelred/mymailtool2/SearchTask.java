@@ -17,8 +17,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * search in a folder and sub-folders
@@ -37,6 +42,7 @@ public class SearchTask extends TaskBase
     private Predicate<Message> matcher;
     private boolean recursive = true;
     private boolean printAttach = false;
+    private File outputDirectory;
 
     public SearchTask(String folderName)
     {
@@ -101,6 +107,30 @@ public class SearchTask extends TaskBase
                 if(Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
                 {
                     System.out.println(Strings.repeat(" ", 27) + part.getFileName());
+                    _tryDownload(part);
+                }
+            }
+        }
+    }
+
+    private void _tryDownload(BodyPart part) throws MessagingException
+    {
+        if (outputDirectory != null)
+        {
+            File outputFile = new File(outputDirectory, part.getFileName());
+            if (outputFile.exists())
+            {
+                System.out.println("File " + outputFile + " already exists, skipping.");
+            }
+            else
+            {
+                try (FileOutputStream out = new FileOutputStream(outputFile))
+                {
+                    part.getInputStream().transferTo(out);
+                }
+                catch (IOException e)
+                {
+                    Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to download attachment", e);
                 }
             }
         }
@@ -180,5 +210,10 @@ public class SearchTask extends TaskBase
     public void setRecursive(boolean recursive)
     {
         this.recursive = recursive;
+    }
+
+    public void setDownloadAttachmentDirectory(File outputDirectory)
+    {
+        this.outputDirectory = outputDirectory;
     }
 }

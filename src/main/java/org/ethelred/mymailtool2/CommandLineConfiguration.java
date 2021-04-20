@@ -1,5 +1,6 @@
 package org.ethelred.mymailtool2;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -121,7 +122,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         throw new CmdLineException("Task Apply is not supported from command line, please use config file");
     }
 
-    @Option(name = "--search", usage = "Search for matching messages", aliases = {"-s"})
+    @Option(name = "--search", usage = "Search for matching messages", aliases = {"-s"}, metaVar = "FOLDER")
     private void taskSearch(String folderName) {
         task = SearchTask.create(folderName);
     }
@@ -132,7 +133,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         invertNextMatcher = true;
     }
 
-    @Option(name = "--to", usage = "Search messages matching To address")
+    @Option(name = "--to", usage = "Search messages matching To address", metaVar = "PATTERN")
     private void searchTo(String searchSpec)
     {
         if(task instanceof SearchTask)
@@ -154,7 +155,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         }
     }
 
-    @Option(name = "--from", usage = "Search messages matching From address")
+    @Option(name = "--from", usage = "Search messages matching From address", metaVar = "PATTERN")
     private void searchFrom(String searchSpec)
     {
         if(task instanceof SearchTask)
@@ -163,7 +164,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         }
     }
 
-    @Option(name = "--attach", usage = "Search messages which have an attachment with filename matching this pattern")
+    @Option(name = "--attach", usage = "Search messages which have an attachment with filename matching this pattern", metaVar = "PATTERN")
     private void searchAttachment(String pattern)
     {
         if(task instanceof SearchTask)
@@ -172,7 +173,20 @@ class CommandLineConfiguration implements MailToolConfiguration
         }
     }
 
-    @Option(name = "--flag", usage = "Search messages which have a flag with this name")
+    @Option(name = "--download", usage = "Download matched attachments to directory")
+    private void downloadAttachment(File outputDirectory) throws CmdLineException
+    {
+        if (task instanceof SearchTask)
+        {
+            if (outputDirectory == null || !outputDirectory.isDirectory())
+            {
+                throw new CmdLineException(outputDirectory + " is not a directory");
+            }
+            ((SearchTask) task).setDownloadAttachmentDirectory(outputDirectory);
+        }
+    }
+
+    @Option(name = "--flag", usage = "Search messages which have a flag with this name", metaVar = "NAME")
     private void searchFlag(String pattern)
     {
         if(task instanceof SearchTask)
@@ -190,7 +204,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         }
     }
 
-    @Option(name = "--subject", usage = "Search messages matching Subject")
+    @Option(name = "--subject", usage = "Search messages matching Subject", metaVar = "PATTERN")
     private void searchSubject(String searchSpec)
     {
         if(task instanceof SearchTask)
@@ -199,7 +213,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         }
     }
 
-    @Option(name = "--newer", usage = "Search messages newer than age")
+    @Option(name = "--newer", usage = "Search messages newer than age", metaVar = "PERIOD")
     private void searchNewer(String searchSpec)
     {
         if(task instanceof SearchTask)
@@ -208,7 +222,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         }
     }
 
-    @Option(name = "--older", usage = "Search messages older than age")
+    @Option(name = "--older", usage = "Search messages older than age", metaVar = "PERIOD")
     private void searchOlder(String searchSpec)
     {
         if(task instanceof SearchTask)
