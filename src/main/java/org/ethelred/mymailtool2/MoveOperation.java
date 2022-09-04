@@ -1,6 +1,6 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

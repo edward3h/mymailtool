@@ -1,6 +1,6 @@
 package org.ethelred.mymailtool2.matcher;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import org.ethelred.mymailtool2.ShortcutFolderScanException;
 import org.ethelred.mymailtool2.Task;
@@ -64,7 +64,7 @@ public class AgeMatcher implements Predicate<Message>
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("older", older)
                 .add("comparisonTime", comparisonTime)
                 .toString();
