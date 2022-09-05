@@ -3,9 +3,9 @@ package org.ethelred.mymailtool2;
 import com.google.common.base.Predicate;
 
 import javax.annotation.CheckForNull;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  *

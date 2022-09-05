@@ -1,8 +1,8 @@
 package org.ethelred.mymailtool2;
 
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.util.Collections;
 

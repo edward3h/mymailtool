@@ -1,11 +1,11 @@
 package org.ethelred.mymailtool2.matcher;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nullable;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * Does the message have a matching User flag?
@@ -39,7 +39,7 @@ public class HasFlagMatcher implements Predicate<Message>
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("matchFlag", matchFlag)
                 .toString();
     }

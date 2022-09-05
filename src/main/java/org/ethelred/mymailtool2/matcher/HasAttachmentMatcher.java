@@ -1,15 +1,15 @@
 package org.ethelred.mymailtool2.matcher;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 
 import javax.annotation.Nullable;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -61,7 +61,7 @@ public class HasAttachmentMatcher implements Predicate<Message>
     @Override
     public String toString()
     {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("fileNamePattern", fileNamePattern)
                 .toString();
     }

@@ -1,6 +1,6 @@
 package org.ethelred.mymailtool2;
 
-import javax.mail.Message;
+import jakarta.mail.Message;
 
 import com.google.common.base.Predicate;
 import org.jmock.Expectations;

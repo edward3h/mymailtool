@@ -1,10 +1,10 @@
 package org.ethelred.mymailtool2;
 
 import java.util.Iterator;
-import javax.mail.FetchProfile;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.FetchProfile;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * iterate over messages in a folder in reverse order (most recent first)

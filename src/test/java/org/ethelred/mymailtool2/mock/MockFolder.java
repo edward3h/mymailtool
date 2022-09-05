@@ -2,11 +2,11 @@ package org.ethelred.mymailtool2.mock;
 
 import java.util.List;
 import java.util.Map;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Store;
+import jakarta.mail.Flags;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Store;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

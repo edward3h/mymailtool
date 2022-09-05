@@ -17,7 +17,7 @@ import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.Option;
 
-import javax.mail.Message;
+import jakarta.mail.Message;
 
 /**
  *

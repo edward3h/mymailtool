@@ -8,8 +8,8 @@ import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 import java.util.Date;
 

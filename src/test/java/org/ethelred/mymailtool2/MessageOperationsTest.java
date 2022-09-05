@@ -2,10 +2,10 @@ package org.ethelred.mymailtool2;
 
 import java.util.Calendar;
 import java.util.Date;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Flags;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;

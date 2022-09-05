@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.Message;
+import jakarta.mail.Message;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;

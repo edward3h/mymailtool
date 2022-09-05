@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import javax.annotation.Nullable;
-import javax.mail.Message;
+import jakarta.mail.Message;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
