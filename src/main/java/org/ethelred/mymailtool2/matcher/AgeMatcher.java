@@ -11,8 +11,8 @@ import org.joda.time.format.PeriodFormat;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * matches against the age of the message

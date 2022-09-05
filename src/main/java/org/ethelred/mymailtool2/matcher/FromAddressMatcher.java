@@ -1,8 +1,8 @@
 package org.ethelred.mymailtool2.matcher;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  *

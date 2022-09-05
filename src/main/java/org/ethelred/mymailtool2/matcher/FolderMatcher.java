@@ -3,7 +3,7 @@ package org.ethelred.mymailtool2.matcher;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nullable;
-import javax.mail.Message;
+import jakarta.mail.Message;
 
 /**
  * Created by edward on 3/3/14.

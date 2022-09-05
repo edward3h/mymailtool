@@ -11,9 +11,9 @@ import com.google.common.collect.Lists;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;

@@ -1,8 +1,8 @@
 package org.ethelred.mymailtool2;
 
-import javax.mail.Flags;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Flags;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * add/remove a User Flag on a message

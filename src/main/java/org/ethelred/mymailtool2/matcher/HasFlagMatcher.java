@@ -4,8 +4,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nullable;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * Does the message have a matching User flag?

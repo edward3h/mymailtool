@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.mail.Message;
+import jakarta.mail.Message;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;

@@ -1,7 +1,7 @@
 package org.ethelred.mymailtool2.matcher;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * match against a message subject

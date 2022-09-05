@@ -3,8 +3,8 @@ package org.ethelred.mymailtool2.matcher;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;

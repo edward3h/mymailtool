@@ -2,8 +2,8 @@ package org.ethelred.mymailtool2;
 
 import org.ethelred.util.ClockFactory;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 
 /**
  * static utils for mail
