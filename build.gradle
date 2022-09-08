@@ -1,9 +1,11 @@
 plugins {
     id 'application'
+    id("org.openrewrite.rewrite") version("5.28.0")
 }
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 java {
@@ -25,10 +27,14 @@ dependencies {
     implementation group: 'joda-time', name: 'joda-time', version: '2.11.1'
     implementation group: 'org.mozilla', name: 'rhino', version: '1.7.14'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+    implementation 'org.apache.logging.log4j:log4j-api:2.18.0'
+    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.18.0'
+
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.jmock', name: 'jmock', version: '2.12.0'
     testImplementation group: 'org.jmock', name: 'jmock-legacy', version: '2.12.0'
 
+    rewrite('org.ethelred:ethelred-rewrite:0.7')
 }
 
 task install {
@@ -44,3 +50,7 @@ task cleanBin(type: Delete) {
 }
 
 clean.dependsOn cleanBin
+
+rewrite {
+    activeRecipe('org.ethelred.rewrite.java.logging.jul.JulToLog4j2')
+}
