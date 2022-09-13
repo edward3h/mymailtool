@@ -6,6 +6,7 @@ plugins {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    mavenLocal()
 }
 
 java {
@@ -34,7 +35,8 @@ dependencies {
     testImplementation group: 'org.jmock', name: 'jmock', version: '2.12.0'
     testImplementation group: 'org.jmock', name: 'jmock-legacy', version: '2.12.0'
 
-    rewrite('org.ethelred:ethelred-rewrite:0.7')
+    rewrite('org.ethelred:ethelred-rewrite:0.3-6-ga72db15.dirty')
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks:latest.release")
 }
 
 task install {
@@ -52,5 +54,6 @@ task cleanBin(type: Delete) {
 clean.dependsOn cleanBin
 
 rewrite {
+    rewriteVersion = "7.30.0-SNAPSHOT"
     activeRecipe('org.ethelred.rewrite.java.logging.jul.JulToLog4j2')
 }
