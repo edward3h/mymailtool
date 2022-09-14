@@ -3,13 +3,15 @@ package org.ethelred.mymailtool2;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -17,6 +19,7 @@ import java.util.logging.Logger;
  */
 class CompositeConfiguration implements MailToolConfiguration
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     /**
      * most important at the start of the list, least important (i.e. built in defaults) at the end
      */
@@ -241,26 +244,26 @@ class CompositeConfiguration implements MailToolConfiguration
                 }
                 catch (IllegalAccessException ex)
                 {
-                    Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Unknown", ex);
                 }
                 catch (IllegalArgumentException ex)
                 {
-                    Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Unknown", ex);
                 }
                 catch (InvocationTargetException ex)
                 {
-                    Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Unknown", ex);
                 }
             }
             
         }
         catch (NoSuchMethodException ex)
         {
-            Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         catch (SecurityException ex)
         {
-            Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         
         return null;

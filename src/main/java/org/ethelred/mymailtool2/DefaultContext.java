@@ -20,14 +20,18 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Console;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DefaultContext implements MailToolContext
 {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MailToolConfiguration config;
 
@@ -68,7 +72,7 @@ public class DefaultContext implements MailToolContext
         /*} catch (NoSuchProviderException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);*/
         } catch (MessagingException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
 
         }
     }
@@ -82,7 +86,7 @@ public class DefaultContext implements MailToolContext
                 store = null;
                 System.out.printf("Disconnected%n");
             } catch (MessagingException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Unknown", ex);
             }
         }
     }
@@ -196,7 +200,7 @@ public class DefaultContext implements MailToolContext
                 return result;
             }
         } catch (MessagingException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         return null;
     }
@@ -210,7 +214,7 @@ public class DefaultContext implements MailToolContext
         }
         catch (MessagingException e)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.error("Unknown", e);
         }
         return null;
     }

@@ -3,9 +3,11 @@ package org.ethelred.mymailtool2;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -13,6 +15,7 @@ import java.util.logging.Logger;
  */
 abstract class TaskBase implements Task
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     protected MailToolContext context;
 
     @Override
@@ -50,7 +53,7 @@ abstract class TaskBase implements Task
             }
             catch (ShortcutFolderScanException sc)
             {
-                Logger.getLogger(TaskBase.class.getName()).log(Level.INFO, "Short cut on folder " + f.getName());
+                LOGGER.info("Short cut on folder {}", f.getName());
             }
             finally {
                 if((openMode() & Folder.READ_WRITE) > 0) {

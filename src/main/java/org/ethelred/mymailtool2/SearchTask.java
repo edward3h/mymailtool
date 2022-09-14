@@ -10,7 +10,9 @@ import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMultipart;
-
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
@@ -22,14 +24,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * search in a folder and sub-folders
  */
 public class SearchTask extends TaskBase
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Map<Flags.Flag, String> SYSTEM_FLAG_STRINGS = ImmutableMap.<Flags.Flag, String>builder()
             .put(Flags.Flag.ANSWERED, "ANSWERED")
             .put(Flags.Flag.DELETED, "DELETED")
@@ -130,7 +131,7 @@ public class SearchTask extends TaskBase
                 }
                 catch (IOException e)
                 {
-                    Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to download attachment", e);
+                    LOGGER.warn("Failed to download attachment", e);
                 }
             }
         }

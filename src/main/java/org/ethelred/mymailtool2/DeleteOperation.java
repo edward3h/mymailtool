@@ -1,10 +1,11 @@
 package org.ethelred.mymailtool2;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jakarta.mail.Flags;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -12,6 +13,8 @@ import jakarta.mail.MessagingException;
  */
 public class DeleteOperation implements MessageOperation
 {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public boolean apply(MailToolContext context, Message m)
@@ -24,7 +27,7 @@ public class DeleteOperation implements MessageOperation
         }
         catch(MessagingException e)
         {
-            Logger.getLogger(DeleteOperation.class.getName()).log(Level.SEVERE, "Error in DeleteOperation", e);
+            LOGGER.error("Error in DeleteOperation", e);
         }
         return false;
     }

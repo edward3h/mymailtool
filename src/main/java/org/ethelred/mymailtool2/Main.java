@@ -8,7 +8,8 @@ import java.io.Console;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.*;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
@@ -16,7 +17,9 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
-
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.google.common.collect.Sets;
 import org.ethelred.util.ClockFactory;
 import org.joda.time.DateTime;
@@ -32,7 +35,9 @@ import org.kohsuke.args4j.CmdLineParser;
  * @author edward
  */
 public class Main
-{   
+{
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @VisibleForTesting
     MailToolConfiguration config;
@@ -73,7 +78,7 @@ public class Main
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 */
         } catch (CmdLineException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
             parser.printUsage(System.err);
             System.exit(1);
         }
@@ -134,7 +139,7 @@ public class Main
         }
         catch(Exception e)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.error("Unknown", e);
             
         } finally {
             context.disconnect();
@@ -146,15 +151,9 @@ public class Main
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        LogManager lm = LogManager.getLogManager();
-        lm.reset();
-        Logger root = Logger.getLogger("");
-        root.setLevel(Level.ALL);
-        root.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
         Main app = new Main();
         app.init(args);
         app.run();
-
     }
 
     private class ShutdownHook implements Runnable

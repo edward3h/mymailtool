@@ -14,10 +14,12 @@ import javax.annotation.Nonnull;
 import jakarta.mail.Address;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,8 @@ import java.util.regex.Pattern;
  */
 abstract class AddressMatcher implements Predicate<Message>
 {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Address[] EMPTY_ADDRESSES = new Address[0];
     private final boolean bLiteral;
@@ -79,7 +83,7 @@ abstract class AddressMatcher implements Predicate<Message>
         }
         catch (ExecutionException e)
         {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Exception in getAddresses", e);
+            LOGGER.error("Exception in getAddresses", e);
             return false;
         }
     }

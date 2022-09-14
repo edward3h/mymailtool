@@ -15,12 +15,13 @@ import org.ethelred.mymailtool2.matcher.FolderMatcher;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -28,6 +29,7 @@ import jakarta.mail.MessagingException;
  */
 public class ApplyMatchOperationsTask extends TaskBase
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Comparator<? super MatchOperation> SPECIFIC_OPS = Ordering.natural().reverse().onResultOf(new Function<MatchOperation, Comparable>()
     {
         @Override
@@ -151,7 +153,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         }
         catch (MessagingException | IOException ex)
         {
-            Logger.getLogger(ApplyMatchOperationsTask.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
     }
 

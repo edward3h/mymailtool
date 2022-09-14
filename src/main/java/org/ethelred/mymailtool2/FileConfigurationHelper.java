@@ -1,13 +1,15 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.collect.MapMaker;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
  */
 public class FileConfigurationHelper
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static Map<String, FileConfigurationHandler> handlers = 
             new MapMaker().makeMap();
     
@@ -72,7 +75,7 @@ public class FileConfigurationHelper
         {
             if(!handlers.containsKey(ext))
             {
-                Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.INFO, "register handler for " + ext + " " + h);
+                LOGGER.info("register handler for {} {}", ext, h);
                 handlers.put(ext, h);
             }
         }
@@ -89,7 +92,7 @@ public class FileConfigurationHelper
         }
                 catch(IOException e)
                 {
-                    Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.SEVERE, null, e);
+                    LOGGER.error("Unknown", e);
                 }
         finally
         {
@@ -102,7 +105,7 @@ public class FileConfigurationHelper
             }
             catch (IOException ex)
             {
-                Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Unknown", ex);
             }
         }
          
@@ -135,8 +138,7 @@ public class FileConfigurationHelper
             }
             catch(ClassNotFoundException e2)
             {
-                Logger.getLogger(CommandLineConfiguration.class.getName()).log(Level.SEVERE, 
-                        String.format("Could not find class %s or %s", className, FileConfigurationHelper.class.getPackage().getName() + "." + className));
+                LOGGER.error(String.format("Could not find class %s or %s", className, FileConfigurationHelper.class.getPackage().getName() + "." + className));
             }
         }
         return null;
@@ -153,11 +155,11 @@ public class FileConfigurationHelper
         }
         catch (InstantiationException ex)
         {
-            Logger.getLogger(CommandLineConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         catch (IllegalAccessException ex)
         {
-            Logger.getLogger(CommandLineConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         return null;
     }
