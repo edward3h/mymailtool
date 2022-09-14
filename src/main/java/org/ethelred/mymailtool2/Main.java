@@ -2,33 +2,14 @@ package org.ethelred.mymailtool2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import java.io.Console;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
-import jakarta.mail.Authenticator;
-import jakarta.mail.Folder;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Store;
-import org.apache.logging.log4j.Level;
+import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.google.common.collect.Sets;
-import org.ethelred.util.ClockFactory;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Period;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.format.PeriodFormat;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -133,8 +114,6 @@ public class Main
         }
         catch(OperationLimitException e)
         {
-            //Logger.getLogger(Main.class.getName()).log(Level.INFO, e.toString());
-            //System.out.println(e.toString());
             context.logCompletion(e);
         }
         catch(Exception e)
