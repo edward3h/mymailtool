@@ -4,7 +4,6 @@ import jakarta.mail.Flags;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.LocalDate;
@@ -33,7 +32,7 @@ public class SplitOperation implements MessageOperation
             Folder moveTo = context.getFolder(getSubFolderName(startingFolder, received));
             startingFolder.copyMessages(new Message[]{m}, moveTo);
             m.setFlag(Flags.Flag.DELETED, true);
-            MailUtil.log("Move message %s from %s to %s", MailUtil.toString(m), startingFolder.getFullName(), moveTo.getFullName());
+            LOGGER.info("Move message {} from {} to {}", MailUtil.supplyString(m), startingFolder.getFullName(), moveTo.getFullName());
             return true;
         }
         catch(MessagingException e)

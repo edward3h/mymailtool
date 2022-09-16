@@ -3,7 +3,6 @@ package org.ethelred.mymailtool2;
 import jakarta.mail.Flags;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +21,7 @@ public class DeleteOperation implements MessageOperation
         try
         {
             m.setFlag(Flags.Flag.DELETED, true);
-            MailUtil.log("Delete message %s", MailUtil.toString(m));
+            LOGGER.info("Delete message {}", MailUtil.supplyString(m));
             return true;
         }
         catch(MessagingException e)

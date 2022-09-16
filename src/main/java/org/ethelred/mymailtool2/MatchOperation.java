@@ -3,6 +3,8 @@ package org.ethelred.mymailtool2;
 import com.google.common.base.Predicate;
 
 import jakarta.mail.Message;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -10,6 +12,7 @@ import jakarta.mail.Message;
  */
 public class MatchOperation
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private final Predicate<Message> match;
     private final MessageOperation operation;
 
@@ -26,7 +29,7 @@ public class MatchOperation
     {
         if(match.apply(m) && operation.apply(ctx, m))
         {
-            ctx.debugF("Matched %s and applied %s to message %s", match, operation, m);
+            LOGGER.debug("Matched {} and applied {} to message {}", match, operation, m);
             ctx.countOperation();
             return operation.finishApplying();
         }

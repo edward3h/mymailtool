@@ -140,7 +140,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             Collections.sort(sortedFolders, FOLDER_PREFERENCE);
             if(randomTraversal)
             {
-                context.debugF("Folder order...%n%s", Joiner.on("\n").join(sortedFolders));
+                LOGGER.debug("Folder order...\n{}", () -> Joiner.on("\n").join(sortedFolders));
             }
             for(Folder k: sortedFolders)
             {
@@ -210,7 +210,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException
     {
-        context.debugF("Checking %s", m);
+        LOGGER.debug("Checking {}", m);
         context.countMessage();
         // match/operation
         int ruleCount = 0;
@@ -241,7 +241,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void status(Folder f)
     {
-        context.debugF("Working on folder %s%n", f.getFullName());
+        LOGGER.debug("Working on folder {}\n", f.getFullName());
     }
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)

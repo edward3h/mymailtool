@@ -32,9 +32,6 @@ public interface MailToolContext
 
     void countMessage();
 
-    void debugF(String format, Object... messageArgs);
-
-
     int getChunkSize();
 
     boolean randomTraversal();

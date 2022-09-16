@@ -246,15 +246,6 @@ public class DefaultContext implements MailToolContext
     }
 
     @Override
-    public void debugF(String format, Object... messageArgs)
-    {
-        if(verbose)
-        {
-            MailUtil.log(format, messageArgs);
-        }
-    }
-
-    @Override
     public int getChunkSize()
     {
         return config.getChunkSize();
