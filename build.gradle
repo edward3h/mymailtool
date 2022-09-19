@@ -63,7 +63,7 @@ rewrite {
 //            "org.openrewrite.java.logging.SystemPrintToLogging",
             "org.openrewrite.java.cleanup.Cleanup",
 //            "org.openrewrite.java.migrate.Java8toJava11",
-//            "org.openrewrite.java.cleanup.CommonStaticAnalysis"
+            "org.openrewrite.java.cleanup.CommonStaticAnalysis"
     )
     exclusion('**/build.gradle')
 }
