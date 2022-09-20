@@ -25,7 +25,7 @@ public class FlagOperation implements MessageOperation
         try
         {
             Flags oldFlags = m.getFlags();
-            if(add == oldFlags.contains(userFlag))
+            if (add == oldFlags.contains(userFlag))
             {
                 // already in correct state
                 return false;

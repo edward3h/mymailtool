@@ -42,7 +42,7 @@ public class SearchTask extends TaskBase
     private final String folderName;
     private Predicate<Message> matcher;
     private boolean recursive = true;
-    private boolean printAttach = false;
+    private boolean printAttach;
     private File outputDirectory;
 
     public SearchTask(String folderName)
@@ -54,7 +54,7 @@ public class SearchTask extends TaskBase
     @Override
     public void run()
     {
-        if(this.matcher == null)
+        if (this.matcher == null)
         {
             throw new IllegalStateException("No search spec provided to SearchTask");
         }
@@ -63,7 +63,7 @@ public class SearchTask extends TaskBase
         {
             traverseFolder(folderName, recursive, true);
         }
-        catch(MessagingException | IOException e)
+        catch (MessagingException | IOException e)
         {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -72,13 +72,13 @@ public class SearchTask extends TaskBase
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException, IOException
     {
-        if(matcher.apply(m))
+        if (matcher.apply(m))
         {
-            _printMatch(f, m);
+            printMatch(f, m);
         }
         else
         {
-            _debugPrintNoMatch(f, m);
+            debugPrintNoMatch(f, m);
         }
     }
 
@@ -88,33 +88,33 @@ public class SearchTask extends TaskBase
         System.err.println("Searching " + f + " with " + matcher);
     }
 
-    private void _printMatch(Folder f, Message m) throws MessagingException, IOException
+    private void printMatch(Folder f, Message m) throws MessagingException, IOException
     {
         Address[] fromA = m.getFrom();
         System.out.printf(
                 "MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
                 f.getFullName(),
                 m.getSentDate(),
-                _printAddress(fromA),
+                printAddress(fromA),
                 m.getSubject()
         );
-        _printFlags(m);
-        if(printAttach)
+        printFlags(m);
+        if (printAttach)
         {
             Multipart mm = (Multipart) m.getContent();
-            for(int i = 0; i < mm.getCount(); i++)
+            for (int i = 0; i < mm.getCount(); i++)
             {
                 BodyPart part = mm.getBodyPart(i);
-                if(Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
+                if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
                 {
                     System.out.println(Strings.repeat(" ", 27) + part.getFileName());
-                    _tryDownload(part);
+                    tryDownload(part);
                 }
             }
         }
     }
 
-    private void _tryDownload(BodyPart part) throws MessagingException
+    private void tryDownload(BodyPart part) throws MessagingException
     {
         if (outputDirectory != null)
         {
@@ -137,16 +137,16 @@ public class SearchTask extends TaskBase
         }
     }
 
-    private void _printFlags(Message m) throws MessagingException
+    private void printFlags(Message m) throws MessagingException
     {
         System.out.print(Strings.repeat(" ", 27));
         Flags ff = m.getFlags();
-        for(Flags.Flag f: ff.getSystemFlags())
+        for (Flags.Flag f : ff.getSystemFlags())
         {
-            System.out.print(_flagToString(f));
+            System.out.print(flagToString(f));
             System.out.print(" ");
         }
-        for(String f: ff.getUserFlags())
+        for (String f : ff.getUserFlags())
         {
             System.out.print(f);
             System.out.print(" ");
@@ -154,26 +154,26 @@ public class SearchTask extends TaskBase
         System.out.println();
     }
 
-    private String _flagToString(Flags.Flag f)
+    private String flagToString(Flags.Flag f)
     {
         return SYSTEM_FLAG_STRINGS.get(f);
     }
 
-    private String _printAddress(Address[] from)
+    private String printAddress(Address[] from)
     {
-        if(from == null || from.length < 1)
+        if (from == null || from.length < 1)
         {
             return "[unknown]";
         }
         Address f = from[0];
-        if(f instanceof InternetAddress)
+        if (f instanceof InternetAddress)
         {
             return ((InternetAddress) f).toUnicodeString();
         }
         return f.toString();
     }
 
-    private void _debugPrintNoMatch(Folder f, Message m) throws MessagingException
+    private void debugPrintNoMatch(Folder f, Message m) throws MessagingException
     {
         /*Address[] fromA = m.getFrom();
         String from = fromA.length > 0 ? fromA[0].toString() : "[unknown]";
@@ -193,7 +193,7 @@ public class SearchTask extends TaskBase
 
     public void addMatcher(Predicate<Message> matcher)
     {
-        if(this.matcher == null)
+        if (this.matcher == null)
         {
             this.matcher = matcher;
         }
@@ -202,7 +202,7 @@ public class SearchTask extends TaskBase
             this.matcher = Predicates.and(this.matcher, matcher);
         }
 
-        if(matcher instanceof HasAttachmentMatcher)
+        if (matcher instanceof HasAttachmentMatcher)
         {
             printAttach = true;
         }

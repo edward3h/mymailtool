@@ -33,7 +33,7 @@ public class AgeMatcher implements Predicate<Message>
     @Override
     public boolean apply(@Nullable Message message)
     {
-        if(message == null)
+        if (message == null)
         {
             return false;
         }
@@ -42,12 +42,12 @@ public class AgeMatcher implements Predicate<Message>
         {
             DateTime received = new DateTime(message.getReceivedDate());
 
-            if(task == null)
+            if (task == null)
             {
                 return older ? received.isBefore(comparisonTime)
                     : received.isAfter(comparisonTime);
             }
-            else if((older && !task.orderNewestFirst() && received.isAfter(comparisonTime)) || (!older && task.orderNewestFirst() && received.isBefore(comparisonTime)))
+            else if ((older && !task.orderNewestFirst() && received.isAfter(comparisonTime)) || (!older && task.orderNewestFirst() && received.isBefore(comparisonTime)))
             {
                 throw new ShortcutFolderScanException();
             }

@@ -15,7 +15,7 @@ public class RecentMessageIterable implements Iterable<Message>
     private final boolean newestFirst;
     private final int chunkSize;
 
-    private final static int DEFAULT_CHUNK_SIZE = 100;
+    private static final int DEFAULT_CHUNK_SIZE = 100;
 
     public RecentMessageIterable(Folder f, boolean newestFirst, int chunkSize)
     {
@@ -34,7 +34,7 @@ public class RecentMessageIterable implements Iterable<Message>
     {
         try
         {
-            if(newestFirst)
+            if (newestFirst)
             {
                 return new NewestFirstRecentMessageIterator(folder, chunkSize);
             }
@@ -43,7 +43,7 @@ public class RecentMessageIterable implements Iterable<Message>
                 return new OldestFirstRecentMessageIterator(folder, chunkSize);
             }
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             throw new RuntimeException(e);
         }
@@ -63,20 +63,20 @@ public class RecentMessageIterable implements Iterable<Message>
             this.folder = folder;
             this.chunkSize = chunkSize;
             this.messageNumber = this.folder.getMessageCount();
-            if(messageNumber < 0)
+            if (messageNumber < 0)
             {
                 throw new MessagingException("Could not get message count from folder" + folder);
             }
             fp = new FetchProfile();
             fp.add(FetchProfile.Item.ENVELOPE);
-            _loadChunk();
+            loadChunk();
         }
 
-        private void _loadChunk()
+        private void loadChunk()
         {
             int chunkSize = Math.min(this.chunkSize, messageNumber);
             int[] ids = new int[chunkSize];
-            for(int i = 0; i < chunkSize; i++)
+            for (int i = 0; i < chunkSize; i++)
             {
                 ids[i] = messageNumber--;
             }
@@ -86,7 +86,7 @@ public class RecentMessageIterable implements Iterable<Message>
                 folder.fetch(messages, fp);
                 arrayIndex = 0;
             }
-            catch(MessagingException e)
+            catch (MessagingException e)
             {
                 throw  new RuntimeException(e);
             }
@@ -102,9 +102,9 @@ public class RecentMessageIterable implements Iterable<Message>
         public Message next()
         {
             Message result = messages[arrayIndex++];
-            if(arrayIndex >= messages.length)
+            if (arrayIndex >= messages.length)
             {
-                _loadChunk();
+                loadChunk();
             }
 
             return result;
@@ -135,15 +135,15 @@ public class RecentMessageIterable implements Iterable<Message>
             this.messageNumber = 0;
             fp = new FetchProfile();
             fp.add(FetchProfile.Item.ENVELOPE);
-            _loadChunk();
+            loadChunk();
         }
 
-        private void _loadChunk()
+        private void loadChunk()
         {
             int chunkSize = Math.min(this.chunkSize, messageCount - messageNumber);
             int[] ids = new int[chunkSize];
             int filler = messageNumber;
-            for(int i = 0; i < chunkSize; i++)
+            for (int i = 0; i < chunkSize; i++)
             {
                 ids[i] = filler++ + 1;
             }
@@ -153,7 +153,7 @@ public class RecentMessageIterable implements Iterable<Message>
                 messages = folder.getMessages(ids);
                 folder.fetch(messages, fp);
             }
-            catch(MessagingException e)
+            catch (MessagingException e)
             {
                 throw  new RuntimeException(e);
             }
@@ -170,9 +170,9 @@ public class RecentMessageIterable implements Iterable<Message>
         {
             int arrayIndex = messageNumber++ % DEFAULT_CHUNK_SIZE;
             Message result = messages[arrayIndex];
-            if(arrayIndex == messages.length - 1)
+            if (arrayIndex == messages.length - 1)
             {
-                _loadChunk();
+                loadChunk();
             }
             return result;
         }

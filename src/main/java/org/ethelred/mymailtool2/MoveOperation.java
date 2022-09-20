@@ -33,7 +33,7 @@ public class MoveOperation implements MessageOperation
             LOGGER.info("Move message {} from {} to {}", MailUtil.supplyString(m), startingFolder.getFullName(), moveTo.getFullName());
             return true;
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             LOGGER.error("Error in MoveOperation", e);
         }

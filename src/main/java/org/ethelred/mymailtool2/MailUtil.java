@@ -9,12 +9,12 @@ import java.util.function.Supplier;
 /**
  * static utils for mail
  */
-public class MailUtil
+public final class MailUtil
 {
     /**
      * not instantiable
      */
-    private MailUtil(){}
+    private MailUtil() {}
 
     public static Supplier<String> supplyString(Message m) throws MessagingException
     {

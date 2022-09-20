@@ -38,7 +38,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             return matchOperation == null ? 0 : matchOperation.getSpecificity();
         }
     });
-    private final Comparator<? super Folder> FOLDER_PREFERENCE = Ordering.natural().onResultOf(new Function<Folder, Integer>()
+    private final Comparator<? super Folder> folderPreference = Ordering.natural().onResultOf(new Function<Folder, Integer>()
     {
         @Override
         public Integer apply(@Nullable Folder applyKey)
@@ -65,7 +65,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         return !rules.isEmpty();
     }
 
-    private static class ApplyKey
+    private static final class ApplyKey
     {
         private final String folderName;
 
@@ -77,23 +77,18 @@ public class ApplyMatchOperationsTask extends TaskBase
         @Override
         public boolean equals(Object o)
         {
-            if(this == o)
+            if (this == o)
             {
                 return true;
             }
-            if(o == null || getClass() != o.getClass())
+            if (o == null || getClass() != o.getClass())
             {
                 return false;
             }
 
             ApplyKey applyKey = (ApplyKey) o;
 
-            if(!folderName.equals(applyKey.folderName))
-            {
-                return false;
-            }
-
-            return true;
+            return !(!folderName.equals(applyKey.folderName));
         }
 
         @Override
@@ -136,15 +131,15 @@ public class ApplyMatchOperationsTask extends TaskBase
             System.out.printf("Starting task with %s folders%n", rules.size());
             boolean randomTraversal = context.randomTraversal();
             // for each folder
-            List<Folder> sortedFolders = _scanFolders(rules.keySet(), randomTraversal);
-            Collections.sort(sortedFolders, FOLDER_PREFERENCE);
-            if(randomTraversal)
+            List<Folder> sortedFolders = scanFolders(rules.keySet(), randomTraversal);
+            Collections.sort(sortedFolders, folderPreference);
+            if (randomTraversal)
             {
                 LOGGER.debug("Folder order...\n{}", () -> Joiner.on("\n").join(sortedFolders));
             }
-            for(Folder k: sortedFolders)
+            for (Folder k : sortedFolders)
             {
-                    List<MatchOperation> lmo = _getRules(k);
+                    List<MatchOperation> lmo = getRules(k);
                     Collections.sort(lmo, SPECIFIC_OPS);
                     System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
                     traverseFolder(k, !randomTraversal && includeSubFolders.contains(k), true);
@@ -157,7 +152,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         }
     }
 
-    private List<Folder> _scanFolders(Set<ApplyKey> applyKeys, boolean randomTraversal) throws IOException, MessagingException {
+    private List<Folder> scanFolders(Set<ApplyKey> applyKeys, boolean randomTraversal) throws IOException, MessagingException {
         final List<Folder> result = Lists.newArrayList();
         TaskBase scanner = new TaskBase(){
 
@@ -177,11 +172,11 @@ public class ApplyMatchOperationsTask extends TaskBase
             }
         };
         scanner.init(context);
-        for(ApplyKey k: applyKeys)
+        for (ApplyKey k : applyKeys)
         {
             scanner.traverseFolder(k.folderName, includeSubFolders.contains(k) && randomTraversal, false);
         }
-        if(randomTraversal)
+        if (randomTraversal)
         {
             Collections.shuffle(result, random);
         }
@@ -194,11 +189,11 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
-    private List<MatchOperation> _getRules(Folder of) throws MessagingException {
-        for(Folder f = of; f != null; f = f.getParent())
+    private List<MatchOperation> getRules(Folder of) throws MessagingException {
+        for (Folder f = of; f != null; f = f.getParent())
         {
             ApplyKey k = new ApplyKey(f.getFullName());
-            if(rules.containsKey(k))
+            if (rules.containsKey(k))
             {
                 return rules.get(k);
             }
@@ -215,12 +210,12 @@ public class ApplyMatchOperationsTask extends TaskBase
         // match/operation
         int ruleCount = 0;
         int shortcutCount = 0;
-        for(MatchOperation mo: _getRules(f))
+        for (MatchOperation mo : getRules(f))
         {
             ruleCount++;
             try
             {
-                if(mo.testApply(m, context))
+                if (mo.testApply(m, context))
                 {
                     break;
                 }
@@ -231,7 +226,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             }
         }
 
-        if(ruleCount == shortcutCount)
+        if (ruleCount == shortcutCount)
         {
             throw new ShortcutFolderScanException();
         }
@@ -249,13 +244,13 @@ public class ApplyMatchOperationsTask extends TaskBase
         System.out.printf("Adding rule against %s with operation %s matching %s%n", folder, operation, checkMatchers);
         ApplyKey key = new ApplyKey(folder);
         List<MatchOperation> lmo = rules.get(key);
-        if(lmo == null)
+        if (lmo == null)
         {
             lmo = Lists.newArrayList();
             rules.put(key, lmo);
         }
 
-        if(!Iterables.any(checkMatchers, new Predicate<Predicate<Message>>()
+        if (!Iterables.any(checkMatchers, new Predicate<Predicate<Message>>()
         {
             @Override
             public boolean apply(@Nullable Predicate<Message> messagePredicate)
@@ -267,7 +262,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             matcher = Predicates.and(deferredDefaultMinAge, matcher);
         }
 
-        if(!includeSubFolders)
+        if (!includeSubFolders)
         {
             matcher = Predicates.and(new FolderMatcher(folder), matcher);
         }

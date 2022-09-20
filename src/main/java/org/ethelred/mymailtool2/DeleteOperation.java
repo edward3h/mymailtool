@@ -24,7 +24,7 @@ public class DeleteOperation implements MessageOperation
             LOGGER.info("Delete message {}", MailUtil.supplyString(m));
             return true;
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             LOGGER.error("Error in DeleteOperation", e);
         }

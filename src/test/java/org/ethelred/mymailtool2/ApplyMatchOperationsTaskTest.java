@@ -76,7 +76,7 @@ public class ApplyMatchOperationsTaskTest
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
         c.set(2013, Calendar.JANUARY, 1);
-        for(int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 5; i++)
         {
             c.add(Calendar.DATE, 1);
             data.addMessage("F1", MockMessage.create(dateFormat.format(c.getTime()), "foo@example.com", String.valueOf(i)));
@@ -115,7 +115,7 @@ public class ApplyMatchOperationsTaskTest
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
         c.set(2013, Calendar.JANUARY, 1);
-        for(int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 5; i++)
         {
             c.add(Calendar.DATE, 1);
             data.addMessage("F1", MockMessage.create(dateFormat.format(c.getTime()), "foo@example.com", String.valueOf(i)));

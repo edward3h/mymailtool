@@ -59,7 +59,7 @@ public class MatchersTest
             assertFalse(matcher.apply(msg3));
             context.assertIsSatisfied();
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             fail("unexpected exception");
         }
@@ -79,7 +79,7 @@ public class MatchersTest
             assertTrue(matcher.apply(msg));
             assertFalse(matcher.apply(msg2));
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             fail("unexpected exception");
         }
@@ -89,7 +89,7 @@ public class MatchersTest
     private Address[] mockAddresses(String... addresses)
     {
         Address[] result = new Address[addresses.length];
-        for(int i = 0; i < addresses.length; i++)
+        for (int i = 0; i < addresses.length; i++)
         {
             result[i] = mockAddress(addresses[i]);
         }

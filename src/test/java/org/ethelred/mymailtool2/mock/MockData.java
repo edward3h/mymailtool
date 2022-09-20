@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
 /**
  * singleton to configure mock folders + messages
  */
-public class MockData
+public final class MockData
 {
     private static final Comparator<? super MockMessage> DATE_SORT = Ordering.natural().onResultOf(new Function<MockMessage, Comparable>()
     {
@@ -30,7 +30,7 @@ public class MockData
             {
                 return mockMessage.getDate();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new IllegalStateException("Bad date in message " + mockMessage);
             }
@@ -49,7 +49,7 @@ public class MockData
     public void addFolder(String sName)
     {
         sName = _checkName(sName);
-        if(!folderMessages.containsKey(sName))
+        if (!folderMessages.containsKey(sName))
         {
             folderMessages.put(sName, Lists.<MockMessage>newArrayList());
         }
@@ -58,7 +58,7 @@ public class MockData
     public int folderSize(String sName)
     {
         sName = _checkName(sName);
-        if(folderMessages.containsKey(sName))
+        if (folderMessages.containsKey(sName))
         {
             return folderMessages.get(sName).size();
         }
@@ -81,7 +81,7 @@ public class MockData
 
     private String _checkName(String name)
     {
-        if(MockStore.DEFAULT_FOLDER_NAME.equalsIgnoreCase(name))
+        if (MockStore.DEFAULT_FOLDER_NAME.equalsIgnoreCase(name))
         {
             return MockStore.DEFAULT_FOLDER_NAME;
         }
@@ -91,7 +91,7 @@ public class MockData
     public MockMessage getMessage(String folderName, int index)
     {
         folderName = _checkName(folderName);
-        if(folderMessages.containsKey(folderName))
+        if (folderMessages.containsKey(folderName))
         {
             return folderMessages.get(folderName).get(index - 1);
         }
@@ -101,7 +101,7 @@ public class MockData
     public boolean deleteMessage(String folderName, MockMessage mockMessage)
     {
         folderName = _checkName(folderName);
-        if(folderMessages.containsKey(folderName))
+        if (folderMessages.containsKey(folderName))
         {
             List<MockMessage> messages = folderMessages.get(folderName);
             return messages.remove(mockMessage);
@@ -114,9 +114,12 @@ public class MockData
         getInstance().folderMessages.clear();
     }
 
-    private static class SingletonHolder
+    private static final class SingletonHolder
     {
         public static final MockData INSTANCE = new MockData();
+
+        private SingletonHolder() {
+        }
     }
 
     private MockData()

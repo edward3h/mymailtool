@@ -19,7 +19,7 @@ public class SplitOperation implements MessageOperation
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final static DateTimeFormatter monthPart = new DateTimeFormatterBuilder().appendMonthOfYear(2).appendLiteral('-').appendMonthOfYearShortText().appendLiteral(
+    private static final DateTimeFormatter monthPart = new DateTimeFormatterBuilder().appendMonthOfYear(2).appendLiteral('-').appendMonthOfYearShortText().appendLiteral(
             '-').appendYear(4, 4).toFormatter();
 
     @Override
@@ -35,7 +35,7 @@ public class SplitOperation implements MessageOperation
             LOGGER.info("Move message {} from {} to {}", MailUtil.supplyString(m), startingFolder.getFullName(), moveTo.getFullName());
             return true;
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             LOGGER.error("Error in Split", e);
         }

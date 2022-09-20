@@ -46,7 +46,7 @@ public class Main
             
             CompositeConfiguration temp = new CompositeConfiguration(clc, spc, dc);
             
-            for(String fileLocation: temp.getFileLocations())
+            for (String fileLocation : temp.getFileLocations())
             {
                 FileConfigurationHelper.loadFileConfiguration(temp, fileLocation);
             }
@@ -67,7 +67,7 @@ public class Main
 
     private synchronized MailToolConfiguration getDefaultConfiguration()
     {
-        if(defaultConfiguration == null)
+        if (defaultConfiguration == null)
         {
             defaultConfiguration = new DefaultConfiguration();
         }
@@ -82,19 +82,19 @@ public class Main
     private void validateRequiredConfiguration(MailToolConfiguration configuration) throws CmdLineException
     {
         Map<String, String> mailProperties = configuration.getMailProperties();
-        if(mailProperties == null || mailProperties.isEmpty())
+        if (mailProperties == null || mailProperties.isEmpty())
         {
             throw new CmdLineException("Missing mail properties - have you set up a config file?");
         }
         Set<String> missingProperties = Sets.newHashSet();
-        for(String key: MailToolConfiguration.ALL_MAIL_PROPERTIES)
+        for (String key : MailToolConfiguration.ALL_MAIL_PROPERTIES)
         {
-            if(!mailProperties.containsKey(key))
+            if (!mailProperties.containsKey(key))
             {
                 missingProperties.add(key);
             }
         }
-        if(!missingProperties.isEmpty())
+        if (!missingProperties.isEmpty())
         {
             throw new CmdLineException("Missing mail properties " + Joiner.on(',').join(missingProperties));
         }
@@ -112,11 +112,11 @@ public class Main
             t.run();
             context.logCompletion(null);
         }
-        catch(OperationLimitException e)
+        catch (OperationLimitException e)
         {
             context.logCompletion(e);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             LOGGER.error("Unknown", e);
             
@@ -140,7 +140,7 @@ public class Main
         @Override
         public void run()
         {
-            if(context != null)
+            if (context != null)
             {
                 context.disconnect();
                 context.shutdown();

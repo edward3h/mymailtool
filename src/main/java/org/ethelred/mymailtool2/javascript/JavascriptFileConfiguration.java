@@ -47,16 +47,16 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     private IJSObject config;
 
     private Context ctx;
-    private static final String SETUP_CALLBACK = "for(var fn in callback) {\n" +
-            "  if(typeof callback[fn] === 'function') {\n" +
-            "    this[fn] = (function() {\n" +
-            "      var method = callback[fn];\n" +
-            "      return function() {\n" +
-            "         return method.apply(callback,arguments);\n" +
-            "      };\n" +
-            "    })();\n" +
-            "  }\n" +
-            "}";
+    private static final String SETUP_CALLBACK = "for(var fn in callback) {\n"
+            + "  if(typeof callback[fn] === 'function') {\n"
+            + "    this[fn] = (function() {\n"
+            + "      var method = callback[fn];\n"
+            + "      return function() {\n"
+            + "         return method.apply(callback,arguments);\n"
+            + "      };\n"
+            + "    })();\n"
+            + "  }\n"
+            + "}";
 
     private List<String> fileLocations = Lists.newArrayList();
     private List<OperationBuilder> deferredRules = Lists.newArrayList();
@@ -140,7 +140,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public Predicate<Message> isFrom(String... regex)
         {
-            return new FromAddressMatcher(false, _first(regex), _rest(regex));
+            return new FromAddressMatcher(false, first(regex), rest(regex));
         }
 
         public Predicate<Message> matchesSubject(String regex)
@@ -150,7 +150,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public Predicate<Message> isTo(String... regex)
         {
-            return new ToAddressMatcher(false, _first(regex), _rest(regex));
+            return new ToAddressMatcher(false, first(regex), rest(regex));
         }
 
         public Predicate<Message> hasAttachment(String regex)
@@ -174,9 +174,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         }
     }
 
-    private String[] _rest(String[] strings)
+    private String[] rest(String[] strings)
     {
-        if(strings.length > 1)
+        if (strings.length > 1)
         {
             String[] result = new String[strings.length - 1];
             System.arraycopy(strings, 1, result, 0, strings.length - 1);
@@ -185,9 +185,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         return new String[0];
     }
 
-    private String _first(String[] strings)
+    private String first(String[] strings)
     {
-        if(strings.length > 0)
+        if (strings.length > 0)
         {
             return strings[0];
         }
@@ -228,10 +228,10 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        for(String k: ALL_MAIL_PROPERTIES) 
+        for (String k : ALL_MAIL_PROPERTIES) 
         {
             String v = config.getString(k);
-            if(v != null)
+            if (v != null)
             {
                 builder.put(k, v);
             }
@@ -274,7 +274,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     public int getChunkSize()
     {
         String v = config.getString("chunk");
-        if(v == null)
+        if (v == null)
         {
             return PRIMITIVE_DEFAULT;
         }
@@ -320,9 +320,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     {
         protected Predicate<Message> delegate;
         protected List<Predicate<Message>> predicates = Lists.newArrayList();
-        protected int specificity = 0;
+        protected int specificity;
         protected String folderName;
-        protected boolean includeSubFolders = false;
+        protected boolean includeSubFolders;
 
         private OperationBuilder(String folderName)
         {

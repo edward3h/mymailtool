@@ -30,7 +30,7 @@ public abstract class StringMatcher implements Predicate<Message>
             CharSequence s = getString(message);
             return s != null && stringPattern.matcher(s).matches();
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             LOGGER.warn("Error in matcher", e);
         }

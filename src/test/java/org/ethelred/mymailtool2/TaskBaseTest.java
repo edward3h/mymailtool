@@ -75,12 +75,12 @@ public class TaskBaseTest
     private class MockTaskBase extends TaskBase
     {
         int giveUpAfter = 1;
-        int messageCounter = 0;
+        int messageCounter;
         @Override
         protected void runMessage(Folder f, Message m) throws MessagingException, IOException
         {
             System.out.println("Check message " + messageCounter);
-            if(messageCounter++ > giveUpAfter)
+            if (messageCounter++ > giveUpAfter)
             {
                 throw new ShortcutFolderScanException();
             }

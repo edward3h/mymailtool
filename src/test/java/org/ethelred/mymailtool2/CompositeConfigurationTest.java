@@ -142,10 +142,10 @@ public class CompositeConfigurationTest
             oneOf(mockFile2).getFileLocations(); will(returnValue(Collections.emptyList()));
         }});
         int counter = 0;
-        for(String filename: cmp.getFileLocations())
+        for (String filename : cmp.getFileLocations())
         {
             MailToolConfiguration fileConf = mockFiles.get(filename);
-            if(fileConf != null)
+            if (fileConf != null)
             {
                 cmp.insert(fileConf);
             }

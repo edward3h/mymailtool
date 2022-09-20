@@ -28,7 +28,7 @@ abstract class TaskBase implements Task
     protected void traverseFolder(String folderName, boolean includeSubFolders, boolean readMessages) throws MessagingException, IOException
     {
         Folder f = context.getFolder(folderName);
-        if(f == null || !f.exists())
+        if (f == null || !f.exists())
         {
             throw new IllegalStateException("Could not open folder " + folderName);
         }
@@ -40,13 +40,13 @@ abstract class TaskBase implements Task
     {
         status(f);
 
-        if(readMessages && (f.getType() & Folder.HOLDS_MESSAGES) > 0)
+        if (readMessages && (f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
             f.open(openMode());
 
             try
             {
-                for(Message m: readMessages(f))
+                for (Message m : readMessages(f))
                 {
                     runMessage(f, m);
                 }
@@ -56,16 +56,16 @@ abstract class TaskBase implements Task
                 LOGGER.info("Short cut on folder {}", f.getName());
             }
             finally {
-                if((openMode() & Folder.READ_WRITE) > 0) {
+                if ((openMode() & Folder.READ_WRITE) > 0) {
                     f.expunge();
                 }
                 f.close(true);
             }
         }
 
-        if(includeSubFolders && (f.getType() & Folder.HOLDS_FOLDERS) > 0)
+        if (includeSubFolders && (f.getType() & Folder.HOLDS_FOLDERS) > 0)
         {
-            for(Folder child: f.list())
+            for (Folder child : f.list())
             {
                 traverseFolder(child, includeSubFolders, readMessages);
             }

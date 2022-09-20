@@ -49,13 +49,13 @@ abstract class AddressMatcher implements Predicate<Message>
     {
         this.bLiteral = bLiteral;
         int nFlags = Pattern.CASE_INSENSITIVE;
-        if(bLiteral)
+        if (bLiteral)
         {
             nFlags = nFlags | Pattern.LITERAL;
         }
         List<Pattern> patterns = Lists.newArrayListWithCapacity(morePatterns.length + 1);
         patterns.add(Pattern.compile(patternSpec, nFlags));
-        for(String pattern: morePatterns)
+        for (String pattern : morePatterns)
         {
             patterns.add(Pattern.compile(pattern, nFlags));
         }
@@ -70,7 +70,7 @@ abstract class AddressMatcher implements Predicate<Message>
             Address[] addresses = addressCache.get(t);
             for (Address a : addresses)
             {
-                for(Pattern addressPattern: addressPatterns)
+                for (Pattern addressPattern : addressPatterns)
                 {
                     Matcher m = addressPattern.matcher(a.toString());
                     if ((bLiteral && m.find()) || (!bLiteral && m.matches()))

@@ -28,23 +28,23 @@ public class HasAttachmentMatcher implements Predicate<Message>
     @Override
     public boolean apply(@Nullable Message message)
     {
-        if(message == null)
+        if (message == null)
         {
             return false;
         }
 
         try
         {
-            if(!message.isMimeType("multipart/mixed"))
+            if (!message.isMimeType("multipart/mixed"))
             {
                 return false;
             }
 
             Multipart mm = (Multipart) message.getContent();
-            for(int i = 0; i < mm.getCount(); i++)
+            for (int i = 0; i < mm.getCount(); i++)
             {
                 BodyPart part = mm.getBodyPart(i);
-                if(Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()) && fileNamePattern.matcher(part.getFileName()).find())
+                if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()) && fileNamePattern.matcher(part.getFileName()).find())
                 {
                     return true;
                 }

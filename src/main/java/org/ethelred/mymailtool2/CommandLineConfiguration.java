@@ -29,7 +29,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     private String user;
     
     @Option(name = "--help", usage = "Show help.", aliases = {"-h", "-?"})
-    private boolean showUsage = false;
+    private boolean showUsage;
 
     @Option(name = "--limit", usage = "Operation limit count", aliases = {"-O"})
     private int limit = PRIMITIVE_DEFAULT;
@@ -52,13 +52,13 @@ class CommandLineConfiguration implements MailToolConfiguration
     private boolean invertNextMatcher;
 
     @Option(name = "--verbose", usage = "Verbose (debugging) output", aliases = {"-v"})
-    private boolean verbose = false;
+    private boolean verbose;
 
     @Option(name = "--chunk", usage = "How many messages to grab in a batch")
     private int chunkSize = PRIMITIVE_DEFAULT;
 
     @Option(name = "--random", usage = "Traverse folders in random order")
-    private boolean random = false;
+    private boolean random;
 
     @Override
     public int getChunkSize()
@@ -92,7 +92,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     private void setFileHandlerClass(String className)
     {
         FileConfigurationHandler handler = FileConfigurationHelper.getHandlerForClassName(className);
-        if(handler != null)
+        if (handler != null)
         {
             fileHandlers.add(handler);
         }
@@ -136,7 +136,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--to", usage = "Search messages matching To address", metaVar = "PATTERN")
     private void searchTo(String searchSpec)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new ToAddressMatcher(false, searchSpec)));
         }
@@ -144,7 +144,7 @@ class CommandLineConfiguration implements MailToolConfiguration
 
     private Predicate<Message> nextMatcher(Predicate<Message> matcher)
     {
-        if(invertNextMatcher)
+        if (invertNextMatcher)
         {
             invertNextMatcher = false;
             return Predicates.not(matcher);
@@ -158,7 +158,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--from", usage = "Search messages matching From address", metaVar = "PATTERN")
     private void searchFrom(String searchSpec)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new FromAddressMatcher(false, searchSpec)));
         }
@@ -167,7 +167,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--attach", usage = "Search messages which have an attachment with filename matching this pattern", metaVar = "PATTERN")
     private void searchAttachment(String pattern)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new HasAttachmentMatcher(pattern)));
         }
@@ -189,7 +189,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--flag", usage = "Search messages which have a flag with this name", metaVar = "NAME")
     private void searchFlag(String pattern)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new HasFlagMatcher(pattern)));
         }
@@ -198,7 +198,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--non-recursive", usage = "Search defaults to reading sub-folders - this stops it")
     private void searchNonRecursive(boolean set)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).setRecursive(false);
         }
@@ -207,7 +207,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--subject", usage = "Search messages matching Subject", metaVar = "PATTERN")
     private void searchSubject(String searchSpec)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new SubjectMatcher(searchSpec)));
         }
@@ -216,7 +216,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--newer", usage = "Search messages newer than age", metaVar = "PERIOD")
     private void searchNewer(String searchSpec)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, false, task)));
         }
@@ -225,7 +225,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--older", usage = "Search messages older than age", metaVar = "PERIOD")
     private void searchOlder(String searchSpec)
     {
-        if(task instanceof SearchTask)
+        if (task instanceof SearchTask)
         {
             ((SearchTask) task).addMatcher(nextMatcher(new AgeMatcher(searchSpec, true, task)));
         }

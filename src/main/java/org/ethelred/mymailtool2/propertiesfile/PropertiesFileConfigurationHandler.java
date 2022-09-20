@@ -25,7 +25,7 @@ public class PropertiesFileConfigurationHandler extends BaseFileConfigurationHan
         {
             return new PropertiesFileConfiguration(f);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return null;
         }

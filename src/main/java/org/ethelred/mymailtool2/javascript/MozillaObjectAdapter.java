@@ -7,7 +7,7 @@ import org.mozilla.javascript.Scriptable;
  * warning - uses undocumented internal classes
  * @author edward
  */
-class MozillaObjectAdapter implements IJSObject
+final class MozillaObjectAdapter implements IJSObject
 {
     
     static IJSObject wrap(Object obj)
@@ -29,16 +29,16 @@ class MozillaObjectAdapter implements IJSObject
     
     Object get(String propertyName)
     {
-        if(propertyName.contains("."))
+        if (propertyName.contains("."))
         {
             String[] parts = propertyName.split("\\.");
             Object o = NativeObject.getProperty(no, parts[0]);
-            if(o instanceof NativeObject)
+            if (o instanceof NativeObject)
             {
                 StringBuilder nested = new StringBuilder();
-                for(int i = 1; i < parts.length; i++)
+                for (int i = 1; i < parts.length; i++)
                 {
-                    if(i > 1)
+                    if (i > 1)
                     {
                         nested.append(".");
                     }

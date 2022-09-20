@@ -27,7 +27,7 @@ public class MatchOperation
     
     boolean testApply(Message m, MailToolContext ctx)
     {
-        if(match.apply(m) && operation.apply(ctx, m))
+        if (match.apply(m) && operation.apply(ctx, m))
         {
             LOGGER.debug("Matched {} and applied {} to message {}", match, operation, m);
             ctx.countOperation();

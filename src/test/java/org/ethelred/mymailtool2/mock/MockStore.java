@@ -11,7 +11,7 @@ import jakarta.mail.URLName;
  */
 public class MockStore extends Store
 {
-    public final static String DEFAULT_FOLDER_NAME = "Inbox";
+    public static final String DEFAULT_FOLDER_NAME = "Inbox";
 
     private static MockData data = MockData.getInstance();
 
