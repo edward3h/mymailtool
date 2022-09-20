@@ -48,7 +48,7 @@ public class CompositeConfigurationTest
             @Override
             public Map<String, String> getMailProperties()
             {
-                return Collections.singletonMap("test", "mail");
+                return Map.of("test", "mail");
             }
 
             @Override

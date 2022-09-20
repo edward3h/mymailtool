@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import jakarta.mail.Message;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -89,7 +88,7 @@ public class ApplyMatchOperationsTaskTest
         assertEquals(-1, data.folderSize("F2"));
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         Predicate<Message> age = new AgeMatcher("3 days", true, task);
-        task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age), Collections.singletonList(age), new MoveOperation("F2"), false);
+        task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age), List.of(age), new MoveOperation("F2"), false);
         MailToolContext context = new DefaultContext(new MockDefaultConfiguration());
         try
         {
@@ -129,8 +128,8 @@ public class ApplyMatchOperationsTaskTest
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         Predicate<Message> age1 = new AgeMatcher("4 days", true, task);
         Predicate<Message> age2 = new AgeMatcher("2 days", true, task);
-        task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age1), Collections.singletonList(age1), new MoveOperation("F2"), false);
-        task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age2), Collections.singletonList(age2), new MoveOperation("F3"), false);
+        task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age1), List.of(age1), new MoveOperation("F2"), false);
+        task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age2), List.of(age2), new MoveOperation("F3"), false);
         MailToolContext context = new DefaultContext(new MockDefaultConfiguration());
         try
         {
