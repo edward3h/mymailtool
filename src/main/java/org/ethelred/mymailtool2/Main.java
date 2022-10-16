@@ -106,7 +106,7 @@ public class Main
             context = new DefaultContext(config);
             context.connect();
 
-            System.out.println("About to get task from config " + config);
+            LOGGER.info("About to get task from config {}", config);
             Task t = config.getTask();
             t.init(context);
             t.run();

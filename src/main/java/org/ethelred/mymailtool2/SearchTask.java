@@ -65,7 +65,7 @@ public class SearchTask extends TaskBase
         }
         catch (MessagingException | IOException e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error("Exception", e);  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -85,14 +85,14 @@ public class SearchTask extends TaskBase
     @Override
     protected void status(Folder f)
     {
-        System.err.println("Searching " + f + " with " + matcher);
+        LOGGER.error("Searching {} with {}", f, matcher);
     }
 
     private void printMatch(Folder f, Message m) throws MessagingException, IOException
     {
         Address[] fromA = m.getFrom();
-        System.out.printf(
-                "MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
+        LOGGER.info(
+                "MATCH {} - {} - {} : {}",
                 f.getFullName(),
                 m.getSentDate(),
                 printAddress(fromA),
@@ -107,7 +107,7 @@ public class SearchTask extends TaskBase
                 BodyPart part = mm.getBodyPart(i);
                 if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
                 {
-                    System.out.println(Strings.repeat(" ", 27) + part.getFileName());
+                    LOGGER.info("{}{}", Strings.repeat(" ", 27), part.getFileName());
                     tryDownload(part);
                 }
             }
@@ -121,7 +121,7 @@ public class SearchTask extends TaskBase
             File outputFile = new File(outputDirectory, part.getFileName());
             if (outputFile.exists())
             {
-                System.out.println("File " + outputFile + " already exists, skipping.");
+                LOGGER.info("File {} already exists, skipping.", outputFile);
             }
             else
             {
@@ -139,17 +139,17 @@ public class SearchTask extends TaskBase
 
     private void printFlags(Message m) throws MessagingException
     {
-        System.out.print(Strings.repeat(" ", 27));
+        LOGGER.info(Strings.repeat(" ", 27));
         Flags ff = m.getFlags();
         for (Flags.Flag f : ff.getSystemFlags())
         {
-            System.out.print(flagToString(f));
-            System.out.print(" ");
+            LOGGER.info(flagToString(f));
+            LOGGER.info(" ");
         }
         for (String f : ff.getUserFlags())
         {
-            System.out.print(f);
-            System.out.print(" ");
+            LOGGER.info(f);
+            LOGGER.info(" ");
         }
         System.out.println();
     }
@@ -177,8 +177,8 @@ public class SearchTask extends TaskBase
     {
         /*Address[] fromA = m.getFrom();
         String from = fromA.length > 0 ? fromA[0].toString() : "[unknown]";
-        System.out.printf(
-                "%20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
+        LOGGER.info(
+                "{} - {} - {} : {}",
                 f.getFullName(),
                 m.getSentDate(),
                 from,

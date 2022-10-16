@@ -128,7 +128,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     {
         try
         {
-            System.out.printf("Starting task with %s folders%n", rules.size());
+            LOGGER.info("Starting task with {} folders", rules.size());
             boolean randomTraversal = context.randomTraversal();
             // for each folder
             List<Folder> sortedFolders = scanFolders(rules.keySet(), randomTraversal);
@@ -141,7 +141,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             {
                     List<MatchOperation> lmo = getRules(k);
                     Collections.sort(lmo, SPECIFIC_OPS);
-                    System.out.printf("Starting application: %s %s%n", k, Joiner.on(", ").join(lmo));
+                    LOGGER.info("Starting application: {} {}", k, Joiner.on(", ").join(lmo));
                     traverseFolder(k, !randomTraversal && includeSubFolders.contains(k), true);
 
             }
@@ -241,7 +241,7 @@ public class ApplyMatchOperationsTask extends TaskBase
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)
     {
-        System.out.printf("Adding rule against %s with operation %s matching %s%n", folder, operation, checkMatchers);
+        LOGGER.info("Adding rule against {} with operation {} matching {}", folder, operation, checkMatchers);
         ApplyKey key = new ApplyKey(folder);
         List<MatchOperation> lmo = rules.get(key);
         if (lmo == null)

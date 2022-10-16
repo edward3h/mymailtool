@@ -14,6 +14,9 @@ import org.junit.Test;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
@@ -23,6 +26,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TaskBaseTest
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     MailToolContext mockContext;
 
     @Before
@@ -79,7 +83,7 @@ public class TaskBaseTest
         @Override
         protected void runMessage(Folder f, Message m) throws MessagingException, IOException
         {
-            System.out.println("Check message " + messageCounter);
+            LOGGER.info("Check message {}", messageCounter);
             if (messageCounter++ > giveUpAfter)
             {
                 throw new ShortcutFolderScanException();
@@ -90,7 +94,7 @@ public class TaskBaseTest
         protected void status(Folder f)
         {
 
-            System.out.println("Status folder " + f);
+            LOGGER.info("Status folder {}", f);
         }
 
         @Override

@@ -14,6 +14,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
@@ -29,6 +31,7 @@ import org.ethelred.util.MapWithDefault;
  */
 class PropertiesFileConfiguration implements MailToolConfiguration
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private Properties delegate;
     private List<String> fileLocations = Lists.newArrayList();
     private List<FileConfigurationHandler> fileHandlers = Lists.newArrayList();
@@ -204,11 +207,11 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             if (sourceFolder != null && matcher != null && operation != null)
             {
                 task.addRule(sourceFolder, matcher, matchers, operation, includeSubFolders);
-                System.out.printf("Adding rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
+                LOGGER.info("Adding rule {} (folder {} matcher {} operation {})", name, sourceFolder, matcher, operation);
             }
             else
             {
-                System.out.printf("Skipping rule %s (folder %s matcher %s operation %s)%n", name, sourceFolder, matcher, operation);
+                LOGGER.info("Skipping rule {} (folder {} matcher {} operation {})", name, sourceFolder, matcher, operation);
             }
         }
         

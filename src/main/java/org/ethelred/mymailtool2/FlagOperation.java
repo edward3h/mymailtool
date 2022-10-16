@@ -3,12 +3,15 @@ package org.ethelred.mymailtool2;
 import jakarta.mail.Flags;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * add/remove a User Flag on a message
  */
 public class FlagOperation implements MessageOperation
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private boolean add;
     private String userFlag;
 
@@ -36,7 +39,7 @@ public class FlagOperation implements MessageOperation
         }
         catch (MessagingException e)
         {
-            System.out.printf("Error in %s: %s%n", getClass().getName(), e);
+            LOGGER.info("Error in {}: {}", getClass().getName(), e);
             return false;
         }
     }

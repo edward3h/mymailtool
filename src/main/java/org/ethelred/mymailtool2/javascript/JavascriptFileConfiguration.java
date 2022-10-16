@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.mail.Message;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
@@ -44,6 +45,7 @@ import org.mozilla.javascript.ScriptableObject;
  */
 class JavascriptFileConfiguration implements MailToolConfiguration
 {
+    private static final Logger LOGGER = LogManager.getLogger(JavascriptFileConfiguration.class);
     private IJSObject config;
 
     private Context ctx;
@@ -254,7 +256,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Task getTask() throws Exception
     {
-        System.out.println("getTask " + deferredRules);
+        LOGGER.info("getTask {}", deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         for (OperationBuilder builder : deferredRules)
         {

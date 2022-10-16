@@ -138,7 +138,7 @@ public final class FileConfigurationHelper
             }
             catch (ClassNotFoundException e2)
             {
-                LOGGER.error(String.format("Could not find class %s or %s", className, FileConfigurationHelper.class.getPackage().getName() + "." + className));
+                LOGGER.error("Could not find class {} or {}", className, FileConfigurationHelper.class.getPackage().getName() + "." + className);
             }
         }
         return null;
