@@ -1,27 +1,29 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import org.ethelred.mymailtool2.matcher.AgeMatcher;
-import org.ethelred.mymailtool2.matcher.FolderMatcher;
-
-import java.io.IOException;
-import java.util.*;
-import javax.annotation.Nullable;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.ethelred.mymailtool2.matcher.AgeMatcher;
+import org.ethelred.mymailtool2.matcher.FolderMatcher;
+import org.ethelred.util.Predicates;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  *
@@ -30,35 +32,16 @@ import org.apache.logging.log4j.Logger;
 public class ApplyMatchOperationsTask extends TaskBase
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Comparator<? super MatchOperation> SPECIFIC_OPS = Ordering.natural().reverse().onResultOf(new Function<MatchOperation, Comparable>()
-    {
-        @Override
-        public Comparable apply(@Nullable MatchOperation matchOperation)
-        {
-            return matchOperation == null ? 0 : matchOperation.getSpecificity();
-        }
-    });
-    private final Comparator<? super Folder> folderPreference = Ordering.natural().onResultOf(new Function<Folder, Integer>()
-    {
-        @Override
-        public Integer apply(@Nullable Folder applyKey)
-        {
-            return context.getDefaultFolder().equals(applyKey) || "INBOX".equalsIgnoreCase(applyKey.getName()) ? 0 : 1;
-        }
-    });
+    private static final Comparator<? super MatchOperation> SPECIFIC_OPS =
+            Comparator.comparing(MatchOperation::getSpecificity).reversed();
 
+    private final Comparator<? super Folder> folderPreference = Comparator.comparing(
+            folder ->context.getDefaultFolder().equals(folder) || "INBOX".equalsIgnoreCase(folder.getName()) ? 0 : 1
+    );
 
     Predicate<Message> defaultMinAgeDelegate;
-    private Predicate<? super Message> deferredDefaultMinAge = new Predicate<Message>()
-    {
-        @Override
-        public boolean apply(@Nullable Message message)
-        {
-            return defaultMinAgeDelegate.apply(message);
-        }
-    };
-
-    private Random random = new Random();
+    private final Predicate<Message> deferredDefaultMinAge = (message) -> defaultMinAgeDelegate.test(message);
+    private final Random random = new Random();
 
     public boolean hasRules()
     {
@@ -72,6 +55,10 @@ public class ApplyMatchOperationsTask extends TaskBase
         private ApplyKey(String folderName)
         {
             this.folderName = folderName.toLowerCase();
+        }
+
+        public ApplyKey(Folder folder) {
+            this(folder.getFullName());
         }
 
         @Override
@@ -88,14 +75,13 @@ public class ApplyMatchOperationsTask extends TaskBase
 
             ApplyKey applyKey = (ApplyKey) o;
 
-            return ! !folderName.equals(applyKey.folderName);
+            return folderName.equals(applyKey.folderName);
         }
 
         @Override
         public int hashCode()
         {
-            int result = folderName.hashCode();
-            return result;
+            return folderName.hashCode();
         }
 
         @Override
@@ -120,7 +106,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     public void init(MailToolContext ctx)
     {
         super.init(ctx);
-        defaultMinAgeDelegate = ctx.defaultMinAge(this);
+        defaultMinAgeDelegate = ctx.defaultMinAge(this)::test;
     }
 
     @Override
@@ -132,7 +118,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             boolean randomTraversal = context.randomTraversal();
             // for each folder
             List<Folder> sortedFolders = scanFolders(rules.keySet(), randomTraversal);
-            Collections.sort(sortedFolders, folderPreference);
+            sortedFolders.sort(folderPreference);
             if (randomTraversal)
             {
                 LOGGER.debug("Folder order...\n{}", () -> Joiner.on("\n").join(sortedFolders));
@@ -140,9 +126,9 @@ public class ApplyMatchOperationsTask extends TaskBase
             for (Folder k : sortedFolders)
             {
                     List<MatchOperation> lmo = getRules(k);
-                    Collections.sort(lmo, SPECIFIC_OPS);
+                    lmo.sort(SPECIFIC_OPS);
                     LOGGER.info("Starting application: {} {}", k, Joiner.on(", ").join(lmo));
-                    traverseFolder(k, !randomTraversal && includeSubFolders.contains(k), true);
+                    traverseFolder(k, !randomTraversal && includeSubFolders.contains(new ApplyKey(k)), true);
 
             }
         }
@@ -162,7 +148,7 @@ public class ApplyMatchOperationsTask extends TaskBase
             }
 
             @Override
-            protected void runMessage(Folder f, Message m) throws MessagingException, IOException {
+            protected void runMessage(Folder f, Message m) {
 
             }
 
@@ -174,7 +160,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         scanner.init(context);
         for (ApplyKey k : applyKeys)
         {
-            scanner.traverseFolder(k.folderName, includeSubFolders.contains(k) && randomTraversal, false);
+            scanner.traverseFolder(k.folderName, randomTraversal && includeSubFolders.contains(k), false);
         }
         if (randomTraversal)
         {
@@ -189,10 +175,10 @@ public class ApplyMatchOperationsTask extends TaskBase
         return Folder.READ_WRITE;
     }
 
-    private List<MatchOperation> getRules(Folder of) throws MessagingException {
+    private List<MatchOperation> getRules(@Nonnull Folder of) throws MessagingException {
         for (Folder f = of; f != null; f = f.getParent())
         {
-            ApplyKey k = new ApplyKey(f.getFullName());
+            ApplyKey k = new ApplyKey(f);
             if (rules.containsKey(k))
             {
                 return rules.get(k);
@@ -205,7 +191,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException
     {
-        LOGGER.debug("Checking {}", m);
+        LOGGER.debug("Checking {}", MailUtil.supplyString(m));
         context.countMessage();
         // match/operation
         int ruleCount = 0;
@@ -243,21 +229,9 @@ public class ApplyMatchOperationsTask extends TaskBase
     {
         LOGGER.info("Adding rule against {} with operation {} matching {}", folder, operation, checkMatchers);
         ApplyKey key = new ApplyKey(folder);
-        List<MatchOperation> lmo = rules.get(key);
-        if (lmo == null)
-        {
-            lmo = Lists.newArrayList();
-            rules.put(key, lmo);
-        }
+        List<MatchOperation> lmo = rules.computeIfAbsent(key, k -> Lists.newArrayList());
 
-        if (!Iterables.any(checkMatchers, new Predicate<Predicate<Message>>()
-        {
-            @Override
-            public boolean apply(@Nullable Predicate<Message> messagePredicate)
-            {
-                return messagePredicate instanceof AgeMatcher;
-            }
-        }))
+        if (checkMatchers.stream().noneMatch(messagePredicate -> messagePredicate instanceof AgeMatcher))
         {
             matcher = Predicates.and(deferredDefaultMinAge, matcher);
         }

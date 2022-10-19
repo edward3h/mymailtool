@@ -1,7 +1,7 @@
 package org.ethelred.mymailtool2.matcher;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 import jakarta.mail.Message;
@@ -12,7 +12,7 @@ import jakarta.mail.MessagingException;
  */
 public class HasFlagMatcher implements Predicate<Message>
 {
-    private String matchFlag;
+    private final String matchFlag;
 
     public HasFlagMatcher(String matchFlag)
     {
@@ -20,7 +20,7 @@ public class HasFlagMatcher implements Predicate<Message>
     }
 
     @Override
-    public boolean apply(@Nullable Message message)
+    public boolean test(@Nullable Message message)
     {
         if (message == null)
         {

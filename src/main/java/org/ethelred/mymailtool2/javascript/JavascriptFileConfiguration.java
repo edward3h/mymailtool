@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import jakarta.mail.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.*;
@@ -25,6 +24,7 @@ import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
+import org.ethelred.util.Predicates;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -309,7 +309,7 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
         return false;
     }
 
-    private abstract class OperationBuilder implements Predicate<Message>
+    private abstract class OperationBuilder
     {
         protected Predicate<Message> delegate;
         protected List<Predicate<Message>> predicates = Lists.newArrayList();
@@ -326,7 +326,6 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
 
         public OperationBuilder ifIt(Predicate<Message> matcher)
         {
-
             return and(matcher);
         }
 
@@ -344,15 +343,10 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
             return this;
         }
 
-        @Override
-        public boolean apply(@javax.annotation.Nullable Message message)
-        {
-            return delegate.apply(message);
-        }
 
         public void addToTask(ApplyMatchOperationsTask task)
         {
-            task.addRule(folderName, this, predicates, getOperation(), includeSubFolders);
+            task.addRule(folderName, delegate, predicates, getOperation(), includeSubFolders);
         }
 
         protected abstract MessageOperation getOperation();

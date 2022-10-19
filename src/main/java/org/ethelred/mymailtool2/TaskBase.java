@@ -92,4 +92,8 @@ abstract class TaskBase implements Task
         return true;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

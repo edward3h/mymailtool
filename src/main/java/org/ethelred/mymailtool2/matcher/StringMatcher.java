@@ -1,13 +1,13 @@
 package org.ethelred.mymailtool2.matcher;
 
-import java.util.regex.Pattern;
+import com.google.common.base.MoreObjects;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
+
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /**
  * base matcher for simple strings
@@ -23,7 +23,7 @@ public abstract class StringMatcher implements Predicate<Message>
     }
 
     @Override
-    public boolean apply(Message message)
+    public boolean test(Message message)
     {
         try
         {

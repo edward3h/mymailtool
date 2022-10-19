@@ -1,6 +1,6 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 import javax.annotation.CheckForNull;
 import jakarta.mail.Folder;

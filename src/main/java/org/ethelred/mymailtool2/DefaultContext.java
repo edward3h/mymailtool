@@ -1,7 +1,7 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;

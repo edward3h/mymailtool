@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import java.util.function.Predicate;
+import org.ethelred.util.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
@@ -158,7 +158,7 @@ class CommandLineConfiguration implements MailToolConfiguration
         if (invertNextMatcher)
         {
             invertNextMatcher = false;
-            return Predicates.not(matcher);
+            return matcher.negate();
         }
         else
         {

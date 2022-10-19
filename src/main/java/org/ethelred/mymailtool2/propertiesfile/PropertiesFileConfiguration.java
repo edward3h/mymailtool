@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jakarta.mail.Message;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -24,6 +23,7 @@ import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
 import org.ethelred.util.MapWithDefault;
+import org.ethelred.util.Predicates;
 
 /**
  *

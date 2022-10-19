@@ -4,7 +4,7 @@ import jakarta.mail.Address;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -44,19 +44,16 @@ public class MatchersTest
         try
         {
             context.checking(new Expectations(){{
-//                oneOf(msg).getAllRecipients(); will(returnValue(add1));
-//                oneOf(msg2).getAllRecipients(); will(returnValue(add2));
-//                oneOf(msg3).getAllRecipients(); will(returnValue(add3));
                 oneOf(msg).getRecipients(Message.RecipientType.TO); will(returnValue(add1));
                 oneOf(msg2).getRecipients(Message.RecipientType.TO); will(returnValue(add2));
                 oneOf(msg3).getRecipients(Message.RecipientType.TO); will(returnValue(add3));
             }});
 
             Predicate<Message> matcher = new ToAddressMatcher(true, "edward@foobar.com");
-            assertTrue(matcher.apply(msg));
+            assertTrue(matcher.test(msg));
 
-            assertFalse(matcher.apply(msg2));
-            assertFalse(matcher.apply(msg3));
+            assertFalse(matcher.test(msg2));
+            assertFalse(matcher.test(msg3));
             context.assertIsSatisfied();
         }
         catch (MessagingException e)
@@ -76,8 +73,8 @@ public class MatchersTest
             }});
 
             Predicate<Message> matcher = new SubjectMatcher(".*subject.*");
-            assertTrue(matcher.apply(msg));
-            assertFalse(matcher.apply(msg2));
+            assertTrue(matcher.test(msg));
+            assertFalse(matcher.test(msg2));
         }
         catch (MessagingException e)
         {
