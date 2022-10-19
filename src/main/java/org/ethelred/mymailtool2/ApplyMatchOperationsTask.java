@@ -88,7 +88,7 @@ public class ApplyMatchOperationsTask extends TaskBase
 
             ApplyKey applyKey = (ApplyKey) o;
 
-            return !(!folderName.equals(applyKey.folderName));
+            return ! !folderName.equals(applyKey.folderName);
         }
 
         @Override
