@@ -32,7 +32,7 @@ public class MailUtilTest
             allowing(m).getSubject(); will(returnValue("test subject"));
         }});
 
-        assertEquals("2012-04-17 11:55: test subject", MailUtil.supplyString(m).get());
+        assertEquals("@|cyan 2012-04-17 11:55|@: @|yellow test subject|@", MailUtil.supplyString(m).get());
 
         context.assertIsSatisfied();
     }
