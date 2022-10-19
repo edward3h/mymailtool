@@ -1,7 +1,7 @@
 package org.ethelred.mymailtool2.javascript;
 
 /**
- *
+ * Javascript compatibility
  */
 public final class JSObjectWrapper
 {
