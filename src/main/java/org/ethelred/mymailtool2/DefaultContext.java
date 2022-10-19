@@ -143,7 +143,7 @@ public class DefaultContext implements MailToolContext
         }
         String timeLimitSpec = config.getTimeLimit();
         long newTimeLimit = 0;
-        if (!(Strings.isNullOrEmpty(timeLimitSpec)))
+        if (! Strings.isNullOrEmpty(timeLimitSpec))
         {
             Period p = PeriodFormat.getDefault().parsePeriod(timeLimitSpec);
             newTimeLimit = p.toStandardDuration().getMillis();

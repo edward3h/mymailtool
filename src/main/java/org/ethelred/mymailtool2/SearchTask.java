@@ -111,7 +111,7 @@ public class SearchTask extends TaskBase
                 BodyPart part = mm.getBodyPart(i);
                 if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
                 {
-                    LOGGER.info("{}{}", Strings.repeat(" ", 27), part.getFileName());
+                    LOGGER.info("{}{}", " ".repeat(27), part.getFileName());
                     tryDownload(part);
                 }
             }
@@ -143,7 +143,7 @@ public class SearchTask extends TaskBase
 
     private void printFlags(Message m) throws MessagingException
     {
-        LOGGER.info(Strings.repeat(" ", 27));
+        LOGGER.info(" ".repeat(27));
         Flags ff = m.getFlags();
         for (Flags.Flag f : ff.getSystemFlags())
         {
