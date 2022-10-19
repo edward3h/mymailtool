@@ -3,6 +3,9 @@ package org.ethelred.mymailtool2;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.util.Collections;
 
@@ -11,6 +14,8 @@ import java.util.Collections;
  */
 public class ListFoldersTask extends TaskBase
 {
+    private static final Logger LOGGER = LogManager.getLogger(ListFoldersTask.class);
+
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException
     {
@@ -31,7 +36,7 @@ public class ListFoldersTask extends TaskBase
     @Override
     protected void status(Folder f)
     {
-        System.out.println(f.getFullName() + " " + (f.equals(context.getDefaultFolder()) ? "[default]" : ""));
+        LOGGER.info("{} {}", f.getFullName(), (f.equals(context.getDefaultFolder()) ? "[default]" : ""));
     }
 
     @Override
@@ -44,7 +49,7 @@ public class ListFoldersTask extends TaskBase
         }
         catch (MessagingException | IOException e)
         {
-            e.printStackTrace();
+            LOGGER.error("Exception", e);
         }
     }
 

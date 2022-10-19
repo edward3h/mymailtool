@@ -45,7 +45,7 @@ public class MainTest
             app.countOperation();
             fail("expected OperationLimitException");
         }
-        catch(OperationLimitException e)
+        catch (OperationLimitException e)
         {
             // expected - success
         }

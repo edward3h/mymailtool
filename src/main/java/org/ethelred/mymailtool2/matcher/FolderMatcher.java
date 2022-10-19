@@ -21,7 +21,7 @@ public class FolderMatcher implements Predicate<Message>
     @Override
     public boolean apply(@Nullable Message message)
     {
-        if(message == null)
+        if (message == null)
         {
             return false;
         }

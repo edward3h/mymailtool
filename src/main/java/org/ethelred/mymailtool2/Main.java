@@ -2,37 +2,25 @@ package org.ethelred.mymailtool2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import java.io.Console;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.*;
-import jakarta.mail.Authenticator;
-import jakarta.mail.Folder;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Store;
-
 import com.google.common.collect.Sets;
-import org.ethelred.util.ClockFactory;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Period;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.format.PeriodFormat;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author edward
  */
 public class Main
-{   
+{
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @VisibleForTesting
     MailToolConfiguration config;
@@ -60,7 +48,7 @@ public class Main
             
             CompositeConfiguration temp = new CompositeConfiguration(clc, spc, dc);
             
-            for(String fileLocation: temp.getFileLocations())
+            for (String fileLocation : temp.getFileLocations())
             {
                 FileConfigurationHelper.loadFileConfiguration(temp, fileLocation);
             }
@@ -68,12 +56,8 @@ public class Main
             validateRequiredConfiguration(temp);
             
             config = temp;
-            
-        /*} catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-*/
         } catch (CmdLineException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Argument error", ex);
             parser.printUsage(System.err);
             System.exit(1);
         }
@@ -81,7 +65,7 @@ public class Main
 
     private synchronized MailToolConfiguration getDefaultConfiguration()
     {
-        if(defaultConfiguration == null)
+        if (defaultConfiguration == null)
         {
             defaultConfiguration = new DefaultConfiguration();
         }
@@ -96,19 +80,19 @@ public class Main
     private void validateRequiredConfiguration(MailToolConfiguration configuration) throws CmdLineException
     {
         Map<String, String> mailProperties = configuration.getMailProperties();
-        if(mailProperties == null || mailProperties.isEmpty())
+        if (mailProperties == null || mailProperties.isEmpty())
         {
             throw new CmdLineException("Missing mail properties - have you set up a config file?");
         }
         Set<String> missingProperties = Sets.newHashSet();
-        for(String key: MailToolConfiguration.ALL_MAIL_PROPERTIES)
+        for (String key : MailToolConfiguration.ALL_MAIL_PROPERTIES)
         {
-            if(!mailProperties.containsKey(key))
+            if (!mailProperties.containsKey(key))
             {
                 missingProperties.add(key);
             }
         }
-        if(!missingProperties.isEmpty())
+        if (!missingProperties.isEmpty())
         {
             throw new CmdLineException("Missing mail properties " + Joiner.on(',').join(missingProperties));
         }
@@ -116,25 +100,26 @@ public class Main
 
     @VisibleForTesting public void run() {
         try {
+            if (config.verbose()) {
+                setDebugLogging();
+            }
 
             context = new DefaultContext(config);
             context.connect();
 
-            System.out.println("About to get task from config " + config);
+            LOGGER.debug("About to get task from config {}", config);
             Task t = config.getTask();
             t.init(context);
             t.run();
             context.logCompletion(null);
         }
-        catch(OperationLimitException e)
+        catch (OperationLimitException e)
         {
-            //Logger.getLogger(Main.class.getName()).log(Level.INFO, e.toString());
-            //System.out.println(e.toString());
             context.logCompletion(e);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.error("Unknown", e);
             
         } finally {
             context.disconnect();
@@ -142,19 +127,22 @@ public class Main
 
     }
 
+    private void setDebugLogging() {
+        var loggerContext = (LoggerContext) LogManager.getContext(false);
+        var loggerConfiguration = loggerContext.getConfiguration();
+        var root = loggerConfiguration.getRootLogger();
+        root.setLevel(Level.DEBUG);
+        loggerContext.updateLoggers();
+        LOGGER.debug("Verbose logging enabled");
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        LogManager lm = LogManager.getLogManager();
-        lm.reset();
-        Logger root = Logger.getLogger("");
-        root.setLevel(Level.ALL);
-        root.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
         Main app = new Main();
         app.init(args);
         app.run();
-
     }
 
     private class ShutdownHook implements Runnable
@@ -162,7 +150,7 @@ public class Main
         @Override
         public void run()
         {
-            if(context != null)
+            if (context != null)
             {
                 context.disconnect();
                 context.shutdown();

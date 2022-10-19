@@ -15,7 +15,7 @@ import jakarta.mail.internet.MimeMessage;
 /**
  *
  */
-public class MockMessage
+public final class MockMessage
 {
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String date;
@@ -30,11 +30,11 @@ public class MockMessage
     @Override
     public String toString()
     {
-        return "MockMessage{" +
-                "date='" + date + '\'' +
-                ", from='" + from + '\'' +
-                ", subject='" + subject + '\'' +
-                '}';
+        return "MockMessage{"
+                + "date='" + date + '\''
+                + ", from='" + from + '\''
+                + ", subject='" + subject + '\''
+                + '}';
     }
 
     public static MockMessage create(String date, String from, String subject)
@@ -67,7 +67,7 @@ public class MockMessage
 
     public static MockMessage getOuter(Message m)
     {
-        if(m instanceof MockMimeMessage)
+        if (m instanceof MockMimeMessage)
         {
             return ((MockMimeMessage) m).getMockMessage();
         }
@@ -91,12 +91,12 @@ public class MockMessage
             {
                 setSentDate(dateFormat.parse(date));
             }
-            catch(ParseException e)
+            catch (ParseException e)
             {
                 throw new MessagingException("Parse exception", e);
             }
 
-            for(Map.Entry<String, String> e: mockheaders.entrySet())
+            for (Map.Entry<String, String> e : mockheaders.entrySet())
             {
                 headers.addHeader(e.getKey(), e.getValue());
             }

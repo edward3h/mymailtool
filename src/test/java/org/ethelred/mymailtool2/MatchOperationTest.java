@@ -18,7 +18,7 @@ public class MatchOperationTest
     @Test
     public void testSuccess()
     {
-        final Predicate<Message> matcher = context.mock(Predicate.class);
+        @SuppressWarnings("unchecked") final Predicate<Message> matcher = context.mock(Predicate.class);
         final MessageOperation operation = context.mock(MessageOperation.class);
         final MailToolContext mailContext = context.mock(MailToolContext.class);
         final Message m = context.mock(Message.class);
@@ -28,7 +28,6 @@ public class MatchOperationTest
             oneOf(operation).apply(mailContext, m); will(returnValue(true));
             allowing(operation).finishApplying(); will(returnValue(true));
             oneOf(mailContext).countOperation();
-            allowing(mailContext).debugF(with(any(String.class)), with(any(Object[].class)));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
@@ -48,7 +47,6 @@ public class MatchOperationTest
             oneOf(matcher).apply(m); will(returnValue(true));
             oneOf(operation).apply(mailContext, m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
-            allowing(mailContext).debugF(with(any(String.class)), with(any(Object[].class)));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
@@ -66,7 +64,6 @@ public class MatchOperationTest
         context.checking(new Expectations(){{
             oneOf(matcher).apply(m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
-            allowing(mailContext).debugF(with(any(String.class)), with(any(Object[].class)));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);

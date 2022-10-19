@@ -18,14 +18,7 @@ public class MapWithDefaultTest
     {
         Map<String, String> ms = Maps.newHashMap();
         assertNull(ms.get("key"));
-        Supplier<String> def = new Supplier<String>()
-        {
-            @Override
-            public String get()
-            {
-                return "def";
-            }
-        };
+        Supplier<String> def = () -> "def";
         ms = MapWithDefault.wrap(ms, def);
         assertFalse(ms.containsKey("key"));
         assertEquals("def", ms.get("key"));

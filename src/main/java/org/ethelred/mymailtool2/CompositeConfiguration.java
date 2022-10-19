@@ -3,13 +3,15 @@ package org.ethelred.mymailtool2;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -17,6 +19,7 @@ import java.util.logging.Logger;
  */
 class CompositeConfiguration implements MailToolConfiguration
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     /**
      * most important at the start of the list, least important (i.e. built in defaults) at the end
      */
@@ -39,7 +42,7 @@ class CompositeConfiguration implements MailToolConfiguration
     public Map<String, String> getMailProperties()
     {
         Map<String, String> combined = Maps.newHashMap();
-        for(MailToolConfiguration conf: Lists.reverse(configs))
+        for (MailToolConfiguration conf : Lists.reverse(configs))
         {
             combined.putAll(conf.getMailProperties());
         }
@@ -59,7 +62,7 @@ class CompositeConfiguration implements MailToolConfiguration
         iterationConfigs.add(fileConfig); // adds at end
     }
 
-    private static Function<MailToolConfiguration, Iterable<String>> FILE_LOCATIONS_ACCESSOR
+    private static Function<MailToolConfiguration, Iterable<String>> fileLocationsAccessor
             = new Function<MailToolConfiguration, Iterable<String>>() {
 
         @Override
@@ -73,14 +76,14 @@ class CompositeConfiguration implements MailToolConfiguration
     public Iterable<String> getFileLocations()
     {
         // we want the iterators to report files as they are added by other files
-        return new LazyCombinedIterable(FILE_LOCATIONS_ACCESSOR);
+        return new LazyCombinedIterable(fileLocationsAccessor);
     }
 
     @Override
     public int getOperationLimit()
     {
         Object v = first("getOperationLimit");
-        if(v instanceof Integer)
+        if (v instanceof Integer)
         {
             return (Integer) v;
         }
@@ -98,7 +101,7 @@ class CompositeConfiguration implements MailToolConfiguration
         return result instanceof Number && ((Number) result).intValue() == PRIMITIVE_DEFAULT;
     }
 
-        private static Function<MailToolConfiguration, Iterable<FileConfigurationHandler>> FILE_HANDLERS_ACCESSOR
+        private static Function<MailToolConfiguration, Iterable<FileConfigurationHandler>> fileHandlersAccessor
             = new Function<MailToolConfiguration, Iterable<FileConfigurationHandler>>() {
 
         @Override
@@ -111,7 +114,7 @@ class CompositeConfiguration implements MailToolConfiguration
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
-        return new LazyCombinedIterable(FILE_HANDLERS_ACCESSOR);
+        return new LazyCombinedIterable(fileHandlersAccessor);
     }
 
     @Override
@@ -123,9 +126,9 @@ class CompositeConfiguration implements MailToolConfiguration
     @Override
     public boolean verbose()
     {
-        for(MailToolConfiguration subConf: configs)
+        for (MailToolConfiguration subConf : configs)
         {
-            if(subConf.verbose())
+            if (subConf.verbose())
             {
                 return true;
             }
@@ -136,9 +139,9 @@ class CompositeConfiguration implements MailToolConfiguration
     @Override
     public boolean randomTraversal() {
 
-        for(MailToolConfiguration subConf: configs)
+        for (MailToolConfiguration subConf : configs)
         {
-            if(subConf.randomTraversal())
+            if (subConf.randomTraversal())
             {
                 return true;
             }
@@ -158,7 +161,7 @@ class CompositeConfiguration implements MailToolConfiguration
         @Override
         public Iterator<T> iterator()
         {
-            return new LazyCombinedIterator<T>(accessor);
+            return new LazyCombinedIterator<>(accessor);
         }
         
     }
@@ -166,7 +169,7 @@ class CompositeConfiguration implements MailToolConfiguration
     private class LazyCombinedIterator<T> implements Iterator<T>
     {
         private final Function<MailToolConfiguration, Iterable<T>> accessor;
-        int cindex = 0;
+        int cindex;
         Iterator<T> current;
         
         LazyCombinedIterator(Function<MailToolConfiguration, Iterable<T>> accessor)
@@ -177,7 +180,7 @@ class CompositeConfiguration implements MailToolConfiguration
         @Override
         public boolean hasNext()
         {
-            while((current == null || !current.hasNext()) && cindex < iterationConfigs.size())
+            while ((current == null || !current.hasNext()) && cindex < iterationConfigs.size())
             {
                 current = accessor.apply(iterationConfigs.get(cindex++)).iterator();
             }
@@ -187,7 +190,7 @@ class CompositeConfiguration implements MailToolConfiguration
         @Override
         public T next()
         {
-            if(hasNext())
+            if (hasNext())
             {
                 return current.next();
             }
@@ -212,7 +215,7 @@ class CompositeConfiguration implements MailToolConfiguration
     public int getChunkSize()
     {
         Object v = first("getChunkSize");
-        if(v instanceof Integer)
+        if (v instanceof Integer)
         {
             return (Integer) v;
         }
@@ -229,42 +232,47 @@ class CompositeConfiguration implements MailToolConfiguration
         try
         {
             Method m = MailToolConfiguration.class.getDeclaredMethod(string, ptypes);
-            for(MailToolConfiguration subConf: configs)
+            for (MailToolConfiguration subConf : configs)
             {
                 try
                 {
                     Object result = m.invoke(subConf, args);
-                    if(result != null && !isPrimitiveDefault(result))
+                    if (result != null && !isPrimitiveDefault(result))
                     {
                         return result;
                     }
                 }
                 catch (IllegalAccessException ex)
                 {
-                    Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Unknown", ex);
                 }
                 catch (IllegalArgumentException ex)
                 {
-                    Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Unknown", ex);
                 }
                 catch (InvocationTargetException ex)
                 {
-                    Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Unknown", ex);
                 }
             }
             
         }
         catch (NoSuchMethodException ex)
         {
-            Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         catch (SecurityException ex)
         {
-            Logger.getLogger(CompositeConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unknown", ex);
         }
         
         return null;
         
+    }
+
+    @Override
+    public String toString() {
+        return configs.toString();
     }
     
 }

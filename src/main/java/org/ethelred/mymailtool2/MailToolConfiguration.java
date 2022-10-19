@@ -10,14 +10,14 @@ import java.util.regex.Pattern;
  */
 public interface MailToolConfiguration
 {
-    public final static String PROTOCOL = "mail.store.protocol";
-    public final static String USER = "mail.user";
-    public final static String HOST = "mail.host";
-    public final static String PORT = "mail.port";
-    public final static Pattern MAIL_PROPERTY_PATTERN = Pattern.compile("mail\\..+");
-    public final static Iterable<String> ALL_MAIL_PROPERTIES = 
+    public static final String PROTOCOL = "mail.store.protocol";
+    public static final String USER = "mail.user";
+    public static final String HOST = "mail.host";
+    public static final String PORT = "mail.port";
+    public static final Pattern MAIL_PROPERTY_PATTERN = Pattern.compile("mail\\..+");
+    public static final Iterable<String> ALL_MAIL_PROPERTIES = 
           ImmutableList.of(PROTOCOL, USER, HOST);
-    public final static int PRIMITIVE_DEFAULT = -1; // this is nasty :-)
+    public static final int PRIMITIVE_DEFAULT = -1; // this is nasty :-)
 
     public String getPassword();
 

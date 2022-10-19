@@ -1,0 +1,9 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.ethelred.PrintRecipe
+recipeList:
+  - org.openrewrite.java.logging.SystemPrintToLogging:
+      addLogger: true
+      loggerName: LOGGER
+      loggingFramework: Log4J2
+      level: info

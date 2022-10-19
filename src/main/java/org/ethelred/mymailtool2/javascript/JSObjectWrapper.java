@@ -1,12 +1,15 @@
 package org.ethelred.mymailtool2.javascript;
 
 /**
- *
+ * Javascript compatibility
  */
-public class JSObjectWrapper
+public final class JSObjectWrapper
 {
     public static IJSObject wrap(Object o)
     {
         return MozillaObjectAdapter.wrap(o);
+    }
+
+    private JSObjectWrapper() {
     }
 }

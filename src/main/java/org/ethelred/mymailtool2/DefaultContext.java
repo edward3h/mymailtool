@@ -20,20 +20,24 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Console;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DefaultContext implements MailToolContext
 {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MailToolConfiguration config;
 
     private Store store;
 
-    private int opCount = 0;
+    private int opCount;
 
     protected Map<String, Folder> folderCache;
 
@@ -42,10 +46,10 @@ public class DefaultContext implements MailToolContext
     private long startTime = ClockFactory.getClock().currentTimeMillis();
     private long timeLimit = -1;
     private int operationLimit = -1;
-    private volatile boolean shutdown = false;
+    private volatile boolean shutdown;
     private final boolean verbose;
 
-    int messageCheckedCount = 0;
+    int messageCheckedCount;
 
     public DefaultContext(MailToolConfiguration config)
     {
@@ -55,6 +59,7 @@ public class DefaultContext implements MailToolContext
 
     @Override
     public synchronized void connect() {
+        String mailHost = config.getMailProperties().get(MailToolConfiguration.HOST);
         try {
             Session session = Session.getDefaultInstance(mapAsProperties(config.getMailProperties()), new MyAuthenticator());
             store = session.getStore();
@@ -63,12 +68,10 @@ public class DefaultContext implements MailToolContext
             startTime = ClockFactory.getClock().currentTimeMillis();
 
             folderCache = Maps.newHashMap();
-            System.out.printf("Connected to %s%n", config.getMailProperties().get(MailToolConfiguration.HOST));
+            LOGGER.info("Connected to {}", mailHost);
 
-        /*} catch (NoSuchProviderException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);*/
         } catch (MessagingException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Failed to connect to {}", mailHost, ex);
 
         }
     }
@@ -80,9 +83,9 @@ public class DefaultContext implements MailToolContext
             try {
                 store.close();
                 store = null;
-                System.out.printf("Disconnected%n");
+                LOGGER.info("Disconnected");
             } catch (MessagingException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Failed while disconnecting", ex);
             }
         }
     }
@@ -90,9 +93,9 @@ public class DefaultContext implements MailToolContext
     private Properties mapAsProperties(Map<String, String> mailProperties)
     {
         Properties p = new Properties();
-        for(Map.Entry<String, String> e: mailProperties.entrySet())
+        for (Map.Entry<String, String> e : mailProperties.entrySet())
         {
-            System.out.printf("Mail property: %s => %s%n", e.getKey(), e.getValue());
+            LOGGER.debug("Mail property: {} => {}", e.getKey(), e.getValue());
             p.setProperty(e.getKey(), e.getValue());
         }
         return p;
@@ -101,17 +104,17 @@ public class DefaultContext implements MailToolContext
     @Override
     public void countOperation()
     {
-        if(++opCount > getOperationLimit())
+        if (++opCount > getOperationLimit())
         {
             throw new OperationLimitException(String.format("Hit operation limit %s (ops %s)", config.getOperationLimit(), opCount));
         }
 
-        if(getTimeLimit() > 0 && startTime > 0 && (ClockFactory.getClock().currentTimeMillis() - startTime) > getTimeLimit())
+        if (getTimeLimit() > 0 && startTime > 0 && (ClockFactory.getClock().currentTimeMillis() - startTime) > getTimeLimit())
         {
             throw new OperationLimitException(String.format("Hit time limit %s (ops %s)", config.getTimeLimit(), opCount));
         }
 
-        if(shutdown)
+        if (shutdown)
         {
             throw new RuntimeException("Shutdown");
         }
@@ -120,32 +123,32 @@ public class DefaultContext implements MailToolContext
 
     private int getOperationLimit()
     {
-        if(operationLimit > -1)
+        if (operationLimit > -1)
         {
             return operationLimit;
         }
 
-        System.out.printf("getOperationLimit%n");
+        LOGGER.debug("getOperationLimit");
         int result = config.getOperationLimit();
-        System.out.printf("Operation limit %s%n", result);
+        LOGGER.debug("Operation limit {}", result);
         operationLimit = result;
         return operationLimit;
     }
 
     private long getTimeLimit()
     {
-        if(timeLimit > -1)
+        if (timeLimit > -1)
         {
             return timeLimit;
         }
         String timeLimitSpec = config.getTimeLimit();
         long newTimeLimit = 0;
-        if(!(Strings.isNullOrEmpty(timeLimitSpec)))
+        if (! Strings.isNullOrEmpty(timeLimitSpec))
         {
             Period p = PeriodFormat.getDefault().parsePeriod(timeLimitSpec);
             newTimeLimit = p.toStandardDuration().getMillis();
         }
-        System.out.printf("Time limit %sms%n", newTimeLimit);
+        LOGGER.debug("Time limit {}ms", newTimeLimit);
         timeLimit = newTimeLimit;
         return timeLimit;
     }
@@ -196,7 +199,7 @@ public class DefaultContext implements MailToolContext
                 return result;
             }
         } catch (MessagingException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Failed to open folder {}", folderName, ex);
         }
         return null;
     }
@@ -210,7 +213,7 @@ public class DefaultContext implements MailToolContext
         }
         catch (MessagingException e)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.error("Failed to open default folder", e);
         }
         return null;
     }
@@ -224,10 +227,10 @@ public class DefaultContext implements MailToolContext
     @Override
     public void logCompletion(@CheckForNull OperationLimitException e)
     {
-        System.out.printf("Checked %d messages, performed %d operations. %s. %n",
+        LOGGER.info("Checked {} messages, performed {} operations. {}. ",
                           messageCheckedCount,
                           opCount,
-                          e == null ? "Finished successfully." : e.toString());
+                          e == null ? "Finished successfully." : e.getMessage());
     }
 
     @Override
@@ -235,18 +238,9 @@ public class DefaultContext implements MailToolContext
     {
         messageCheckedCount++;
 
-        if(getTimeLimit() > 0 && startTime > 0 && (ClockFactory.getClock().currentTimeMillis() - startTime) > getTimeLimit())
+        if (getTimeLimit() > 0 && startTime > 0 && (ClockFactory.getClock().currentTimeMillis() - startTime) > getTimeLimit())
         {
             throw new OperationLimitException(String.format("Hit time limit %s (ops %s)", config.getTimeLimit(), opCount));
-        }
-    }
-
-    @Override
-    public void debugF(String format, Object... messageArgs)
-    {
-        if(verbose)
-        {
-            MailUtil.log(format, messageArgs);
         }
     }
 

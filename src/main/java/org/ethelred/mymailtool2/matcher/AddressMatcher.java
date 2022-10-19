@@ -14,10 +14,12 @@ import javax.annotation.Nonnull;
 import jakarta.mail.Address;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,8 @@ import java.util.regex.Pattern;
  */
 abstract class AddressMatcher implements Predicate<Message>
 {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Address[] EMPTY_ADDRESSES = new Address[0];
     private final boolean bLiteral;
@@ -45,13 +49,13 @@ abstract class AddressMatcher implements Predicate<Message>
     {
         this.bLiteral = bLiteral;
         int nFlags = Pattern.CASE_INSENSITIVE;
-        if(bLiteral)
+        if (bLiteral)
         {
             nFlags = nFlags | Pattern.LITERAL;
         }
         List<Pattern> patterns = Lists.newArrayListWithCapacity(morePatterns.length + 1);
         patterns.add(Pattern.compile(patternSpec, nFlags));
-        for(String pattern: morePatterns)
+        for (String pattern : morePatterns)
         {
             patterns.add(Pattern.compile(pattern, nFlags));
         }
@@ -66,7 +70,7 @@ abstract class AddressMatcher implements Predicate<Message>
             Address[] addresses = addressCache.get(t);
             for (Address a : addresses)
             {
-                for(Pattern addressPattern: addressPatterns)
+                for (Pattern addressPattern : addressPatterns)
                 {
                     Matcher m = addressPattern.matcher(a.toString());
                     if ((bLiteral && m.find()) || (!bLiteral && m.matches()))
@@ -79,7 +83,7 @@ abstract class AddressMatcher implements Predicate<Message>
         }
         catch (ExecutionException e)
         {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Exception in getAddresses", e);
+            LOGGER.error("Exception in getAddresses", e);
             return false;
         }
     }

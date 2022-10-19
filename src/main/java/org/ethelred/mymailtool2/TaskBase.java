@@ -3,9 +3,11 @@ package org.ethelred.mymailtool2;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -13,6 +15,7 @@ import java.util.logging.Logger;
  */
 abstract class TaskBase implements Task
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     protected MailToolContext context;
 
     @Override
@@ -25,7 +28,7 @@ abstract class TaskBase implements Task
     protected void traverseFolder(String folderName, boolean includeSubFolders, boolean readMessages) throws MessagingException, IOException
     {
         Folder f = context.getFolder(folderName);
-        if(f == null || !f.exists())
+        if (f == null || !f.exists())
         {
             throw new IllegalStateException("Could not open folder " + folderName);
         }
@@ -37,32 +40,32 @@ abstract class TaskBase implements Task
     {
         status(f);
 
-        if(readMessages && (f.getType() & Folder.HOLDS_MESSAGES) > 0)
+        if (readMessages && (f.getType() & Folder.HOLDS_MESSAGES) > 0)
         {
             f.open(openMode());
 
             try
             {
-                for(Message m: readMessages(f))
+                for (Message m : readMessages(f))
                 {
                     runMessage(f, m);
                 }
             }
             catch (ShortcutFolderScanException sc)
             {
-                Logger.getLogger(TaskBase.class.getName()).log(Level.INFO, "Short cut on folder " + f.getName());
+                LOGGER.info("Short cut on folder {}", f.getName());
             }
             finally {
-                if((openMode() & Folder.READ_WRITE) > 0) {
+                if ((openMode() & Folder.READ_WRITE) > 0) {
                     f.expunge();
                 }
                 f.close(true);
             }
         }
 
-        if(includeSubFolders && (f.getType() & Folder.HOLDS_FOLDERS) > 0)
+        if (includeSubFolders && (f.getType() & Folder.HOLDS_FOLDERS) > 0)
         {
-            for(Folder child: f.list())
+            for (Folder child : f.list())
             {
                 traverseFolder(child, includeSubFolders, readMessages);
             }

@@ -1,13 +1,15 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.collect.MapMaker;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +17,9 @@ import java.util.regex.Pattern;
  *
  * @author edward
  */
-public class FileConfigurationHelper
+public final class FileConfigurationHelper
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static Map<String, FileConfigurationHandler> handlers = 
             new MapMaker().makeMap();
     
@@ -25,41 +28,41 @@ public class FileConfigurationHelper
     static void loadFileConfiguration(CompositeConfiguration temp, String fileLocation)
     {
         // allow configurations to override the set of handlers
-        for(FileConfigurationHandler h: temp.getFileHandlers())
+        for (FileConfigurationHandler h : temp.getFileHandlers())
         {
             registerHandler(h);
         }
         
         // does file exist?
         File f = new File(fileLocation);
-        if(!f.exists() || !f.canRead())
+        if (!f.exists() || !f.canRead())
         {
             return;
         }
         FileConfigurationHandler handler = null;
         // does file have an extension?
         String ext = getFileExtension(f);
-        if(ext != null)
+        if (ext != null)
         {
             handler = handlers.get(ext);
         }
         
         // does file have special comment?
-        if(handler == null)
+        if (handler == null)
         {
             String firstLine = readFirstLine(f);
             Matcher m = commentPattern.matcher(firstLine);
-            if(m.matches())
+            if (m.matches())
             {
                 ext = m.group(1);
                 handler = handlers.get(ext);
             }
         }
         
-        if(handler != null)
+        if (handler != null)
         {
             MailToolConfiguration conf = handler.readConfiguration(f);
-            if(conf != null)
+            if (conf != null)
             {
                 temp.insert(conf);
             }
@@ -68,11 +71,11 @@ public class FileConfigurationHelper
     
     static void registerHandler(FileConfigurationHandler h)
     {
-        for(String ext: h.getExtensions())
+        for (String ext : h.getExtensions())
         {
-            if(!handlers.containsKey(ext))
+            if (!handlers.containsKey(ext))
             {
-                Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.INFO, "register handler for " + ext + " " + h);
+                LOGGER.debug("register handler for {} {}", ext, h);
                 handlers.put(ext, h);
             }
         }
@@ -87,22 +90,22 @@ public class FileConfigurationHelper
             br = new BufferedReader(new FileReader(f));
             line = br.readLine();
         }
-                catch(IOException e)
+                catch (IOException e)
                 {
-                    Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.SEVERE, null, e);
+                    LOGGER.error("Failed to read from {}", f, e);
                 }
         finally
         {
             try
             {
-                if(br != null)
+                if (br != null)
                 {
                     br.close();
                 }
             }
             catch (IOException ex)
             {
-                Logger.getLogger(FileConfigurationHelper.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Failed to close {}", f, ex);
             }
         }
          
@@ -113,7 +116,7 @@ public class FileConfigurationHelper
     private static String getFileExtension(File f)
     {
         Matcher m = fileExtPattern.matcher(f.getName());
-        if(m.matches())
+        if (m.matches())
         {
             return m.group(1);
         }
@@ -125,25 +128,25 @@ public class FileConfigurationHelper
     {
         try
         {
-            return _instantiateHandler(className);
+            return instantiateHandler(className);
         }
-        catch(ClassNotFoundException e)
+        catch (ClassNotFoundException e)
         {
+            String siblingClassName = FileConfigurationHelper.class.getPackage().getName() + "." + className;
             try
             {
-                return _instantiateHandler(FileConfigurationHelper.class.getPackage().getName() + "." + className);
+                return instantiateHandler(siblingClassName);
             }
-            catch(ClassNotFoundException e2)
+            catch (ClassNotFoundException e2)
             {
-                Logger.getLogger(CommandLineConfiguration.class.getName()).log(Level.SEVERE, 
-                        String.format("Could not find class %s or %s", className, FileConfigurationHelper.class.getPackage().getName() + "." + className));
+                LOGGER.error("Could not find class {} or {}", className, siblingClassName);
             }
         }
         return null;
     }
     
     
-    private static FileConfigurationHandler _instantiateHandler(String className) throws ClassNotFoundException
+    private static FileConfigurationHandler instantiateHandler(String className) throws ClassNotFoundException
     {
         try
         {
@@ -151,15 +154,14 @@ public class FileConfigurationHelper
                     (Class<? extends FileConfigurationHandler>) Class.forName(className);
             return klass.newInstance();
         }
-        catch (InstantiationException ex)
+        catch (InstantiationException | IllegalAccessException ex)
         {
-            Logger.getLogger(CommandLineConfiguration.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (IllegalAccessException ex)
-        {
-            Logger.getLogger(CommandLineConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Failed to construct instance of {}", className, ex);
         }
         return null;
+    }
+
+    private FileConfigurationHelper() {
     }
 
 

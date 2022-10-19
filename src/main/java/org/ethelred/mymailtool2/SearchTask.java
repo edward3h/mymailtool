@@ -10,26 +10,28 @@ import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMultipart;
-
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
+import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * search in a folder and sub-folders
  */
 public class SearchTask extends TaskBase
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Map<Flags.Flag, String> SYSTEM_FLAG_STRINGS = ImmutableMap.<Flags.Flag, String>builder()
             .put(Flags.Flag.ANSWERED, "ANSWERED")
             .put(Flags.Flag.DELETED, "DELETED")
@@ -41,8 +43,9 @@ public class SearchTask extends TaskBase
     private final String folderName;
     private Predicate<Message> matcher;
     private boolean recursive = true;
-    private boolean printAttach = false;
+    private boolean printAttach;
     private File outputDirectory;
+    private boolean printFlags;
 
     public SearchTask(String folderName)
     {
@@ -53,7 +56,7 @@ public class SearchTask extends TaskBase
     @Override
     public void run()
     {
-        if(this.matcher == null)
+        if (this.matcher == null)
         {
             throw new IllegalStateException("No search spec provided to SearchTask");
         }
@@ -62,65 +65,67 @@ public class SearchTask extends TaskBase
         {
             traverseFolder(folderName, recursive, true);
         }
-        catch(MessagingException | IOException e)
+        catch (MessagingException | IOException e)
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error("Exception", e);  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException, IOException
     {
-        if(matcher.apply(m))
+        if (matcher.apply(m))
         {
-            _printMatch(f, m);
+            printMatch(f, m);
         }
         else
         {
-            _debugPrintNoMatch(f, m);
+            debugPrintNoMatch(f, m);
         }
     }
 
     @Override
     protected void status(Folder f)
     {
-        System.err.println("Searching " + f + " with " + matcher);
+        LOGGER.error("Searching {} with {}", f, matcher);
     }
 
-    private void _printMatch(Folder f, Message m) throws MessagingException, IOException
+    private void printMatch(Folder f, Message m) throws MessagingException, IOException
     {
         Address[] fromA = m.getFrom();
-        System.out.printf(
-                "MATCH %20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
+        LOGGER.info(
+                "MATCH {} - {} - {} : {}",
                 f.getFullName(),
                 m.getSentDate(),
-                _printAddress(fromA),
+                printAddress(fromA),
                 m.getSubject()
         );
-        _printFlags(m);
-        if(printAttach)
+        if (printFlags) {
+            printFlags(m);
+        }
+        if (printAttach)
         {
             Multipart mm = (Multipart) m.getContent();
-            for(int i = 0; i < mm.getCount(); i++)
+            for (int i = 0; i < mm.getCount(); i++)
             {
                 BodyPart part = mm.getBodyPart(i);
-                if(Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
+                if (Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition()) && !Strings.isNullOrEmpty(part.getFileName()))
                 {
-                    System.out.println(Strings.repeat(" ", 27) + part.getFileName());
-                    _tryDownload(part);
+                    LOGGER.info("{}{}", " ".repeat(27), part.getFileName());
+                    tryDownload(part);
                 }
             }
         }
     }
 
-    private void _tryDownload(BodyPart part) throws MessagingException
+    private void tryDownload(BodyPart part) throws MessagingException
     {
         if (outputDirectory != null)
         {
             File outputFile = new File(outputDirectory, part.getFileName());
             if (outputFile.exists())
             {
-                System.out.println("File " + outputFile + " already exists, skipping.");
+                LOGGER.info("File {} already exists, skipping.", outputFile);
             }
             else
             {
@@ -130,54 +135,54 @@ public class SearchTask extends TaskBase
                 }
                 catch (IOException e)
                 {
-                    Logger.getLogger(getClass().getName()).log(Level.WARNING, "Failed to download attachment", e);
+                    LOGGER.warn("Failed to download attachment", e);
                 }
             }
         }
     }
 
-    private void _printFlags(Message m) throws MessagingException
+    private void printFlags(Message m) throws MessagingException
     {
-        System.out.print(Strings.repeat(" ", 27));
+        LOGGER.info(" ".repeat(27));
         Flags ff = m.getFlags();
-        for(Flags.Flag f: ff.getSystemFlags())
+        for (Flags.Flag f : ff.getSystemFlags())
         {
-            System.out.print(_flagToString(f));
-            System.out.print(" ");
+            LOGGER.info(flagToString(f));
+            LOGGER.info(" ");
         }
-        for(String f: ff.getUserFlags())
+        for (String f : ff.getUserFlags())
         {
-            System.out.print(f);
-            System.out.print(" ");
+            LOGGER.info(f);
+            LOGGER.info(" ");
         }
         System.out.println();
     }
 
-    private String _flagToString(Flags.Flag f)
+    private String flagToString(Flags.Flag f)
     {
         return SYSTEM_FLAG_STRINGS.get(f);
     }
 
-    private String _printAddress(Address[] from)
+    private String printAddress(Address[] from)
     {
-        if(from == null || from.length < 1)
+        if (from == null || from.length < 1)
         {
             return "[unknown]";
         }
         Address f = from[0];
-        if(f instanceof InternetAddress)
+        if (f instanceof InternetAddress)
         {
             return ((InternetAddress) f).toUnicodeString();
         }
         return f.toString();
     }
 
-    private void _debugPrintNoMatch(Folder f, Message m) throws MessagingException
+    private void debugPrintNoMatch(Folder f, Message m) throws MessagingException
     {
         /*Address[] fromA = m.getFrom();
         String from = fromA.length > 0 ? fromA[0].toString() : "[unknown]";
-        System.out.printf(
-                "%20.20s - %tY-%<tm-%<td - %20.20s : %s%n",
+        LOGGER.info(
+                "{} - {} - {} : {}",
                 f.getFullName(),
                 m.getSentDate(),
                 from,
@@ -192,7 +197,7 @@ public class SearchTask extends TaskBase
 
     public void addMatcher(Predicate<Message> matcher)
     {
-        if(this.matcher == null)
+        if (this.matcher == null)
         {
             this.matcher = matcher;
         }
@@ -201,9 +206,14 @@ public class SearchTask extends TaskBase
             this.matcher = Predicates.and(this.matcher, matcher);
         }
 
-        if(matcher instanceof HasAttachmentMatcher)
+        if (matcher instanceof HasAttachmentMatcher)
         {
             printAttach = true;
+        }
+
+        if (matcher instanceof HasFlagMatcher)
+        {
+            printFlags = true;
         }
     }
 

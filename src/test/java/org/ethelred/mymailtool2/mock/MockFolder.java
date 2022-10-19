@@ -134,9 +134,13 @@ public class MockFolder extends Folder
     @Override
     public Message getMessage(int i) throws MessagingException
     {
-        if(msgCache.containsKey(i)) return msgCache.get(i);
+        if (msgCache.containsKey(i)) {
+            return msgCache.get(i);
+        }
         MockMessage mm = data.getMessage(name, i);
-        if(mm == null) throw new MessagingException();
+        if (mm == null) {
+            throw new MessagingException();
+        }
         Message result = mm.getMimeMessage(this, i);
         msgCache.put(i, result);
         return result;
@@ -145,7 +149,7 @@ public class MockFolder extends Folder
     @Override
     public void appendMessages(Message[] messages) throws MessagingException
     {
-        for(Message m: messages)
+        for (Message m : messages)
         {
             data.addMessage(name, MockMessage.get(m));
         }
@@ -155,9 +159,9 @@ public class MockFolder extends Folder
     public Message[] expunge() throws MessagingException
     {
         List<Message> result = Lists.newArrayList();
-        for(Message m: msgCache.values())
+        for (Message m : msgCache.values())
         {
-            if(m.isSet(Flags.Flag.DELETED) && data.deleteMessage(name, MockMessage.getOuter(m)))
+            if (m.isSet(Flags.Flag.DELETED) && data.deleteMessage(name, MockMessage.getOuter(m)))
             {
                 result.add(m);
             }

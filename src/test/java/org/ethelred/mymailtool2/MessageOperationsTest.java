@@ -58,7 +58,7 @@ public class MessageOperationsTest
             assertTrue(del.apply(mailContext, msg));
             context.assertIsSatisfied();
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             fail("unexpected exception");
         }
@@ -83,7 +83,7 @@ public class MessageOperationsTest
             assertTrue(move.apply(mailContext, msg));
             context.assertIsSatisfied();
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             fail("unexpected exception");
         }
@@ -111,7 +111,7 @@ public class MessageOperationsTest
             assertTrue(split.apply(mailContext, msg));
             context.assertIsSatisfied();
         }
-        catch(MessagingException e)
+        catch (MessagingException e)
         {
             fail("unexpected exception");
         }

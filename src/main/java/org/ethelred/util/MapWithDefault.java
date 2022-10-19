@@ -8,7 +8,7 @@ import com.google.common.collect.ForwardingMap;
 /**
  * wraps a Map so that it fills in a default value on get calls
  */
-public class MapWithDefault<K, V> extends ForwardingMap<K, V>
+public final class MapWithDefault<K, V> extends ForwardingMap<K, V>
 {
     private final Map<K, V> delegate;
     private final Supplier<V> defaultSupplier;
@@ -16,11 +16,11 @@ public class MapWithDefault<K, V> extends ForwardingMap<K, V>
     public static <K, V> Map<K, V> wrap(Map<K, V> delegate, Supplier<V> defaultSupplier)
     {
         // don't double wrap
-        if(delegate instanceof MapWithDefault)
+        if (delegate instanceof MapWithDefault)
         {
             return delegate;
         }
-        return new MapWithDefault<K, V>(delegate, defaultSupplier);
+        return new MapWithDefault<>(delegate, defaultSupplier);
     }
 
     private MapWithDefault(Map<K, V> delegate, Supplier<V> defaultSupplier)
@@ -39,7 +39,7 @@ public class MapWithDefault<K, V> extends ForwardingMap<K, V>
     @SuppressWarnings("unchecked")
     public V get(Object key)
     {
-        if(!containsKey(key))
+        if (!containsKey(key))
         {
             put((K) key, defaultSupplier.get());
         }

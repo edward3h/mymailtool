@@ -12,22 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.mail.Message;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
-import org.ethelred.mymailtool2.DeleteOperation;
-import org.ethelred.mymailtool2.FileConfigurationHandler;
-import org.ethelred.mymailtool2.FlagOperation;
-import org.ethelred.mymailtool2.MailToolConfiguration;
-import org.ethelred.mymailtool2.MailToolContext;
-import org.ethelred.mymailtool2.MatchOperation;
-import org.ethelred.mymailtool2.MessageOperation;
-import org.ethelred.mymailtool2.MoveOperation;
-import org.ethelred.mymailtool2.SplitOperation;
-import org.ethelred.mymailtool2.Task;
+import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
@@ -42,21 +33,22 @@ import org.mozilla.javascript.ScriptableObject;
  *
  * @author edward
  */
-class JavascriptFileConfiguration implements MailToolConfiguration
+class JavascriptFileConfiguration extends BaseFileConfiguration
 {
+    private static final Logger LOGGER = LogManager.getLogger(JavascriptFileConfiguration.class);
     private IJSObject config;
 
     private Context ctx;
-    private static final String SETUP_CALLBACK = "for(var fn in callback) {\n" +
-            "  if(typeof callback[fn] === 'function') {\n" +
-            "    this[fn] = (function() {\n" +
-            "      var method = callback[fn];\n" +
-            "      return function() {\n" +
-            "         return method.apply(callback,arguments);\n" +
-            "      };\n" +
-            "    })();\n" +
-            "  }\n" +
-            "}";
+    private static final String SETUP_CALLBACK = "for(var fn in callback) {\n"
+            + "  if(typeof callback[fn] === 'function') {\n"
+            + "    this[fn] = (function() {\n"
+            + "      var method = callback[fn];\n"
+            + "      return function() {\n"
+            + "         return method.apply(callback,arguments);\n"
+            + "      };\n"
+            + "    })();\n"
+            + "  }\n"
+            + "}";
 
     private List<String> fileLocations = Lists.newArrayList();
     private List<OperationBuilder> deferredRules = Lists.newArrayList();
@@ -93,6 +85,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
     public JavascriptFileConfiguration(File f) throws IOException
     {
+        super(f);
         ctx = Context.enter();
         Scriptable scope = ctx.initStandardObjects();
         ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));
@@ -140,7 +133,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public Predicate<Message> isFrom(String... regex)
         {
-            return new FromAddressMatcher(false, _first(regex), _rest(regex));
+            return new FromAddressMatcher(false, first(regex), rest(regex));
         }
 
         public Predicate<Message> matchesSubject(String regex)
@@ -150,7 +143,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
         public Predicate<Message> isTo(String... regex)
         {
-            return new ToAddressMatcher(false, _first(regex), _rest(regex));
+            return new ToAddressMatcher(false, first(regex), rest(regex));
         }
 
         public Predicate<Message> hasAttachment(String regex)
@@ -174,9 +167,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         }
     }
 
-    private String[] _rest(String[] strings)
+    private String[] rest(String[] strings)
     {
-        if(strings.length > 1)
+        if (strings.length > 1)
         {
             String[] result = new String[strings.length - 1];
             System.arraycopy(strings, 1, result, 0, strings.length - 1);
@@ -185,9 +178,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
         return new String[0];
     }
 
-    private String _first(String[] strings)
+    private String first(String[] strings)
     {
-        if(strings.length > 0)
+        if (strings.length > 0)
         {
             return strings[0];
         }
@@ -228,10 +221,10 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     public Map<String, String> getMailProperties()
     {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        for(String k: ALL_MAIL_PROPERTIES) 
+        for (String k : ALL_MAIL_PROPERTIES) 
         {
             String v = config.getString(k);
-            if(v != null)
+            if (v != null)
             {
                 builder.put(k, v);
             }
@@ -254,7 +247,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     @Override
     public Task getTask() throws Exception
     {
-        System.out.println("getTask " + deferredRules);
+        LOGGER.info("getTask {}", deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         for (OperationBuilder builder : deferredRules)
         {
@@ -274,7 +267,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     public int getChunkSize()
     {
         String v = config.getString("chunk");
-        if(v == null)
+        if (v == null)
         {
             return PRIMITIVE_DEFAULT;
         }
@@ -320,9 +313,9 @@ class JavascriptFileConfiguration implements MailToolConfiguration
     {
         protected Predicate<Message> delegate;
         protected List<Predicate<Message>> predicates = Lists.newArrayList();
-        protected int specificity = 0;
+        protected int specificity;
         protected String folderName;
-        protected boolean includeSubFolders = false;
+        protected boolean includeSubFolders;
 
         private OperationBuilder(String folderName)
         {
