@@ -269,5 +269,10 @@ class CompositeConfiguration implements MailToolConfiguration
         return null;
         
     }
+
+    @Override
+    public String toString() {
+        return configs.toString();
+    }
     
 }

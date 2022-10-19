@@ -18,17 +18,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
-import org.ethelred.mymailtool2.DeleteOperation;
-import org.ethelred.mymailtool2.FileConfigurationHandler;
-import org.ethelred.mymailtool2.FlagOperation;
-import org.ethelred.mymailtool2.MailToolConfiguration;
-import org.ethelred.mymailtool2.MailToolContext;
-import org.ethelred.mymailtool2.MatchOperation;
-import org.ethelred.mymailtool2.MessageOperation;
-import org.ethelred.mymailtool2.MoveOperation;
-import org.ethelred.mymailtool2.SplitOperation;
-import org.ethelred.mymailtool2.Task;
+import org.ethelred.mymailtool2.*;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FromAddressMatcher;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
@@ -43,7 +33,7 @@ import org.mozilla.javascript.ScriptableObject;
  *
  * @author edward
  */
-class JavascriptFileConfiguration implements MailToolConfiguration
+class JavascriptFileConfiguration extends BaseFileConfiguration
 {
     private static final Logger LOGGER = LogManager.getLogger(JavascriptFileConfiguration.class);
     private IJSObject config;
@@ -95,6 +85,7 @@ class JavascriptFileConfiguration implements MailToolConfiguration
 
     public JavascriptFileConfiguration(File f) throws IOException
     {
+        super(f);
         ctx = Context.enter();
         Scriptable scope = ctx.initStandardObjects();
         ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));

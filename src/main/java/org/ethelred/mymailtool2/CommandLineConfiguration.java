@@ -52,6 +52,12 @@ class CommandLineConfiguration implements MailToolConfiguration
     private boolean invertNextMatcher;
 
     @Option(name = "--verbose", usage = "Verbose (debugging) output", aliases = {"-v"})
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+        if (verbose) {
+            mailProperties.put("mail.debug", "true");
+        }
+    }
     private boolean verbose;
 
     @Option(name = "--chunk", usage = "How many messages to grab in a batch")
@@ -140,6 +146,11 @@ class CommandLineConfiguration implements MailToolConfiguration
         {
             ((SearchTask) task).addMatcher(nextMatcher(new ToAddressMatcher(false, searchSpec)));
         }
+    }
+
+    @Option(name = "--split", usage = "Split named folder", metaVar = "FOLDER")
+    private void taskSplit(String folderName) {
+        task = new SplitTask(folderName);
     }
 
     private Predicate<Message> nextMatcher(Predicate<Message> matcher)
@@ -300,4 +311,8 @@ class CommandLineConfiguration implements MailToolConfiguration
         return runTimeLimit;
     }
 
+    @Override
+    public String toString() {
+        return "CommandLineConfiguration";
+    }
 }

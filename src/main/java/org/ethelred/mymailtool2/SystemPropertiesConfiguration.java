@@ -93,4 +93,9 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
     public boolean randomTraversal() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "SystemPropertiesConfiguration";
+    }
 }

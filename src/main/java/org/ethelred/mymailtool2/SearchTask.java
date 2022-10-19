@@ -18,6 +18,7 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
+import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +45,7 @@ public class SearchTask extends TaskBase
     private boolean recursive = true;
     private boolean printAttach;
     private File outputDirectory;
+    private boolean printFlags;
 
     public SearchTask(String folderName)
     {
@@ -98,7 +100,9 @@ public class SearchTask extends TaskBase
                 printAddress(fromA),
                 m.getSubject()
         );
-        printFlags(m);
+        if (printFlags) {
+            printFlags(m);
+        }
         if (printAttach)
         {
             Multipart mm = (Multipart) m.getContent();
@@ -205,6 +209,11 @@ public class SearchTask extends TaskBase
         if (matcher instanceof HasAttachmentMatcher)
         {
             printAttach = true;
+        }
+
+        if (matcher instanceof HasFlagMatcher)
+        {
+            printFlags = true;
         }
     }
 

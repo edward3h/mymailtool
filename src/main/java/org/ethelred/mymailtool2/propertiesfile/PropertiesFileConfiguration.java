@@ -29,7 +29,7 @@ import org.ethelred.util.MapWithDefault;
  *
  * @author edward
  */
-class PropertiesFileConfiguration implements MailToolConfiguration
+class PropertiesFileConfiguration extends BaseFileConfiguration
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private Properties delegate;
@@ -39,6 +39,7 @@ class PropertiesFileConfiguration implements MailToolConfiguration
     
     public PropertiesFileConfiguration(File f) throws IOException
     {
+        super(f);
         init(f);
     }
 
@@ -311,5 +312,4 @@ class PropertiesFileConfiguration implements MailToolConfiguration
             rulesTemp.get(m.group(1)).put(m.group(2), value);
         }
     }
-    
 }

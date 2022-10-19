@@ -236,7 +236,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void status(Folder f)
     {
-        LOGGER.debug("Working on folder {}\n", f.getFullName());
+        LOGGER.info("Working on folder {}", f.getFullName());
     }
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)

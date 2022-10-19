@@ -2,9 +2,7 @@ package org.ethelred.mymailtool2;
 
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.ethelred.util.function.CheckedSupplier;
-
-import java.util.function.Supplier;
+import org.apache.logging.log4j.util.Supplier;
 
 /**
  * static utils for mail
@@ -18,8 +16,16 @@ public final class MailUtil
 
     public static Supplier<String> supplyString(Message m) throws MessagingException
     {
-        return CheckedSupplier.unchecked(() -> String.format(
-                "%tY-%<tm-%<td %<tR: %s", m.getSentDate(), m.getSubject()
-        ));
+        return () -> {
+            try {
+                return String.format(
+                        "@|cyan %tY-%<tm-%<td %<tR|@: @|yellow %s|@", m.getSentDate(), m.getSubject()
+                );
+            }
+            catch (MessagingException e)
+            {
+                return e.getMessage();
+            }
+        };
     }
 }

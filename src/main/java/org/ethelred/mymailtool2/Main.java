@@ -3,8 +3,10 @@ package org.ethelred.mymailtool2;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -54,12 +56,8 @@ public class Main
             validateRequiredConfiguration(temp);
             
             config = temp;
-            
-        /*} catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-*/
         } catch (CmdLineException ex) {
-            LOGGER.error("Unknown", ex);
+            LOGGER.error("Argument error", ex);
             parser.printUsage(System.err);
             System.exit(1);
         }
@@ -102,11 +100,14 @@ public class Main
 
     @VisibleForTesting public void run() {
         try {
+            if (config.verbose()) {
+                setDebugLogging();
+            }
 
             context = new DefaultContext(config);
             context.connect();
 
-            LOGGER.info("About to get task from config {}", config);
+            LOGGER.debug("About to get task from config {}", config);
             Task t = config.getTask();
             t.init(context);
             t.run();
@@ -124,6 +125,15 @@ public class Main
             context.disconnect();
         }
 
+    }
+
+    private void setDebugLogging() {
+        var loggerContext = (LoggerContext) LogManager.getContext(false);
+        var loggerConfiguration = loggerContext.getConfiguration();
+        var root = loggerConfiguration.getRootLogger();
+        root.setLevel(Level.DEBUG);
+        loggerContext.updateLoggers();
+        LOGGER.debug("Verbose logging enabled");
     }
 
     /**

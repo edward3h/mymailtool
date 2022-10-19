@@ -88,4 +88,9 @@ class DefaultConfiguration implements MailToolConfiguration
     public boolean randomTraversal() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "DefaultConfiguration";
+    }
 }

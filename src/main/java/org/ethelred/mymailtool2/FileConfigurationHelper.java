@@ -75,7 +75,7 @@ public final class FileConfigurationHelper
         {
             if (!handlers.containsKey(ext))
             {
-                LOGGER.info("register handler for {} {}", ext, h);
+                LOGGER.debug("register handler for {} {}", ext, h);
                 handlers.put(ext, h);
             }
         }
@@ -92,7 +92,7 @@ public final class FileConfigurationHelper
         }
                 catch (IOException e)
                 {
-                    LOGGER.error("Unknown", e);
+                    LOGGER.error("Failed to read from {}", f, e);
                 }
         finally
         {
@@ -105,7 +105,7 @@ public final class FileConfigurationHelper
             }
             catch (IOException ex)
             {
-                LOGGER.error("Unknown", ex);
+                LOGGER.error("Failed to close {}", f, ex);
             }
         }
          
@@ -132,13 +132,14 @@ public final class FileConfigurationHelper
         }
         catch (ClassNotFoundException e)
         {
+            String siblingClassName = FileConfigurationHelper.class.getPackage().getName() + "." + className;
             try
             {
-                return instantiateHandler(FileConfigurationHelper.class.getPackage().getName() + "." + className);
+                return instantiateHandler(siblingClassName);
             }
             catch (ClassNotFoundException e2)
             {
-                LOGGER.error("Could not find class {} or {}", className, FileConfigurationHelper.class.getPackage().getName() + "." + className);
+                LOGGER.error("Could not find class {} or {}", className, siblingClassName);
             }
         }
         return null;
@@ -153,13 +154,9 @@ public final class FileConfigurationHelper
                     (Class<? extends FileConfigurationHandler>) Class.forName(className);
             return klass.newInstance();
         }
-        catch (InstantiationException ex)
+        catch (InstantiationException | IllegalAccessException ex)
         {
-            LOGGER.error("Unknown", ex);
-        }
-        catch (IllegalAccessException ex)
-        {
-            LOGGER.error("Unknown", ex);
+            LOGGER.error("Failed to construct instance of {}", className, ex);
         }
         return null;
     }
