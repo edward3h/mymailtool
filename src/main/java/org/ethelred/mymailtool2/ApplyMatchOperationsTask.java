@@ -232,7 +232,7 @@ public class ApplyMatchOperationsTask extends TaskBase
 
         if (checkMatchers.stream().noneMatch(messagePredicate -> messagePredicate instanceof AgeMatcher))
         {
-            matcher = Predicates.and(deferredDefaultMinAge, matcher);
+            matcher = Predicates.and(this::deferredDefaultMinAge, matcher);
         }
 
         if (!includeSubFolders)
