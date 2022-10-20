@@ -1,10 +1,10 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.base.Predicate;
-
 import jakarta.mail.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.function.Predicate;
 
 /**
  *
@@ -27,7 +27,7 @@ public class MatchOperation
     
     boolean testApply(Message m, MailToolContext ctx)
     {
-        if (match.apply(m) && operation.apply(ctx, m))
+        if (match.test(m) && operation.apply(ctx, m))
         {
             LOGGER.debug("Matched {} and applied {} to message {}", match, operation, m);
             ctx.countOperation();

@@ -1,5 +1,7 @@
 package org.ethelred.mymailtool2;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import jakarta.mail.Address;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Flags;
@@ -9,22 +11,17 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMultipart;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
+import org.ethelred.util.Predicates;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * search in a folder and sub-folders
@@ -74,13 +71,9 @@ public class SearchTask extends TaskBase
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException, IOException
     {
-        if (matcher.apply(m))
+        if (matcher.test(m))
         {
             printMatch(f, m);
-        }
-        else
-        {
-            debugPrintNoMatch(f, m);
         }
     }
 
@@ -175,19 +168,6 @@ public class SearchTask extends TaskBase
             return ((InternetAddress) f).toUnicodeString();
         }
         return f.toString();
-    }
-
-    private void debugPrintNoMatch(Folder f, Message m) throws MessagingException
-    {
-        /*Address[] fromA = m.getFrom();
-        String from = fromA.length > 0 ? fromA[0].toString() : "[unknown]";
-        LOGGER.info(
-                "{} - {} - {} : {}",
-                f.getFullName(),
-                m.getSentDate(),
-                from,
-                m.getSubject()
-        );*/
     }
 
     public static Task create(String folderName)

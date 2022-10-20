@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import jakarta.mail.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.*;
@@ -25,6 +24,7 @@ import org.ethelred.mymailtool2.matcher.HasAttachmentMatcher;
 import org.ethelred.mymailtool2.matcher.HasFlagMatcher;
 import org.ethelred.mymailtool2.matcher.SubjectMatcher;
 import org.ethelred.mymailtool2.matcher.ToAddressMatcher;
+import org.ethelred.util.Predicates;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -38,7 +38,6 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
     private static final Logger LOGGER = LogManager.getLogger(JavascriptFileConfiguration.class);
     private IJSObject config;
 
-    private Context ctx;
     private static final String SETUP_CALLBACK = "for(var fn in callback) {\n"
             + "  if(typeof callback[fn] === 'function') {\n"
             + "    this[fn] = (function() {\n"
@@ -86,7 +85,7 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
     public JavascriptFileConfiguration(File f) throws IOException
     {
         super(f);
-        ctx = Context.enter();
+        Context ctx = Context.enter();
         Scriptable scope = ctx.initStandardObjects();
         ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));
         ctx.evaluateString(scope, SETUP_CALLBACK, "setup", 1, null);
@@ -245,8 +244,7 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
     }
 
     @Override
-    public Task getTask() throws Exception
-    {
+    public Task getTask() {
         LOGGER.info("getTask {}", deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         for (OperationBuilder builder : deferredRules)
@@ -309,7 +307,7 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
         return false;
     }
 
-    private abstract class OperationBuilder implements Predicate<Message>
+    private abstract class OperationBuilder
     {
         protected Predicate<Message> delegate;
         protected List<Predicate<Message>> predicates = Lists.newArrayList();
@@ -326,7 +324,6 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
 
         public OperationBuilder ifIt(Predicate<Message> matcher)
         {
-
             return and(matcher);
         }
 
@@ -344,15 +341,10 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
             return this;
         }
 
-        @Override
-        public boolean apply(@javax.annotation.Nullable Message message)
-        {
-            return delegate.apply(message);
-        }
 
         public void addToTask(ApplyMatchOperationsTask task)
         {
-            task.addRule(folderName, this, predicates, getOperation(), includeSubFolders);
+            task.addRule(folderName, delegate, predicates, getOperation(), includeSubFolders);
         }
 
         protected abstract MessageOperation getOperation();

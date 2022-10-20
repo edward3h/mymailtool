@@ -1,6 +1,6 @@
 package org.ethelred.mymailtool2.matcher;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 import jakarta.mail.Message;
@@ -11,7 +11,7 @@ import jakarta.mail.Message;
 public class FolderMatcher implements Predicate<Message>
 {
 
-    private String folder;
+    private final String folder;
 
     public FolderMatcher(String folder)
     {
@@ -19,15 +19,12 @@ public class FolderMatcher implements Predicate<Message>
     }
 
     @Override
-    public boolean apply(@Nullable Message message)
+    public boolean test(@Nullable Message message)
     {
         if (message == null)
         {
             return false;
         }
-
-//        if(!folder.equalsIgnoreCase(message.getFolder().getFullName()))
-//        System.err.println("FolderMatcher " + folder + " check " + message.getFolder().getFullName());
 
         return folder.equalsIgnoreCase(message.getFolder().getFullName());
     }

@@ -3,7 +3,6 @@ package org.ethelred.mymailtool2;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,7 +66,7 @@ abstract class TaskBase implements Task
         {
             for (Folder child : f.list())
             {
-                traverseFolder(child, includeSubFolders, readMessages);
+                traverseFolder(child, true, readMessages);
             }
         }
     }
@@ -92,4 +91,8 @@ abstract class TaskBase implements Task
         return true;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

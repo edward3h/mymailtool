@@ -1,11 +1,10 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 import javax.annotation.CheckForNull;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
 
 /**
  *
@@ -14,13 +13,13 @@ import jakarta.mail.MessagingException;
 public interface MailToolContext
 {
 
-    public void countOperation();
+    void countOperation();
 
-    public Folder getFolder(String folderName);
+    Folder getFolder(String folderName);
 
-    public Folder getDefaultFolder();
+    Folder getDefaultFolder();
 
-    public Predicate<Message> defaultMinAge(Task t);
+    Predicate<Message> defaultMinAge(Task t);
 
     void connect();
 

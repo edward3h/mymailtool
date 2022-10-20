@@ -1,7 +1,7 @@
 package org.ethelred.mymailtool2.matcher;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 import com.google.common.base.Strings;
 
 import javax.annotation.Nullable;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 public class HasAttachmentMatcher implements Predicate<Message>
 {
-    private Pattern fileNamePattern;
+    private final Pattern fileNamePattern;
 
     public HasAttachmentMatcher(String patternSpec)
     {
@@ -26,7 +26,7 @@ public class HasAttachmentMatcher implements Predicate<Message>
     }
 
     @Override
-    public boolean apply(@Nullable Message message)
+    public boolean test(@Nullable Message message)
     {
         if (message == null)
         {

@@ -17,8 +17,7 @@ public class ListFoldersTask extends TaskBase
     private static final Logger LOGGER = LogManager.getLogger(ListFoldersTask.class);
 
     @Override
-    protected void runMessage(Folder f, Message m) throws MessagingException
-    {
+    protected void runMessage(Folder f, Message m) {
         // don't do anything
     }
 

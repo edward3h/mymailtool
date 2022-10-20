@@ -9,7 +9,7 @@ public interface Task
 
     void run();
 
-    public void init(MailToolContext ctx);
+    void init(MailToolContext ctx);
 
     boolean orderNewestFirst();
 }

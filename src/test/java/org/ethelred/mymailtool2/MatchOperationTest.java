@@ -2,11 +2,12 @@ package org.ethelred.mymailtool2;
 
 import jakarta.mail.Message;
 
-import com.google.common.base.Predicate;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Test;
+
+import java.util.function.Predicate;
 
 /**
  * unit test MatchOperation
@@ -24,7 +25,7 @@ public class MatchOperationTest
         final Message m = context.mock(Message.class);
 
         context.checking(new Expectations(){{
-            oneOf(matcher).apply(m); will(returnValue(true));
+            oneOf(matcher).test(m); will(returnValue(true));
             oneOf(operation).apply(mailContext, m); will(returnValue(true));
             allowing(operation).finishApplying(); will(returnValue(true));
             oneOf(mailContext).countOperation();
@@ -44,7 +45,7 @@ public class MatchOperationTest
         final Message m = context.mock(Message.class);
 
         context.checking(new Expectations(){{
-            oneOf(matcher).apply(m); will(returnValue(true));
+            oneOf(matcher).test(m); will(returnValue(true));
             oneOf(operation).apply(mailContext, m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
         }});
@@ -62,7 +63,7 @@ public class MatchOperationTest
         final Message m = context.mock(Message.class);
 
         context.checking(new Expectations(){{
-            oneOf(matcher).apply(m); will(returnValue(false));
+            oneOf(matcher).test(m); will(returnValue(false));
             allowing(operation).finishApplying(); will(returnValue(true));
         }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);

@@ -3,7 +3,6 @@ package org.ethelred.mymailtool2;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,20 +62,12 @@ class CompositeConfiguration implements MailToolConfiguration
     }
 
     private static Function<MailToolConfiguration, Iterable<String>> fileLocationsAccessor
-            = new Function<MailToolConfiguration, Iterable<String>>() {
-
-        @Override
-        public Iterable<String> apply(MailToolConfiguration f)
-        {
-            return f.getFileLocations();
-        }
-                
-            };
+            = f -> f.getFileLocations();
     @Override
     public Iterable<String> getFileLocations()
     {
         // we want the iterators to report files as they are added by other files
-        return new LazyCombinedIterable(fileLocationsAccessor);
+        return new LazyCombinedIterable<>(fileLocationsAccessor);
     }
 
     @Override
@@ -102,19 +93,11 @@ class CompositeConfiguration implements MailToolConfiguration
     }
 
         private static Function<MailToolConfiguration, Iterable<FileConfigurationHandler>> fileHandlersAccessor
-            = new Function<MailToolConfiguration, Iterable<FileConfigurationHandler>>() {
-
-        @Override
-        public Iterable<FileConfigurationHandler> apply(MailToolConfiguration f)
-        {
-            return f.getFileHandlers();
-        }
-                
-            };
+            = f -> f.getFileHandlers();
     @Override
     public Iterable<FileConfigurationHandler> getFileHandlers()
     {
-        return new LazyCombinedIterable(fileHandlersAccessor);
+        return new LazyCombinedIterable<>(fileHandlersAccessor);
     }
 
     @Override
@@ -227,7 +210,7 @@ class CompositeConfiguration implements MailToolConfiguration
         return first(method, new Class[0], new Object[0]);
     }
 
-    private Object first(String string, Class[] ptypes, Object[] args)
+    private Object first(String string, Class<?>[] ptypes, Object[] args)
     {
         try
         {
@@ -242,30 +225,18 @@ class CompositeConfiguration implements MailToolConfiguration
                         return result;
                     }
                 }
-                catch (IllegalAccessException ex)
-                {
-                    LOGGER.error("Unknown", ex);
-                }
-                catch (IllegalArgumentException ex)
-                {
-                    LOGGER.error("Unknown", ex);
-                }
-                catch (InvocationTargetException ex)
+                catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)
                 {
                     LOGGER.error("Unknown", ex);
                 }
             }
             
         }
-        catch (NoSuchMethodException ex)
+        catch (NoSuchMethodException | SecurityException ex)
         {
             LOGGER.error("Unknown", ex);
         }
-        catch (SecurityException ex)
-        {
-            LOGGER.error("Unknown", ex);
-        }
-        
+
         return null;
         
     }

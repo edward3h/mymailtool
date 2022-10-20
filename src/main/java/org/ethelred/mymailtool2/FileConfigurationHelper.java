@@ -1,7 +1,6 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.collect.MapMaker;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -152,9 +152,9 @@ public final class FileConfigurationHelper
         {
             Class<? extends FileConfigurationHandler> klass = 
                     (Class<? extends FileConfigurationHandler>) Class.forName(className);
-            return klass.newInstance();
+            return klass.getDeclaredConstructor().newInstance();
         }
-        catch (InstantiationException | IllegalAccessException ex)
+        catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex)
         {
             LOGGER.error("Failed to construct instance of {}", className, ex);
         }

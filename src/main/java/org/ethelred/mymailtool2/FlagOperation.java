@@ -53,6 +53,6 @@ public class FlagOperation implements MessageOperation
     @Override
     public String toString()
     {
-        return "Flag(" + (add ? "+" : "-") + userFlag + ")";
+        return "Flag{" + (add ? "+" : "-") + userFlag + "}";
     }
 }

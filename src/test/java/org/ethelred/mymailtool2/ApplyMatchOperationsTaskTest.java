@@ -1,7 +1,7 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import java.util.function.Predicate;
+import org.ethelred.util.Predicates;
 import com.google.common.collect.Lists;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.mock.MockData;
@@ -35,7 +35,7 @@ public class ApplyMatchOperationsTaskTest
         MatchOperation mo = new MatchOperation(new Predicate<Message>()
         {
             @Override
-            public boolean apply(@Nullable Message message)
+            public boolean test(@Nullable Message message)
             {
                 return true;
             }

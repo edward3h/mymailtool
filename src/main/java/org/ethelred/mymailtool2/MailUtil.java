@@ -14,8 +14,7 @@ public final class MailUtil
      */
     private MailUtil() {}
 
-    public static Supplier<String> supplyString(Message m) throws MessagingException
-    {
+    public static Supplier<String> supplyString(Message m) {
         return () -> {
             try {
                 return String.format(

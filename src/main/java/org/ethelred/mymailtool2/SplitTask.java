@@ -27,7 +27,7 @@ public class SplitTask extends TaskBase {
     }
 
     @Override
-    protected void runMessage(Folder f, Message m) throws MessagingException, IOException {
+    protected void runMessage(Folder f, Message m) {
         context.countMessage();
         if (operation.apply(context, m)) {
             context.countOperation();

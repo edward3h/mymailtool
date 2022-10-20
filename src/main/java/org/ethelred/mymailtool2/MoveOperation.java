@@ -49,6 +49,6 @@ public class MoveOperation implements MessageOperation
     @Override
     public String toString()
     {
-        return "Move(" + moveToFolderName + ")";
+        return "Move{" + moveToFolderName + "}";
     }
 }

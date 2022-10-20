@@ -16,7 +16,7 @@ class DefaultConfiguration implements MailToolConfiguration
     private Iterable<String> defaultFileLocations = ImmutableList.of(new File(System.getProperty("user.home"), ".mymailtoolrc.properties").getAbsolutePath(), "/etc/mymailtoolrc.properties");
 
     private Iterable<FileConfigurationHandler> defaultFileHandlers
-            = ImmutableList.of((FileConfigurationHandler) new PropertiesFileConfigurationHandler());
+            = ImmutableList.of(new PropertiesFileConfigurationHandler());
     
     @Override
     public String getPassword()
