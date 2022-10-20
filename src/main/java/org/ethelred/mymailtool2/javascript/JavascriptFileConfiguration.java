@@ -38,7 +38,6 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
     private static final Logger LOGGER = LogManager.getLogger(JavascriptFileConfiguration.class);
     private IJSObject config;
 
-    private Context ctx;
     private static final String SETUP_CALLBACK = "for(var fn in callback) {\n"
             + "  if(typeof callback[fn] === 'function') {\n"
             + "    this[fn] = (function() {\n"
@@ -86,7 +85,7 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
     public JavascriptFileConfiguration(File f) throws IOException
     {
         super(f);
-        ctx = Context.enter();
+        Context ctx = Context.enter();
         Scriptable scope = ctx.initStandardObjects();
         ScriptableObject.putProperty(scope, "callback", Context.javaToJS(new Callback(), scope));
         ctx.evaluateString(scope, SETUP_CALLBACK, "setup", 1, null);
@@ -245,8 +244,7 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
     }
 
     @Override
-    public Task getTask() throws Exception
-    {
+    public Task getTask() {
         LOGGER.info("getTask {}", deferredRules);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         for (OperationBuilder builder : deferredRules)

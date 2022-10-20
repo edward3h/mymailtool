@@ -15,7 +15,6 @@ import org.ethelred.mymailtool2.matcher.FolderMatcher;
 import org.ethelred.util.Predicates;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -94,8 +93,8 @@ public class ApplyMatchOperationsTask extends TaskBase
     }
 
     // order is important
-    LinkedHashMap<ApplyKey, List<MatchOperation>> rules = Maps.newLinkedHashMap();
-    Set<ApplyKey> includeSubFolders = Sets.newHashSet();
+    final LinkedHashMap<ApplyKey, List<MatchOperation>> rules = Maps.newLinkedHashMap();
+    final Set<ApplyKey> includeSubFolders = Sets.newHashSet();
 
     public static ApplyMatchOperationsTask create()
     {
@@ -106,7 +105,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     public void init(MailToolContext ctx)
     {
         super.init(ctx);
-        defaultMinAgeDelegate = ctx.defaultMinAge(this)::test;
+        defaultMinAgeDelegate = ctx.defaultMinAge(this);
     }
 
     @Override

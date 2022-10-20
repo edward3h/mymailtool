@@ -7,7 +7,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public final class ClockFactory
 {
-    private static final Clock SYSTEM = () -> System.currentTimeMillis();
+    private static final Clock SYSTEM = System::currentTimeMillis;
 
     private static Clock instance = SYSTEM;
 

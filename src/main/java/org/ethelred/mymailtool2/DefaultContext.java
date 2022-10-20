@@ -1,6 +1,5 @@
 package org.ethelred.mymailtool2;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.util.function.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -20,7 +19,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

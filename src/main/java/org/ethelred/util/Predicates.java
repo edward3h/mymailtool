@@ -13,7 +13,7 @@ public class Predicates {
     }
 
     public static <T> Predicate<T> alwaysTrue() {
-        return new Predicate<T>() {
+        return new Predicate<>() {
             @Override
             public boolean test(T t) {
                 return true;

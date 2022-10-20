@@ -9,8 +9,8 @@ import java.io.File;
 public interface FileConfigurationHandler
 {
 
-    public Iterable<String> getExtensions();
+    Iterable<String> getExtensions();
 
-    public MailToolConfiguration readConfiguration(File f);
+    MailToolConfiguration readConfiguration(File f);
     
 }

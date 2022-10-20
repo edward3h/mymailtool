@@ -10,32 +10,32 @@ import java.util.regex.Pattern;
  */
 public interface MailToolConfiguration
 {
-    public static final String PROTOCOL = "mail.store.protocol";
-    public static final String USER = "mail.user";
-    public static final String HOST = "mail.host";
-    public static final String PORT = "mail.port";
-    public static final Pattern MAIL_PROPERTY_PATTERN = Pattern.compile("mail\\..+");
-    public static final Iterable<String> ALL_MAIL_PROPERTIES = 
+    String PROTOCOL = "mail.store.protocol";
+    String USER = "mail.user";
+    String HOST = "mail.host";
+    String PORT = "mail.port";
+    Pattern MAIL_PROPERTY_PATTERN = Pattern.compile("mail\\..+");
+    Iterable<String> ALL_MAIL_PROPERTIES =
           ImmutableList.of(PROTOCOL, USER, HOST);
-    public static final int PRIMITIVE_DEFAULT = -1; // this is nasty :-)
+    int PRIMITIVE_DEFAULT = -1; // this is nasty :-)
 
-    public String getPassword();
+    String getPassword();
 
-    public Map<String, String> getMailProperties();
+    Map<String, String> getMailProperties();
 
-    public String getUser();
+    String getUser();
 
-    public Iterable<String> getFileLocations();
+    Iterable<String> getFileLocations();
 
-    public Task getTask() throws Exception;
+    Task getTask() throws Exception;
 
-    public int getOperationLimit();
+    int getOperationLimit();
 
-    public String getMinAge();
+    String getMinAge();
 
     Iterable<FileConfigurationHandler> getFileHandlers();
 
-    public String getTimeLimit();
+    String getTimeLimit();
 
     boolean verbose();
 

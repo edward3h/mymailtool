@@ -48,8 +48,7 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
     }
 
     @Override
-    public Task getTask() throws Exception
-    {
+    public Task getTask() {
         return null;
     }
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.function.Predicate;
-import org.ethelred.util.Predicates;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
@@ -105,8 +105,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     }
     
     @Option(name = "--list", usage = "List folders.", aliases = {"-l"})
-    private void taskListFolders(boolean fake) throws CmdLineException
-    {
+    private void taskListFolders(boolean fake) {
         task = ListFoldersTask.create();
     }
 
@@ -288,8 +287,7 @@ class CommandLineConfiguration implements MailToolConfiguration
     }
 
     @Override
-    public Task getTask() throws CmdLineException
-    {
+    public Task getTask() {
         return task;
     }
 

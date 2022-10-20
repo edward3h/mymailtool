@@ -17,7 +17,7 @@ public abstract class BaseFileConfiguration implements MailToolConfiguration {
     private String _shortFile(File file) {
         var s = file.toString();
         var home = System.getProperty("user.home");
-        if (home != null || s.startsWith(home)) {
+        if (home != null && s.startsWith(home)) {
             return s.replace(home, "~");
         }
         return s;
