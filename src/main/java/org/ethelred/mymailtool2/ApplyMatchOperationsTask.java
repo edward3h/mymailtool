@@ -39,7 +39,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     );
 
     Predicate<Message> defaultMinAgeDelegate;
-    private final Predicate<Message> deferredDefaultMinAge = (message) -> defaultMinAgeDelegate.test(message);
+    private  boolean deferredDefaultMinAge(Message message){return defaultMinAgeDelegate.test(message);}
     private final Random random = new Random();
 
     public boolean hasRules()

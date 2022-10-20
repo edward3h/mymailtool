@@ -32,7 +32,7 @@ public class Predicates {
 
     /**
      * wrap as object rather than lambda, so it can have a toString()
-     * @param <T>
+     *
      */
     private static class AndPredicate<T> implements Predicate<T> {
         private final List<Predicate<T>> predicates;
