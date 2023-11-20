@@ -30,7 +30,7 @@ dependencies {
     implementation group: 'org.mozilla', name: 'rhino', version: '1.7.14'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     implementation 'org.ethelred:ethelred_util:0.4'
-    implementation 'org.apache.logging.log4j:log4j-api:2.21.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.22.0'
     implementation 'org.apache.logging.log4j:log4j-jul:2.21.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.21.1'
 
@@ -41,7 +41,7 @@ dependencies {
 //    rewrite('org.ethelred:ethelred-rewrite:0.3-6-ga72db15.dirty')
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks:latest.release")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java:1.21.1")
-    rewrite('org.apache.logging.log4j:log4j-api:2.21.1')
+    rewrite('org.apache.logging.log4j:log4j-api:2.22.0')
 }
 
 task install {
