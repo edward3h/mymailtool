@@ -35,7 +35,7 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation group: 'org.jmock', name: 'jmock', version: '2.12.0'
+    testImplementation group: 'org.jmock', name: 'jmock', version: '2.13.0'
     testImplementation group: 'org.jmock', name: 'jmock-legacy', version: '2.12.0'
 
 //    rewrite('org.ethelred:ethelred-rewrite:0.3-6-ga72db15.dirty')
