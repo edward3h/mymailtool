@@ -27,7 +27,7 @@ dependencies {
     implementation group: 'javax.activation', name: 'javax.activation-api', version: '1.2.0'
     implementation group: 'com.sun.mail', name: 'jakarta.mail', version: '2.0.1'
     implementation group: 'joda-time', name: 'joda-time', version: '2.13.0'
-    implementation group: 'org.mozilla', name: 'rhino', version: '1.7.15'
+    implementation group: 'org.mozilla', name: 'rhino', version: '1.8.0'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     implementation 'org.ethelred:ethelred_util:0.4'
     implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
