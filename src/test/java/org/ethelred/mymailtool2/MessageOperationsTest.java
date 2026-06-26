@@ -9,7 +9,7 @@ import jakarta.mail.MessagingException;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
  */
 public class MessageOperationsTest
 {
-    Mockery context = new Mockery(){{setImposteriser(ClassImposteriser.INSTANCE);}};
+    Mockery context = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
 
     Message msg;
     Folder startingFolder;

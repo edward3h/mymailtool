@@ -6,7 +6,7 @@ import org.ethelred.mymailtool2.mock.MockMessage;
 import org.ethelred.mymailtool2.mock.MockStore;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

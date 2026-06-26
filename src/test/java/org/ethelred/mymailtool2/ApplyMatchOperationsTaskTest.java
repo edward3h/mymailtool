@@ -9,7 +9,7 @@ import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
 import org.ethelred.util.ClockFactory;
 import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.junit.After;
 import org.junit.Test;
 
