@@ -5,11 +5,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.util.ClockFactory;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Period;
-import org.joda.time.ReadablePeriod;
-import org.joda.time.format.PeriodFormat;
+import java.time.Duration;
+import java.time.format.DateTimeParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
 import jakarta.mail.Authenticator;
@@ -39,8 +38,7 @@ public class DefaultContext implements MailToolContext
 
     protected Map<String, Folder> folderCache;
 
-    protected static final ReadablePeriod DEFAULT_MIN_AGE = Days.days(30);
-    private DateTime ageCompare;
+    protected static final Duration DEFAULT_MIN_AGE = Duration.ofDays(30);
     private long startTime = ClockFactory.getClock().currentTimeMillis();
     private long timeLimit = -1;
     private int operationLimit = -1;
@@ -143,12 +141,33 @@ public class DefaultContext implements MailToolContext
         long newTimeLimit = 0;
         if (! Strings.isNullOrEmpty(timeLimitSpec))
         {
-            Period p = PeriodFormat.getDefault().parsePeriod(timeLimitSpec);
-            newTimeLimit = p.toStandardDuration().getMillis();
+            newTimeLimit = parseDuration(timeLimitSpec).toMillis();
         }
         LOGGER.debug("Time limit {}ms", newTimeLimit);
         timeLimit = newTimeLimit;
         return timeLimit;
+    }
+
+    private static final Pattern DURATION_PART = Pattern.compile("(\\d+)\\s*(second|minute|hour|day|week)s?", Pattern.CASE_INSENSITIVE);
+
+    private static Duration parseDuration(String spec) {
+        try {
+            return Duration.parse(spec);
+        } catch (DateTimeParseException ignored) {}
+        Matcher m = DURATION_PART.matcher(spec);
+        Duration total = Duration.ZERO;
+        while (m.find()) {
+            long n = Long.parseLong(m.group(1));
+            total = total.plus(switch (m.group(2).toLowerCase()) {
+                case "second" -> Duration.ofSeconds(n);
+                case "minute" -> Duration.ofMinutes(n);
+                case "hour" -> Duration.ofHours(n);
+                case "day" -> Duration.ofDays(n);
+                case "week" -> Duration.ofDays(n * 7);
+                default -> Duration.ZERO;
+            });
+        }
+        return total;
     }
 
     @Override

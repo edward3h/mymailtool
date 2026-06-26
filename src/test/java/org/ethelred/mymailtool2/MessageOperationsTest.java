@@ -10,7 +10,8 @@ import jakarta.mail.MessagingException;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.joda.time.LocalDate;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -100,7 +101,7 @@ public class MessageOperationsTest
                 oneOf(msg).getFolder(); will(returnValue(startingFolder));
                 oneOf(startingFolder).getSeparator(); will(returnValue('.'));
                 exactly(2).of(startingFolder).getFullName(); will(returnValue("folder"));
-                oneOf(msg).getReceivedDate(); will(returnValue(new LocalDate(2012, 4, 8).toDate()));
+                oneOf(msg).getReceivedDate(); will(returnValue(Date.from(LocalDate.of(2012, 4, 8).atStartOfDay(ZoneId.systemDefault()).toInstant())));
                 oneOf(mailContext).getFolder("folder.2012.04-Apr-2012"); will(returnValue(moveTo));
                 //allowing(moveTo).getFullName(); will(returnValue("folder.04-Apr-2012"));
                 oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
