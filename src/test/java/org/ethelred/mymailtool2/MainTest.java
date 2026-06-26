@@ -3,7 +3,7 @@ package org.ethelred.mymailtool2;
 import org.ethelred.util.ClockFactory;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
  */
 public class MainTest
 {
-    Mockery my = new Mockery(){{setImposteriser(ClassImposteriser.INSTANCE);}};
+    Mockery my = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
 
     @Test
     public void testOperationLimit()

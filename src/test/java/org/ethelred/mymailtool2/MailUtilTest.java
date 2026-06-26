@@ -7,7 +7,7 @@ import jakarta.mail.MessagingException;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class MailUtilTest
 {
-    Mockery context = new Mockery(){{setImposteriser(ClassImposteriser.INSTANCE);}};
+    Mockery context = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
 
     @Test
     public void messageToString() throws MessagingException
