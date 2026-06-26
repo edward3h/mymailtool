@@ -6,9 +6,10 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  *
@@ -19,15 +20,14 @@ public class SplitOperation implements MessageOperation
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final DateTimeFormatter monthPart = new DateTimeFormatterBuilder().appendMonthOfYear(2).appendLiteral('-').appendMonthOfYearShortText().appendLiteral(
-            '-').appendYear(4, 4).toFormatter();
+    private static final DateTimeFormatter monthPart = DateTimeFormatter.ofPattern("MM-MMM-yyyy", Locale.ENGLISH);
 
     @Override
     public boolean apply(MailToolContext context, Message m)
     {
         try
         {
-            LocalDate received = new LocalDate(m.getReceivedDate());
+            LocalDate received = m.getReceivedDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             Folder startingFolder = m.getFolder();
             Folder moveTo = context.getFolder(getSubFolderName(startingFolder, received));
             startingFolder.copyMessages(new Message[]{m}, moveTo);
@@ -58,7 +58,7 @@ public class SplitOperation implements MessageOperation
     {
         char sep = folder.getSeparator();
         String year = String.valueOf(received.getYear());
-        String month = monthPart.print(received);
+        String month = monthPart.format(received);
         return folder.getFullName() + sep + year + sep + month;
     }
 }

@@ -4,8 +4,8 @@ import org.ethelred.util.ClockFactory;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.Test;
 
 import jakarta.mail.Message;
@@ -29,7 +29,7 @@ public class MainTest
     {
         final MailToolConfiguration conf = my.mock(MailToolConfiguration.class);
 
-        ClockFactory.setClock(new DateMidnight(2014, 1, 1).getMillis());
+        ClockFactory.setClock(LocalDate.of(2014, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli());
         my.checking(new Expectations(){{
             exactly(2).of(conf).getOperationLimit(); will(returnValue(3));
             exactly(1).of(conf).getTimeLimit(); will(returnValue("50 days"));
