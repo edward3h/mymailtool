@@ -39,7 +39,7 @@ dependencies {
 
 //    rewrite('org.ethelred:ethelred-rewrite:0.3-6-ga72db15.dirty')
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks:latest.release")
-    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.38.0")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.39.0")
     rewrite('org.apache.logging.log4j:log4j-api:2.26.0')
 }
 
