@@ -3,13 +3,9 @@ package org.ethelred.mymailtool2;
 import org.ethelred.mymailtool2.mock.MockData;
 import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
-import org.ethelred.mymailtool2.mock.MockStore;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
@@ -19,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  * tests for base functionality
@@ -29,7 +25,7 @@ public class TaskBaseTest
     private static final Logger LOGGER = LogManager.getLogger();
     MailToolContext mockContext;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
 
@@ -47,7 +43,7 @@ public class TaskBaseTest
         mockContext.connect();
     }
 
-    @After
+    @AfterEach
     public void cleanup()
     {
         mockContext.disconnect();
@@ -60,7 +56,7 @@ public class TaskBaseTest
         MockTaskBase tb = new MockTaskBase();
         tb.init(mockContext);
         tb.traverseFolder("Folder", false, true);
-        assertEquals(3, tb.messageCounter);
+        assertThat(tb.messageCounter).isEqualTo(3);
 
     }
 
@@ -72,7 +68,7 @@ public class TaskBaseTest
         tb.giveUpAfter = Integer.MAX_VALUE;
         tb.init(mockContext);
         tb.traverseFolder("Folder", false, true);
-        assertEquals(MockData.getInstance().folderSize("Folder"), tb.messageCounter);
+        assertThat(tb.messageCounter).isEqualTo(MockData.getInstance().folderSize("Folder"));
 
     }
 
