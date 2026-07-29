@@ -11,20 +11,17 @@ import org.ethelred.mymailtool2.Task;
 import org.ethelred.mymailtool2.mock.MockData;
 import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  * test loading a js file
  */
 public class JavascriptConfigurationTest
 {
-    @After
+    @AfterEach
     public void cleanup()
     {
         MockData.clear();
@@ -37,20 +34,20 @@ public class JavascriptConfigurationTest
         FileConfigurationHandler h = new JavascriptFileConfigurationHandler();
 
         URL testFileLocation = this.getClass().getResource("testjavascript.js");
-        assertNotNull(testFileLocation);
+        assertThat(testFileLocation).isNotNull();
         File f = new File(testFileLocation.getFile());
 
         MailToolConfiguration conf = h.readConfiguration(f);
 
-        assertNotNull(conf);
-        assertEquals("edward", conf.getUser());
-        assertEquals("3 months", conf.getMinAge());
-        assertEquals(300, conf.getOperationLimit());
-        assertEquals("imap", conf.getMailProperties().get("mail.store.protocol"));
+        assertThat(conf).isNotNull();
+        assertThat(conf.getUser()).isEqualTo("edward");
+        assertThat(conf.getMinAge()).isEqualTo("3 months");
+        assertThat(conf.getOperationLimit()).isEqualTo(300);
+        assertThat(conf.getMailProperties().get("mail.store.protocol")).isEqualTo("imap");
 
         Task t = conf.getTask();
-        assertNotNull(t);
-        assertTrue(t instanceof ApplyMatchOperationsTask);
+        assertThat(t).isNotNull();
+        assertThat(t).isInstanceOf(ApplyMatchOperationsTask.class);
     }
 
     @Test
@@ -73,13 +70,13 @@ public class JavascriptConfigurationTest
         data.addMessage("spamtest", MockMessage.create("2012-01-01", "from1@example.com", "Hello world").addHeader("X-Spam-Score", "1.5"));
         data.addMessage("spamtest", MockMessage.create("2012-01-01", "from1@example.com", "Hello world 2").addHeader("X-Spam-Score", "2.6"));
 
-        assertEquals(3, data.folderSize("Inbox"));
-        assertEquals(0, data.folderSize("archive"));
-        assertEquals(-1, data.folderSize("archive.2012.01-Jan-2012"));
-        assertEquals(2, data.folderSize("test"));
-        assertEquals(-1, data.folderSize("repeated"));
-        assertEquals(2, data.folderSize("spamtest"));
-        assertEquals(-1, data.folderSize("spamscore"));
+        assertThat(data.folderSize("Inbox")).isEqualTo(3);
+        assertThat(data.folderSize("archive")).isEqualTo(0);
+        assertThat(data.folderSize("archive.2012.01-Jan-2012")).isEqualTo(-1);
+        assertThat(data.folderSize("test")).isEqualTo(2);
+        assertThat(data.folderSize("repeated")).isEqualTo(-1);
+        assertThat(data.folderSize("spamtest")).isEqualTo(2);
+        assertThat(data.folderSize("spamscore")).isEqualTo(-1);
 
         Main main = new Main();
         main.setDefaultConfiguration(conf);
@@ -87,13 +84,13 @@ public class JavascriptConfigurationTest
         main.run();
 
 
-        assertEquals(0, data.folderSize("Inbox"));
-        assertEquals(0, data.folderSize("archive"));
-        assertEquals(1, data.folderSize("archive.2012.01-Jan-2012"));
-        assertEquals(1, data.folderSize("test"));
-        assertEquals(1, data.folderSize("repeated"));
-        assertEquals(1, data.folderSize("spamtest"));
-        assertEquals(1, data.folderSize("spamscore"));
+        assertThat(data.folderSize("Inbox")).isEqualTo(0);
+        assertThat(data.folderSize("archive")).isEqualTo(0);
+        assertThat(data.folderSize("archive.2012.01-Jan-2012")).isEqualTo(1);
+        assertThat(data.folderSize("test")).isEqualTo(1);
+        assertThat(data.folderSize("repeated")).isEqualTo(1);
+        assertThat(data.folderSize("spamtest")).isEqualTo(1);
+        assertThat(data.folderSize("spamscore")).isEqualTo(1);
     }
 
 
@@ -114,7 +111,7 @@ public class JavascriptConfigurationTest
         data.addMessage("Inbox", MockMessage.create("2012-01-01", "banana@fruit.com", "Hello subject1 world"));
         data.addMessage("Inbox", MockMessage.create("2012-01-01", "cheddar@cheese.com", "Hello subject2 world"));
 
-        assertEquals(3, data.folderSize("Inbox"));
+        assertThat(data.folderSize("Inbox")).isEqualTo(3);
 
         Main main = new Main();
         main.setDefaultConfiguration(conf);
@@ -122,6 +119,6 @@ public class JavascriptConfigurationTest
         main.run();
 
 
-        assertEquals(1, data.folderSize("Inbox"));
+        assertThat(data.folderSize("Inbox")).isEqualTo(1);
     }
 }
