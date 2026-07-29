@@ -5,35 +5,32 @@ import java.util.Date;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.lenient;
 
 /**
  * tests for MailUtil
  */
+@ExtendWith(MockitoExtension.class)
 public class MailUtilTest
 {
-    Mockery context = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
+    @Mock Message m;
 
     @Test
     public void messageToString() throws MessagingException
     {
-        final Message m = context.mock(Message.class);
         Calendar c = Calendar.getInstance();
         c.set(2012, Calendar.APRIL, 17, 11, 55);
         final Date sentDate = c.getTime();
 
-        context.checking(new Expectations(){{
-            allowing(m).getSentDate(); will(returnValue(sentDate));
-            allowing(m).getSubject(); will(returnValue("test subject"));
-        }});
+        lenient().when(m.getSentDate()).thenReturn(sentDate);
+        lenient().when(m.getSubject()).thenReturn("test subject");
 
-        assertEquals("@|cyan 2012-04-17 11:55|@: @|yellow test subject|@", MailUtil.supplyString(m).get());
-
-        context.assertIsSatisfied();
+        assertThat(MailUtil.supplyString(m).get()).isEqualTo("@|cyan 2012-04-17 11:55|@: @|yellow test subject|@");
     }
 }
