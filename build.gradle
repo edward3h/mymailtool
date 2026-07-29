@@ -1,6 +1,11 @@
 plugins {
     id 'application'
+    id 'jacoco'
     id("org.openrewrite.rewrite") version("7.37.0")
+}
+
+jacoco {
+    toolVersion = '0.8.12'
 }
 
 repositories {
@@ -41,6 +46,18 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks:latest.release")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.40.0")
     rewrite('org.apache.logging.log4j:log4j-api:2.26.1')
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
 
 task install {
