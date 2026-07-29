@@ -2,72 +2,65 @@ package org.ethelred.mymailtool2;
 
 import jakarta.mail.Message;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.function.Predicate;
+
+import static org.mockito.Mockito.*;
 
 /**
  * unit test MatchOperation
  */
+@ExtendWith(MockitoExtension.class)
 public class MatchOperationTest
 {
-    Mockery context = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
+    @Mock Predicate<Message> matcher;
+    @Mock MessageOperation operation;
+    @Mock MailToolContext mailContext;
+    @Mock Message m;
 
     @Test
     public void testSuccess()
     {
-        @SuppressWarnings("unchecked") final Predicate<Message> matcher = context.mock(Predicate.class);
-        final MessageOperation operation = context.mock(MessageOperation.class);
-        final MailToolContext mailContext = context.mock(MailToolContext.class);
-        final Message m = context.mock(Message.class);
+        when(matcher.test(m)).thenReturn(true);
+        when(operation.apply(mailContext, m)).thenReturn(true);
+        lenient().when(operation.finishApplying()).thenReturn(true);
 
-        context.checking(new Expectations(){{
-            oneOf(matcher).test(m); will(returnValue(true));
-            oneOf(operation).apply(mailContext, m); will(returnValue(true));
-            allowing(operation).finishApplying(); will(returnValue(true));
-            oneOf(mailContext).countOperation();
-        }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
-        context.assertIsSatisfied();
+
+        verify(matcher).test(m);
+        verify(operation).apply(mailContext, m);
+        verify(mailContext).countOperation();
     }
 
 
     @Test
     public void testOpFailure()
     {
-        final Predicate<Message> matcher = context.mock(Predicate.class);
-        final MessageOperation operation = context.mock(MessageOperation.class);
-        final MailToolContext mailContext = context.mock(MailToolContext.class);
-        final Message m = context.mock(Message.class);
+        when(matcher.test(m)).thenReturn(true);
+        when(operation.apply(mailContext, m)).thenReturn(false);
+        lenient().when(operation.finishApplying()).thenReturn(true);
 
-        context.checking(new Expectations(){{
-            oneOf(matcher).test(m); will(returnValue(true));
-            oneOf(operation).apply(mailContext, m); will(returnValue(false));
-            allowing(operation).finishApplying(); will(returnValue(true));
-        }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
-        context.assertIsSatisfied();
+
+        verify(matcher).test(m);
+        verify(operation).apply(mailContext, m);
     }
 
     @Test
     public void testMatchFailure()
     {
-        final Predicate<Message> matcher = context.mock(Predicate.class);
-        final MessageOperation operation = context.mock(MessageOperation.class);
-        final MailToolContext mailContext = context.mock(MailToolContext.class);
-        final Message m = context.mock(Message.class);
+        when(matcher.test(m)).thenReturn(false);
+        lenient().when(operation.finishApplying()).thenReturn(true);
 
-        context.checking(new Expectations(){{
-            oneOf(matcher).test(m); will(returnValue(false));
-            allowing(operation).finishApplying(); will(returnValue(true));
-        }});
         MatchOperation test = new MatchOperation(matcher, operation, 1);
         test.testApply(m, mailContext);
-        context.assertIsSatisfied();
+
+        verify(matcher).test(m);
     }
 }
