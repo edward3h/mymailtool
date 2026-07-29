@@ -39,8 +39,8 @@ public class MessageOperationsTest
         c.set(2012, Calendar.APRIL, 17);
         sentDate = c.getTime();
 
-        lenient().when(msg.getSentDate()).thenReturn(sentDate);
-        lenient().when(msg.getSubject()).thenReturn("test subject");
+        when(msg.getSentDate()).thenReturn(sentDate);
+        when(msg.getSubject()).thenReturn("test subject");
     }
 
     @Test
@@ -51,6 +51,7 @@ public class MessageOperationsTest
             MessageOperation del = new DeleteOperation();
             assertThat(del.apply(mailContext, msg)).isTrue();
             verify(msg).setFlag(Flags.Flag.DELETED, true);
+            verifyNoInteractions(mailContext);
         }
         catch (MessagingException e)
         {
