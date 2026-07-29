@@ -1,28 +1,22 @@
 package org.ethelred.util;
 
-import com.google.common.collect.Iterables;
+import static com.google.common.truth.Truth.assertThat;
 
-import static org.junit.Assert.assertTrue;
-
-/**
- * utils for tests
- */
 public final class TestUtil
 {
     public static void assertEmpty(String value)
     {
-        assertTrue("not empty [" + value + "]", "".equals(value));
+        assertThat(value).isEmpty();
     }
 
     public static void assertEmpty(Iterable<?> value)
     {
-        assertTrue("not empty [" + Iterables.toString(value) + "]", Iterables.isEmpty(value));
-
+        assertThat(value).isEmpty();
     }
 
     public static <T> void assertEquals(Iterable<T> expected, Iterable<T> actual)
     {
-        assertTrue("Iterables do not match", Iterables.elementsEqual(expected, actual));
+        assertThat(actual).containsExactlyElementsIn(expected).inOrder();
     }
 
     private TestUtil() {
