@@ -7,14 +7,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.ethelred.util.TestUtil;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.ethelred.util.TestUtil.assertEmpty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -25,10 +24,10 @@ public class CompositeConfigurationTest
     public void testEmptyConfiguration()
     {
         MailToolConfiguration empty = new CompositeConfiguration();
-        assertEquals(-1, empty.getOperationLimit());
-        assertNull(empty.getUser());
-        assertNull(empty.getMinAge());
-        assertNull(empty.getPassword());
+        assertThat(empty.getOperationLimit()).isEqualTo(-1);
+        assertThat(empty.getUser()).isNull();
+        assertThat(empty.getMinAge()).isNull();
+        assertThat(empty.getPassword()).isNull();
         assertEmpty(empty.getFileLocations());
         assertEmpty(empty.getFileHandlers());
     }
@@ -112,10 +111,10 @@ public class CompositeConfigurationTest
         };
 
         MailToolConfiguration comp = new CompositeConfiguration(mock);
-        assertEquals(mock.getOperationLimit(), comp.getOperationLimit());
-        assertEquals(mock.getUser(), comp.getUser());
-        assertEquals(mock.getMinAge(), comp.getMinAge());
-        assertEquals(mock.getPassword(), comp.getPassword());
+        assertThat(comp.getOperationLimit()).isEqualTo(mock.getOperationLimit());
+        assertThat(comp.getUser()).isEqualTo(mock.getUser());
+        assertThat(comp.getMinAge()).isEqualTo(mock.getMinAge());
+        assertThat(comp.getPassword()).isEqualTo(mock.getPassword());
         TestUtil.assertEquals(mock.getFileLocations(), comp.getFileLocations());
         TestUtil.assertEquals(mock.getFileHandlers(), comp.getFileHandlers());
     }
@@ -123,24 +122,21 @@ public class CompositeConfigurationTest
     @Test
     public void testInsertion()
     {
-        Mockery my = new Mockery();
-
         final Iterable<String> testFileLocs = ImmutableList.of("loc1", "loc2");
         final Iterable<String> testFileLocs2 = ImmutableList.of("ins1");
-        final MailToolConfiguration mockDefault = my.mock(MailToolConfiguration.class, "MTCdefault");
-        final MailToolConfiguration mockFile1 = my.mock(MailToolConfiguration.class, "MTCfile1");
-        final MailToolConfiguration mockFile2 = my.mock(MailToolConfiguration.class, "MTCfile2");
+        final MailToolConfiguration mockDefault = mock(MailToolConfiguration.class, "MTCdefault");
+        final MailToolConfiguration mockFile1 = mock(MailToolConfiguration.class, "MTCfile1");
+        final MailToolConfiguration mockFile2 = mock(MailToolConfiguration.class, "MTCfile2");
         Map<String, MailToolConfiguration> mockFiles = ImmutableMap.of(
                 "loc1", mockFile1,
                 "ins1", mockFile2
         );
         CompositeConfiguration cmp = new CompositeConfiguration(mockDefault);
 
-        my.checking(new Expectations(){{
-            oneOf(mockDefault).getFileLocations(); will(returnValue(testFileLocs));
-            oneOf(mockFile1).getFileLocations(); will(returnValue(testFileLocs2));
-            oneOf(mockFile2).getFileLocations(); will(returnValue(Collections.emptyList()));
-        }});
+        when(mockDefault.getFileLocations()).thenReturn(testFileLocs);
+        when(mockFile1.getFileLocations()).thenReturn(testFileLocs2);
+        when(mockFile2.getFileLocations()).thenReturn(Collections.emptyList());
+
         int counter = 0;
         for (String filename : cmp.getFileLocations())
         {
@@ -150,8 +146,11 @@ public class CompositeConfigurationTest
                 cmp.insert(fileConf);
             }
             counter++;
-            assertTrue("excessive loop count", counter < 5);
+            assertThat(counter).isLessThan(5);
         }
-        my.assertIsSatisfied();
+
+        verify(mockDefault).getFileLocations();
+        verify(mockFile1).getFileLocations();
+        verify(mockFile2).getFileLocations();
     }
 }
