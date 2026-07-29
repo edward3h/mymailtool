@@ -79,8 +79,11 @@ Applied consistently across all files:
 | `context.checking(new Expectations(){{ oneOf(x).method(args); will(returnValue(v)); }})` | `when(x.method(args)).thenReturn(v);` for stubbing, plus `verify(x).method(args);` to assert the call happened |
 | `allowing(x).method(args); will(returnValue(v));` | `lenient().when(x.method(args)).thenReturn(v);` (or plain `when(...)` if always exercised) — no `verify` since the call isn't required |
 | `context.assertIsSatisfied();` | removed — Mockito's `@Mock`/strict stubbing plus explicit `verify(...)` calls cover this; add `verifyNoMoreInteractions(x)` only where a test's current exhaustiveness is actually load-bearing |
-| `import static org.junit.Assert.*;` + `assertEquals/assertTrue/assertNull/...` | `import static com.google.truth.Truth.assertThat;` + `assertThat(actual).isEqualTo(expected)` / `.isTrue()` / `.isNull()` / etc. |
+| `import static org.junit.Assert.*;` + `assertEquals/assertTrue/assertNull/...` | `import static com.google.common.truth.Truth.assertThat;` (note the package is `com.google.common.truth`, not `com.google.truth`, despite the Maven coordinate being `com.google.truth:truth`) + `assertThat(actual).isEqualTo(expected)` / `.isTrue()` / `.isNull()` / etc. |
 | `TestUtil.assertEmpty(...)`, `TestUtil.assertEquals(Iterable, Iterable)` | Same method signatures kept (call sites unchanged), but reimplemented internally using Truth: `assertThat(value).isEmpty()`, `assertThat(actual).containsExactlyElementsIn(expected).inOrder()` |
+| `exactly(n).of(x).method(args); will(returnValue(v));` (counted expectation, e.g. `MainTest.java:34-35`, `MessageOperationsTest.java:103`) | `when(x.method(args)).thenReturn(v);` for stubbing, `verify(x, times(n)).method(args);` for the count assertion |
+| `oneOf(x).method(with(hamcrestMatcher1), with(hamcrestMatcher2));` (Hamcrest arg matchers via jmock's `with(...)`, e.g. `MessageOperationsTest.java:78,107` — `with(hasItemInArray(msg))`, `with(equal(moveTo))`) | `verify(x).method(argThat(...), eq(...));` using Mockito's `ArgumentMatchers`. **Gotcha:** once any argument in a call uses a Mockito matcher, *every* argument in that call must use a matcher (mixing raw values and matchers throws `InvalidUseOfMatchersException`) — wrap plain-value args in `eq(...)` |
+| `import org.junit.Ignore` / `@Ignore` (appears imported but unused in `JavascriptConfigurationTest.java`) | `import org.junit.jupiter.api.Disabled` / `@Disabled` if ever applied; since it's currently unused, just drop the import |
 
 Example — `MatchOperationTest.testSuccess()` before/after:
 
@@ -115,3 +118,16 @@ verify(mailContext).countOperation();
 - Spot-check that Mockito's strict stubbing doesn't flag `UnnecessaryStubbingException` for
   `allowing(...)`-derived stubs that aren't exercised on every path — use `lenient()` for those
   rather than suppressing strictness suite-wide.
+
+## Notes for the implementer
+
+- Required static imports per migrated file (in addition to `com.google.common.truth.Truth.assertThat`):
+  `org.mockito.Mockito.*` (for `when`, `verify`, `times`, `lenient`, etc.) and, where argument
+  matchers are used, `org.mockito.ArgumentMatchers.*` (for `argThat`, `eq`, `any`, etc.).
+- Drop now-unnecessary `@SuppressWarnings("unchecked")` annotations on mock fields/casts (e.g.
+  `MatchOperationTest.java:22`) where Mockito's `@Mock` no longer requires the raw-type cast
+  that jmock's `context.mock(Predicate.class)` did.
+- `MockitoExtension` runs with strict stubbing by default (`Strictness.STRICT_STUBS`), which is
+  desirable — it surfaces unused stubs as errors rather than silently ignoring them, closer in
+  spirit to jmock's `assertIsSatisfied()`. Only reach for `lenient()` on stubs that are
+  genuinely optional across branches, not as a blanket fix for strictness failures.
