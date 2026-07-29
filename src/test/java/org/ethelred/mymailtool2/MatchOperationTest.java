@@ -50,6 +50,7 @@ public class MatchOperationTest
 
         verify(matcher).test(m);
         verify(operation).apply(mailContext, m);
+        verifyNoInteractions(mailContext);
     }
 
     @Test
@@ -62,5 +63,7 @@ public class MatchOperationTest
         test.testApply(m, mailContext);
 
         verify(matcher).test(m);
+        verify(operation, never()).apply(any(), any());
+        verifyNoInteractions(mailContext);
     }
 }
