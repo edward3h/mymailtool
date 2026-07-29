@@ -190,7 +190,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void runMessage(Folder f, Message m) throws MessagingException
     {
-        LOGGER.debug("Checking {}", MailUtil.supplyString(m));
+        LOGGER.debug("Checking {}", () -> MailUtil.supplyString(m).get());
         context.countMessage();
         // match/operation
         int ruleCount = 0;
