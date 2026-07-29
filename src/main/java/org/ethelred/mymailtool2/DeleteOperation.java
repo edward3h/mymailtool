@@ -21,7 +21,7 @@ public class DeleteOperation implements MessageOperation
         try
         {
             m.setFlag(Flags.Flag.DELETED, true);
-            LOGGER.info("Delete message {}", MailUtil.supplyString(m));
+            LOGGER.info("Delete message {}", () -> MailUtil.supplyString(m).get());
             return true;
         }
         catch (MessagingException e)

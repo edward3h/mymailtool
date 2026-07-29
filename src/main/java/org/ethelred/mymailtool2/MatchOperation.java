@@ -29,7 +29,7 @@ public class MatchOperation
     {
         if (match.test(m) && operation.apply(ctx, m))
         {
-            LOGGER.debug("Matched {} and applied {} to message {}", match, operation, m);
+            LOGGER.debug("Matched {} and applied {} to message {}", () -> match, () -> operation, MailUtil.supplyString(m));
             ctx.countOperation();
             return operation.finishApplying();
         }
