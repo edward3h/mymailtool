@@ -42,8 +42,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.google.truth:truth:1.4.5'
-    testImplementation 'org.mockito:mockito-core:5.14.2'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
+    testImplementation 'org.mockito:mockito-core:5.23.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.23.0'
 
 //    rewrite('org.ethelred:ethelred-rewrite:0.3-6-ga72db15.dirty')
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks:latest.release")
