@@ -41,4 +41,5 @@ function spamscore(msg) {
 
 move("spamtest").to("spamscore").ifIt(spamscore);
 
+// exists only for JavascriptFileConfiguration$FlagBuilder coverage; not asserted on
 addFlag("myflag").inFolder("flagtest");
