@@ -89,17 +89,29 @@ download logic. Fix: add a small `MockMessage.addAttachment(String filename,
 byte[] content)` builder method (same shape as the existing `addHeader`),
 which causes `MockMimeMessage`'s constructor to build a `MimeMultipart` with
 one `MimeBodyPart` per attachment (`setFileName`, `setDisposition(Part
-.ATTACHMENT)`, `setContent`/`setDataHandler`) and call `setContent(multipart)`
-instead of leaving content unset. Messages with no attachments added behave
+.ATTACHMENT)`, `setContent`/`setDataHandler`), call `setContent(multipart)`,
+and then call `saveChanges()`. The `saveChanges()` call is required, not
+optional decoration: `setContent(Multipart)` only calls `setDataHandler(...)`
+and never touches the `Content-Type` header, so without `saveChanges()` (or
+an explicit header set) `isMimeType("multipart/mixed")` stays `false` —
+which would make `HasAttachmentMatcher.test()` (and thus `SearchTask`'s own
+`addMatcher`-gated match predicate) never reach the attachment loop at all,
+silently defeating the whole test. `new MimeMultipart()` already defaults to
+subtype "mixed", so no explicit `new MimeMultipart("mixed")` is needed once
+`saveChanges()` is in place. Messages with no attachments added behave
 exactly as before (no content set).
 
-`MockFolder.list(String)` always returns `new Folder[0]` — the mock framework
-has no subfolder hierarchy at all (this is a pre-existing gap across the
-whole test suite, not specific to `SearchTask`). Building real folder-tree
-support is disproportionate to this task, so recursive-vs-non-recursive
-traversal is dropped from scope here — `setRecursive` is a thin pass-through
-to `TaskBase.traverseFolder`'s existing (already-covered-elsewhere) subfolder
-loop, not `SearchTask`-specific logic.
+`MockFolder.list(String)` always returns `new Folder[0]`, and
+`MockFolder.getType()` always returns `HOLDS_MESSAGES` — so
+`TaskBase.traverseFolder`'s subfolder-recursion branch
+(`(f.getType() & Folder.HOLDS_FOLDERS) > 0`) is dead code under the mock
+framework across the *entire* existing test suite, not just for
+`SearchTask` (no existing test, including `TaskBaseTest`, exercises
+`includeSubFolders=true` in a way that actually recurses). Building real
+folder-tree support to close that gap is disproportionate to this task, so
+recursive-vs-non-recursive traversal is dropped from scope here —
+`setRecursive` only ever forwards its value to that same untestable
+inherited branch and has no `SearchTask`-specific behaviour of its own.
 
 `SearchTaskTest`:
 - message matches predicate → match processed (verified via attachment
