@@ -80,21 +80,43 @@ fixture — the same framework `TaskBaseTest` and
 This is the established pattern for task-level (as opposed to
 operation-level) tests in this codebase.
 
+`MockMessage` currently has no way to simulate multipart/attachment content
+(`getMimeMessage()` never calls `setContent`, so `getContent()` throws on any
+`MockMessage`-backed message). `SearchTask.printMatch()` calls `m.getContent()`
+directly with no try/catch, so enabling `printAttach` against unmodified
+`MockMessage` data would throw and abort the task rather than exercise the
+download logic. Fix: add a small `MockMessage.addAttachment(String filename,
+byte[] content)` builder method (same shape as the existing `addHeader`),
+which causes `MockMimeMessage`'s constructor to build a `MimeMultipart` with
+one `MimeBodyPart` per attachment (`setFileName`, `setDisposition(Part
+.ATTACHMENT)`, `setContent`/`setDataHandler`) and call `setContent(multipart)`
+instead of leaving content unset. Messages with no attachments added behave
+exactly as before (no content set).
+
+`MockFolder.list(String)` always returns `new Folder[0]` — the mock framework
+has no subfolder hierarchy at all (this is a pre-existing gap across the
+whole test suite, not specific to `SearchTask`). Building real folder-tree
+support is disproportionate to this task, so recursive-vs-non-recursive
+traversal is dropped from scope here — `setRecursive` is a thin pass-through
+to `TaskBase.traverseFolder`'s existing (already-covered-elsewhere) subfolder
+loop, not `SearchTask`-specific logic.
+
 `SearchTaskTest`:
-- message matches predicate → logged as a match (verify via side effects
-  reachable through the mock framework, e.g. attachment download / flag
-  printing paths below — not log output itself)
-- message doesn't match → no match processing
+- message matches predicate → match processed (verified via attachment
+  download / flag printing side effects below, not log output)
+- message doesn't match → no match processing (no download/flag side effects)
 - `addMatcher` composes multiple matchers with AND
 - `addMatcher` with a `HasAttachmentMatcher` turns on attachment printing;
   with a `HasFlagMatcher` turns on flag printing
-- attachment download: attachment written to `outputDirectory` when set;
-  skipped if the target file already exists
-- recursive vs non-recursive traversal (via `setRecursive`)
+- attachment download (using the new `MockMessage.addAttachment` support):
+  attachment written to `outputDirectory` when set; skipped if the target
+  file already exists
+- non-attachment body part (no/blank disposition or filename) is not
+  downloaded
 
 Skip: exact log message formats, `flagToString` for every enum value
 individually (one representative case is enough), the `printFlags` console
-`System.out.println()` call itself.
+`System.out.println()` call itself, recursive traversal (see above).
 
 `ListFoldersTaskTest`:
 - `run()` traverses from `context.getDefaultFolder()` without reading
@@ -135,6 +157,11 @@ coverage, without a dedicated unit test.
   trivial code is left untested where testing it wouldn't catch a real bug.
 - No production code changes except where a genuine bug is found while
   writing tests (would be called out separately, not assumed).
+- No subfolder-hierarchy support added to the mock framework (see
+  `SearchTaskTest` section) — out of proportion to this task's scope.
+- The one mock-framework change in scope is `MockMessage.addAttachment(...)`
+  (test infrastructure, not production code), needed to make
+  `SearchTask`'s attachment-download logic testable at all.
 
 ## Testing
 
