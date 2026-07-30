@@ -8,10 +8,8 @@ import org.ethelred.mymailtool2.mock.MockData;
 import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
 import org.ethelred.util.ClockFactory;
-import org.jmock.Mockery;
-import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nullable;
 import jakarta.mail.Message;
@@ -19,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  *
@@ -62,7 +60,7 @@ public class ApplyMatchOperationsTaskTest
         }
     }
 
-    @After
+    @AfterEach
     public void reset()
     {
         MockData.clear();
@@ -84,8 +82,8 @@ public class ApplyMatchOperationsTaskTest
         ClockFactory.setClock(c.getTimeInMillis());
 
 
-        assertEquals(5, data.folderSize("F1"));
-        assertEquals(-1, data.folderSize("F2"));
+        assertThat(data.folderSize("F1")).isEqualTo(5);
+        assertThat(data.folderSize("F2")).isEqualTo(-1);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         Predicate<Message> age = new AgeMatcher("3 days", true, task);
         task.addRule("F1", Predicates.and(Predicates.alwaysTrue(), age), List.of(age), new MoveOperation("F2"), false);
@@ -102,9 +100,9 @@ public class ApplyMatchOperationsTaskTest
         }
 
 
-        assertEquals("F1 size", 3, data.folderSize("F1"));
-        assertEquals("F2 size", 2, data.folderSize("F2"));
-        assertEquals("messages checked", 3, ((DefaultContext) context).messageCheckedCount);
+        assertThat(data.folderSize("F1")).isEqualTo(3);
+        assertThat(data.folderSize("F2")).isEqualTo(2);
+        assertThat(((DefaultContext) context).messageCheckedCount).isEqualTo(3);
     }
 
     @Test
@@ -123,8 +121,8 @@ public class ApplyMatchOperationsTaskTest
         ClockFactory.setClock(c.getTimeInMillis());
 
 
-        assertEquals(5, data.folderSize("F1"));
-        assertEquals(-1, data.folderSize("F2"));
+        assertThat(data.folderSize("F1")).isEqualTo(5);
+        assertThat(data.folderSize("F2")).isEqualTo(-1);
         ApplyMatchOperationsTask task = ApplyMatchOperationsTask.create();
         Predicate<Message> age1 = new AgeMatcher("4 days", true, task);
         Predicate<Message> age2 = new AgeMatcher("2 days", true, task);
@@ -143,10 +141,10 @@ public class ApplyMatchOperationsTaskTest
         }
 
 
-        assertEquals("F1 size", 2, data.folderSize("F1"));
-        assertEquals("F2 size", 1, data.folderSize("F2"));
-        assertEquals("F3 size", 2, data.folderSize("F3"));
-        assertEquals("messages checked", 4, ((DefaultContext) context).messageCheckedCount);
+        assertThat(data.folderSize("F1")).isEqualTo(2);
+        assertThat(data.folderSize("F2")).isEqualTo(1);
+        assertThat(data.folderSize("F3")).isEqualTo(2);
+        assertThat(((DefaultContext) context).messageCheckedCount).isEqualTo(4);
     }
 
 }

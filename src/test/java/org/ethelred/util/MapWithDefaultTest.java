@@ -4,24 +4,21 @@ import java.util.Map;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static com.google.common.truth.Truth.assertThat;
 
-/**
- *
- */
 public class MapWithDefaultTest
 {
     @Test
     public void basicTest()
     {
         Map<String, String> ms = Maps.newHashMap();
-        assertNull(ms.get("key"));
+        assertThat(ms.get("key")).isNull();
         Supplier<String> def = () -> "def";
         ms = MapWithDefault.wrap(ms, def);
-        assertFalse(ms.containsKey("key"));
-        assertEquals("def", ms.get("key"));
-        assertTrue(ms.containsKey("key"));
+        assertThat(ms.containsKey("key")).isFalse();
+        assertThat(ms.get("key")).isEqualTo("def");
+        assertThat(ms.containsKey("key")).isTrue();
     }
 }

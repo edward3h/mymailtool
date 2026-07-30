@@ -5,33 +5,29 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 
 import java.util.function.Predicate;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.imposters.ByteBuddyClassImposteriser;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * test message matchers
  */
 public class MatchersTest
 {
-    Mockery context = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
-
     Message msg;
     Message msg2;
     Message msg3;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
-        msg = context.mock(Message.class);
-        msg2 = context.mock(Message.class, "Message2");
-        msg3 = context.mock(Message.class, "Message3");
+        msg = mock(Message.class);
+        msg2 = mock(Message.class, "Message2");
+        msg3 = mock(Message.class, "Message3");
     }
 
     @Test
@@ -43,18 +39,15 @@ public class MatchersTest
 
         try
         {
-            context.checking(new Expectations(){{
-                oneOf(msg).getRecipients(Message.RecipientType.TO); will(returnValue(add1));
-                oneOf(msg2).getRecipients(Message.RecipientType.TO); will(returnValue(add2));
-                oneOf(msg3).getRecipients(Message.RecipientType.TO); will(returnValue(add3));
-            }});
+            when(msg.getRecipients(Message.RecipientType.TO)).thenReturn(add1);
+            when(msg2.getRecipients(Message.RecipientType.TO)).thenReturn(add2);
+            when(msg3.getRecipients(Message.RecipientType.TO)).thenReturn(add3);
 
             Predicate<Message> matcher = new ToAddressMatcher(true, "edward@foobar.com");
-            assertTrue(matcher.test(msg));
+            assertThat(matcher.test(msg)).isTrue();
 
-            assertFalse(matcher.test(msg2));
-            assertFalse(matcher.test(msg3));
-            context.assertIsSatisfied();
+            assertThat(matcher.test(msg2)).isFalse();
+            assertThat(matcher.test(msg3)).isFalse();
         }
         catch (MessagingException e)
         {
@@ -67,14 +60,12 @@ public class MatchersTest
     {
         try
         {
-            context.checking(new Expectations(){{
-                oneOf(msg).getSubject(); will(returnValue("test Subject"));
-                oneOf(msg2).getSubject(); will(returnValue(null));
-            }});
+            when(msg.getSubject()).thenReturn("test Subject");
+            when(msg2.getSubject()).thenReturn(null);
 
             Predicate<Message> matcher = new SubjectMatcher(".*subject.*");
-            assertTrue(matcher.test(msg));
-            assertFalse(matcher.test(msg2));
+            assertThat(matcher.test(msg)).isTrue();
+            assertThat(matcher.test(msg2)).isFalse();
         }
         catch (MessagingException e)
         {

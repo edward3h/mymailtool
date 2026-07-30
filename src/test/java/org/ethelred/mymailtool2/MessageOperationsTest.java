@@ -7,44 +7,40 @@ import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.imposters.ByteBuddyClassImposteriser;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.hamcrest.Matchers.hasItemInArray;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * test message operations
  */
+@ExtendWith(MockitoExtension.class)
 public class MessageOperationsTest
 {
-    Mockery context = new Mockery(){{setImposteriser(ByteBuddyClassImposteriser.INSTANCE);}};
-
-    Message msg;
-    Folder startingFolder;
-    MailToolContext mailContext;
+    @Mock Message msg;
+    @Mock Folder startingFolder;
+    @Mock MailToolContext mailContext;
     private Date sentDate;
 
-    @Before
+    @BeforeEach
     public void setup() throws MessagingException
     {
-        msg = context.mock(Message.class);
-        startingFolder = context.mock(Folder.class);
-        mailContext = context.mock(MailToolContext.class);
         Calendar c = Calendar.getInstance();
         c.set(2012, Calendar.APRIL, 17);
         sentDate = c.getTime();
 
-        context.checking(new Expectations(){{
-            allowing(msg).getSentDate(); will(returnValue(sentDate));
-            allowing(msg).getSubject(); will(returnValue("test subject"));
-        }});
+        when(msg.getSentDate()).thenReturn(sentDate);
+        when(msg.getSubject()).thenReturn("test subject");
     }
 
     @Test
@@ -52,12 +48,10 @@ public class MessageOperationsTest
     {
         try
         {
-            context.checking(new Expectations(){{
-                oneOf(msg).setFlag(Flags.Flag.DELETED, true);
-            }});
             MessageOperation del = new DeleteOperation();
-            assertTrue(del.apply(mailContext, msg));
-            context.assertIsSatisfied();
+            assertThat(del.apply(mailContext, msg)).isTrue();
+            verify(msg).setFlag(Flags.Flag.DELETED, true);
+            verifyNoInteractions(mailContext);
         }
         catch (MessagingException e)
         {
@@ -68,21 +62,22 @@ public class MessageOperationsTest
     @Test
     public void testMove()
     {
-        final Folder moveTo = context.mock(Folder.class, "moveTo");
+        final Folder moveTo = mock(Folder.class, "moveTo");
         final String moveToName = "MoveTo";
         try
         {
-            context.checking(new Expectations(){{
-                oneOf(msg).getFolder(); will(returnValue(startingFolder));
-                oneOf(mailContext).getFolder(moveToName); will(returnValue(moveTo));
-                oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
-                oneOf(msg).setFlag(Flags.Flag.DELETED, true);
-                oneOf(startingFolder).getFullName(); will(returnValue("folder"));
-                oneOf(moveTo).getFullName(); will(returnValue(moveToName));
-            }});
+            when(msg.getFolder()).thenReturn(startingFolder);
+            when(mailContext.getFolder(moveToName)).thenReturn(moveTo);
+            when(startingFolder.getFullName()).thenReturn("folder");
+            when(moveTo.getFullName()).thenReturn(moveToName);
+
             MessageOperation move = new MoveOperation(moveToName);
-            assertTrue(move.apply(mailContext, msg));
-            context.assertIsSatisfied();
+            assertThat(move.apply(mailContext, msg)).isTrue();
+
+            verify(startingFolder).copyMessages(argThat(a -> java.util.Arrays.asList(a).contains(msg)), eq(moveTo));
+            verify(msg).setFlag(Flags.Flag.DELETED, true);
+            verify(startingFolder).getFullName();
+            verify(moveTo).getFullName();
         }
         catch (MessagingException e)
         {
@@ -94,23 +89,23 @@ public class MessageOperationsTest
     @Test
     public void testSplit()
     {
-        final Folder moveTo = context.mock(Folder.class, "moveTo");
+        final Folder moveTo = mock(Folder.class, "moveTo");
         try
         {
-            context.checking(new Expectations(){{
-                oneOf(msg).getFolder(); will(returnValue(startingFolder));
-                oneOf(startingFolder).getSeparator(); will(returnValue('.'));
-                exactly(2).of(startingFolder).getFullName(); will(returnValue("folder"));
-                oneOf(msg).getReceivedDate(); will(returnValue(Date.from(LocalDate.of(2012, 4, 8).atStartOfDay(ZoneId.systemDefault()).toInstant())));
-                oneOf(mailContext).getFolder("folder.2012.04-Apr-2012"); will(returnValue(moveTo));
-                //allowing(moveTo).getFullName(); will(returnValue("folder.04-Apr-2012"));
-                oneOf(startingFolder).copyMessages(with(hasItemInArray(msg)), with(equal(moveTo)));
-                oneOf(msg).setFlag(Flags.Flag.DELETED, true);
-                oneOf(moveTo).getFullName(); will(returnValue("folder.2012.04-Apr-2012"));
-            }});
+            when(msg.getFolder()).thenReturn(startingFolder);
+            when(startingFolder.getSeparator()).thenReturn('.');
+            when(startingFolder.getFullName()).thenReturn("folder");
+            when(msg.getReceivedDate()).thenReturn(Date.from(LocalDate.of(2012, 4, 8).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            when(mailContext.getFolder("folder.2012.04-Apr-2012")).thenReturn(moveTo);
+            when(moveTo.getFullName()).thenReturn("folder.2012.04-Apr-2012");
+
             MessageOperation split = new SplitOperation();
-            assertTrue(split.apply(mailContext, msg));
-            context.assertIsSatisfied();
+            assertThat(split.apply(mailContext, msg)).isTrue();
+
+            verify(startingFolder).copyMessages(argThat(a -> java.util.Arrays.asList(a).contains(msg)), eq(moveTo));
+            verify(msg).setFlag(Flags.Flag.DELETED, true);
+            verify(startingFolder, times(2)).getFullName();
+            verify(moveTo).getFullName();
         }
         catch (MessagingException e)
         {

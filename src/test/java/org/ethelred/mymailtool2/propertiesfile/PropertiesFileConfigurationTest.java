@@ -1,23 +1,19 @@
 package org.ethelred.mymailtool2.propertiesfile;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.MailToolConfiguration;
 import org.ethelred.mymailtool2.Main;
 import org.ethelred.mymailtool2.Task;
-import org.ethelred.mymailtool2.javascript.JavascriptFileConfigurationHandler;
 import org.ethelred.mymailtool2.mock.MockData;
 import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  *
@@ -26,13 +22,13 @@ public class PropertiesFileConfigurationTest
 {
     File confFile;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
         confFile = new File(getClass().getResource("testproperties.properties").getFile());
     }
 
-    @After
+    @AfterEach
     public void cleanup()
     {
         MockData.clear();
@@ -42,11 +38,11 @@ public class PropertiesFileConfigurationTest
     public void testProperties() throws Exception
     {
         MailToolConfiguration conf = new PropertiesFileConfiguration(confFile);
-        assertEquals("operation limit", 300, conf.getOperationLimit());
+        assertThat(conf.getOperationLimit()).isEqualTo(300);
 
         Task t = conf.getTask();
-        assertNotNull(t);
-        assertTrue(t instanceof ApplyMatchOperationsTask);
+        assertThat(t).isNotNull();
+        assertThat(t).isInstanceOf(ApplyMatchOperationsTask.class);
 
     }
 
@@ -66,9 +62,9 @@ public class PropertiesFileConfigurationTest
         data.addMessage("Inbox", MockMessage.create("2012-01-01", "from1@example.com", "Hello subject1 world"));
         data.addMessage("Inbox", MockMessage.create("2012-01-01", "from1@example.com", "Hello subject2 world"));
 
-        assertEquals(3, data.folderSize("Inbox"));
-        assertEquals(0, data.folderSize("archive"));
-        assertEquals(-1, data.folderSize("archive.2012.01-Jan-2012"));
+        assertThat(data.folderSize("Inbox")).isEqualTo(3);
+        assertThat(data.folderSize("archive")).isEqualTo(0);
+        assertThat(data.folderSize("archive.2012.01-Jan-2012")).isEqualTo(-1);
 
         Main main = new Main();
         main.setDefaultConfiguration(conf);
@@ -76,8 +72,8 @@ public class PropertiesFileConfigurationTest
         main.run();
 
 
-        assertEquals(0, data.folderSize("Inbox"));
-        assertEquals(0, data.folderSize("archive"));
-        assertEquals(3, data.folderSize("archive.2012.01-Jan-2012"));
+        assertThat(data.folderSize("Inbox")).isEqualTo(0);
+        assertThat(data.folderSize("archive")).isEqualTo(0);
+        assertThat(data.folderSize("archive.2012.01-Jan-2012")).isEqualTo(3);
     }
 }

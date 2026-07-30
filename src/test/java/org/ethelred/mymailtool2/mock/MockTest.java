@@ -3,14 +3,12 @@ package org.ethelred.mymailtool2.mock;
 import java.util.Properties;
 import jakarta.mail.Folder;
 import jakarta.mail.MessagingException;
-import jakarta.mail.NoSuchProviderException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  * Just tests loading the Mock providers
@@ -26,9 +24,9 @@ public class MockTest
         Session ss = Session.getDefaultInstance(props, new MockAuthenticator());
         Store store = ss.getStore();
 
-        assertEquals("MockStore", store.getClass().getSimpleName());
+        assertThat(store.getClass().getSimpleName()).isEqualTo("MockStore");
 
         Folder f = store.getDefaultFolder();
-        assertEquals("Inbox", f.getName());
+        assertThat(f.getName()).isEqualTo("Inbox");
     }
 }
