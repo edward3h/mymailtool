@@ -115,8 +115,15 @@ public class SearchTaskTest
     }
 
     @Test
-    public void testAddMatcherWithHasFlagMatcherRunsWithoutError() throws IOException
+    public void testAddMatcherWithHasFlagMatcherDoesNotThrow() throws IOException
     {
+        // This is a smoke test, not a verification test: printFlags()'s only
+        // observable effects are a log line and a System.out.println(), and the
+        // design spec deliberately scopes out asserting on either (see
+        // docs/superpowers/specs/2026-07-30-zero-coverage-tests-design.md). So this
+        // cannot prove printFlags() actually ran — it only proves that matching a
+        // message via HasFlagMatcher and reaching that code path doesn't throw
+        // (e.g. m.getFlags() succeeding against a real flagged mock message).
         MockData data = MockData.getInstance();
         data.addMessage("Folder", MockMessage.create("2012-12-12", "foo@example.com", "test subject")
                 .addFlag("myflag"));
@@ -125,8 +132,5 @@ public class SearchTaskTest
         task.addMatcher(new HasFlagMatcher("myflag"));
 
         runSearch(task);
-
-        // No exception means addMatcher correctly turned on printFlags() and
-        // its m.getFlags() call succeeded end-to-end against a matched message.
     }
 }
