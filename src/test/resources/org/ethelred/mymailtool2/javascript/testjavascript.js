@@ -40,3 +40,5 @@ function spamscore(msg) {
 }
 
 move("spamtest").to("spamscore").ifIt(spamscore);
+
+addFlag("myflag").inFolder("flagtest");
