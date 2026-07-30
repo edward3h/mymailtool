@@ -42,6 +42,9 @@ public class ListFoldersTaskTest
     @Test
     public void testReadMessagesReturnsEmpty()
     {
+        // run() always passes readMessages=false to traverseFolder, so this override
+        // is never reached via the public API; tested directly instead. The null
+        // argument is safe because the override ignores its Folder parameter entirely.
         ListFoldersTask task = (ListFoldersTask) ListFoldersTask.create();
         assertThat(task.readMessages(null)).isEmpty();
     }
