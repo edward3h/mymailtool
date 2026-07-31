@@ -2,6 +2,7 @@ package org.ethelred.mymailtool2.javascript;
 
 import java.io.File;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 
 import org.ethelred.mymailtool2.ApplyMatchOperationsTask;
 import org.ethelred.mymailtool2.FileConfigurationHandler;
@@ -11,6 +12,7 @@ import org.ethelred.mymailtool2.Task;
 import org.ethelred.mymailtool2.mock.MockData;
 import org.ethelred.mymailtool2.mock.MockDefaultConfiguration;
 import org.ethelred.mymailtool2.mock.MockMessage;
+import org.ethelred.util.ClockFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +27,7 @@ public class JavascriptConfigurationTest
     public void cleanup()
     {
         MockData.clear();
+        ClockFactory.reset();
     }
 
 
@@ -120,5 +123,46 @@ public class JavascriptConfigurationTest
 
 
         assertThat(data.folderSize("Inbox")).isEqualTo(1);
+    }
+
+    @Test
+    public void testFullerConfig() throws Exception
+    {
+        ClockFactory.setClock(new SimpleDateFormat("yyyy-MM-dd").parse("2024-01-10").getTime());
+
+        MockDefaultConfiguration conf = new MockDefaultConfiguration();
+        conf.addFileHandler(new JavascriptFileConfigurationHandler());
+        conf.addFile(this.getClass().getResource("fuller.js").getFile());
+
+        MockData data = MockData.getInstance();
+        data.addFolder("Inbox");
+        data.addFolder("old-messages");
+        data.addFolder("Currency");
+
+        // deleted by the spamSenders matcherList() rule
+        data.addMessage("Inbox", MockMessage.create("2024-01-09", "Fake Spam Co <spam1@example.com>", "Hello"));
+        // older than 4 days: moved to old-messages
+        data.addMessage("Inbox", MockMessage.create("2024-01-01", "legit@example.com", "Old news"));
+        // not old, not spam, not currency: stays in Inbox
+        data.addMessage("Inbox", MockMessage.create("2024-01-09", "legit@example.com", "Recent news"));
+        // matches both isFrom() and matchesSubject(): moved to Currency by the and() rule
+        data.addMessage("Inbox", MockMessage.create("2024-01-09", "Universal Currency Converter <ucc@example.com>", "Currency Update for today"));
+        // matches isFrom() only, not the subject: and() rule must not match, stays in Inbox
+        data.addMessage("Inbox", MockMessage.create("2024-01-09", "Universal Currency Converter <ucc2@example.com>", "Random subject"));
+        // pre-existing old-messages entry, deleted via the includeSubFolders() spamSenders rule
+        data.addMessage("old-messages", MockMessage.create("2023-01-01", "Another Spammer <spam3@example.com>", "junk"));
+
+        assertThat(data.folderSize("Inbox")).isEqualTo(5);
+        assertThat(data.folderSize("old-messages")).isEqualTo(1);
+        assertThat(data.folderSize("Currency")).isEqualTo(0);
+
+        Main main = new Main();
+        main.setDefaultConfiguration(conf);
+        main.init(new String[]{});
+        main.run();
+
+        assertThat(data.folderSize("Inbox")).isEqualTo(2);
+        assertThat(data.folderSize("old-messages")).isEqualTo(1);
+        assertThat(data.folderSize("Currency")).isEqualTo(1);
     }
 }
