@@ -1,16 +1,24 @@
 package org.ethelred.mymailtool2.mock;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import jakarta.activation.DataHandler;
 import jakarta.mail.Address;
+import jakarta.mail.Flags;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
 import jakarta.mail.internet.InternetHeaders;
+import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 
 /**
  *
@@ -22,6 +30,10 @@ public final class MockMessage
     private String from;
     private String subject;
     private Map<String, String> mockheaders = Maps.newHashMap();
+    private List<Attachment> attachments = Lists.newArrayList();
+    private Flags flags = new Flags();
+
+    private record Attachment(String filename, byte[] content) {}
 
     private MockMessage()
     {
@@ -49,6 +61,18 @@ public final class MockMessage
     public MockMessage addHeader(String header, String value)
     {
         mockheaders.put(header, value);
+        return this;
+    }
+
+    public MockMessage addAttachment(String filename, byte[] content)
+    {
+        attachments.add(new Attachment(filename, content));
+        return this;
+    }
+
+    public MockMessage addFlag(String flag)
+    {
+        flags.add(flag);
         return this;
     }
 
@@ -99,6 +123,24 @@ public final class MockMessage
             for (Map.Entry<String, String> e : mockheaders.entrySet())
             {
                 headers.addHeader(e.getKey(), e.getValue());
+            }
+
+            setFlags(flags, true);
+
+            if (!attachments.isEmpty())
+            {
+                MimeMultipart multipart = new MimeMultipart();
+                for (Attachment attachment : attachments)
+                {
+                    MimeBodyPart part = new MimeBodyPart();
+                    part.setFileName(attachment.filename());
+                    part.setDisposition(Part.ATTACHMENT);
+                    part.setDataHandler(new DataHandler(
+                            new ByteArrayDataSource(attachment.content(), "application/octet-stream")));
+                    multipart.addBodyPart(part);
+                }
+                setContent(multipart);
+                saveChanges();
             }
 
         }

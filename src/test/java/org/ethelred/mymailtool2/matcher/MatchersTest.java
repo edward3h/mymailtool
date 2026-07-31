@@ -1,9 +1,14 @@
 package org.ethelred.mymailtool2.matcher;
 
 import jakarta.mail.Address;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Flags;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 
+import java.io.IOException;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,6 +78,114 @@ public class MatchersTest
         }
     }
 
+
+    @Test
+    public void testHasAttachmentMatcherNullMessage()
+    {
+        Predicate<Message> matcher = new HasAttachmentMatcher(".*");
+        assertThat(matcher.test(null)).isFalse();
+    }
+
+    @Test
+    public void testHasAttachmentMatcherNonMultipart() throws MessagingException
+    {
+        when(msg.isMimeType("multipart/mixed")).thenReturn(false);
+
+        Predicate<Message> matcher = new HasAttachmentMatcher(".*");
+        assertThat(matcher.test(msg)).isFalse();
+    }
+
+    @Test
+    public void testHasAttachmentMatcherMatchingFilename() throws MessagingException, IOException
+    {
+        when(msg.isMimeType("multipart/mixed")).thenReturn(true);
+        Multipart mp = mock(Multipart.class);
+        BodyPart part = mock(BodyPart.class);
+        when(msg.getContent()).thenReturn(mp);
+        when(mp.getCount()).thenReturn(1);
+        when(mp.getBodyPart(0)).thenReturn(part);
+        when(part.getDisposition()).thenReturn(Part.ATTACHMENT);
+        when(part.getFileName()).thenReturn("report.pdf");
+
+        Predicate<Message> matcher = new HasAttachmentMatcher("report.*");
+        assertThat(matcher.test(msg)).isTrue();
+    }
+
+    @Test
+    public void testHasAttachmentMatcherFilenameDoesNotMatchPattern() throws MessagingException, IOException
+    {
+        when(msg.isMimeType("multipart/mixed")).thenReturn(true);
+        Multipart mp = mock(Multipart.class);
+        BodyPart part = mock(BodyPart.class);
+        when(msg.getContent()).thenReturn(mp);
+        when(mp.getCount()).thenReturn(1);
+        when(mp.getBodyPart(0)).thenReturn(part);
+        when(part.getDisposition()).thenReturn(Part.ATTACHMENT);
+        when(part.getFileName()).thenReturn("other.txt");
+
+        Predicate<Message> matcher = new HasAttachmentMatcher("report.*");
+        assertThat(matcher.test(msg)).isFalse();
+    }
+
+    @Test
+    public void testHasAttachmentMatcherNonAttachmentPart() throws MessagingException, IOException
+    {
+        when(msg.isMimeType("multipart/mixed")).thenReturn(true);
+        Multipart mp = mock(Multipart.class);
+        BodyPart part = mock(BodyPart.class);
+        when(msg.getContent()).thenReturn(mp);
+        when(mp.getCount()).thenReturn(1);
+        when(mp.getBodyPart(0)).thenReturn(part);
+        when(part.getDisposition()).thenReturn(Part.INLINE);
+
+        Predicate<Message> matcher = new HasAttachmentMatcher(".*");
+        assertThat(matcher.test(msg)).isFalse();
+    }
+
+    @Test
+    public void testHasAttachmentMatcherMessagingException() throws MessagingException
+    {
+        when(msg.isMimeType("multipart/mixed")).thenThrow(new MessagingException("boom"));
+
+        Predicate<Message> matcher = new HasAttachmentMatcher(".*");
+        assertThat(matcher.test(msg)).isFalse();
+    }
+
+    @Test
+    public void testHasFlagMatcherNullMessage()
+    {
+        Predicate<Message> matcher = new HasFlagMatcher("myflag");
+        assertThat(matcher.test(null)).isFalse();
+    }
+
+    @Test
+    public void testHasFlagMatcherFlagPresent() throws MessagingException
+    {
+        Flags flags = new Flags();
+        flags.add("myflag");
+        when(msg.getFlags()).thenReturn(flags);
+
+        Predicate<Message> matcher = new HasFlagMatcher("myflag");
+        assertThat(matcher.test(msg)).isTrue();
+    }
+
+    @Test
+    public void testHasFlagMatcherFlagAbsent() throws MessagingException
+    {
+        when(msg.getFlags()).thenReturn(new Flags());
+
+        Predicate<Message> matcher = new HasFlagMatcher("myflag");
+        assertThat(matcher.test(msg)).isFalse();
+    }
+
+    @Test
+    public void testHasFlagMatcherMessagingException() throws MessagingException
+    {
+        when(msg.getFlags()).thenThrow(new MessagingException("boom"));
+
+        Predicate<Message> matcher = new HasFlagMatcher("myflag");
+        assertThat(matcher.test(msg)).isFalse();
+    }
 
     private Address[] mockAddresses(String... addresses)
     {
