@@ -9,7 +9,7 @@ config({
         imap: {starttls: {enable: true}}
     },
     password: "xxxxxx",
-    minage: "1 month",
+    minage: "1 second",
     operations: 300
 });
 

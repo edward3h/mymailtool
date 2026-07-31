@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class AgeMatcher implements Predicate<Message>
 {
-    private static final Pattern DURATION_PART = Pattern.compile("(\\d+)\\s*(second|minute|hour|day|week)s?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DURATION_PART = Pattern.compile("(\\d+)\\s*(second|minute|hour|day|week|month|year)s?", Pattern.CASE_INSENSITIVE);
 
     private final boolean older;
     private final Instant comparisonTime;
@@ -39,7 +39,9 @@ public class AgeMatcher implements Predicate<Message>
         } catch (DateTimeParseException ignored) {}
         Matcher m = DURATION_PART.matcher(spec);
         Duration total = Duration.ZERO;
+        boolean matchedAny = false;
         while (m.find()) {
+            matchedAny = true;
             long n = Long.parseLong(m.group(1));
             total = total.plus(switch (m.group(2).toLowerCase()) {
                 case "second" -> Duration.ofSeconds(n);
@@ -47,8 +49,13 @@ public class AgeMatcher implements Predicate<Message>
                 case "hour" -> Duration.ofHours(n);
                 case "day" -> Duration.ofDays(n);
                 case "week" -> Duration.ofDays(n * 7);
+                case "month" -> Duration.ofDays(n * 30);
+                case "year" -> Duration.ofDays(n * 365);
                 default -> Duration.ZERO;
             });
+        }
+        if (!matchedAny) {
+            throw new IllegalArgumentException("Unrecognized duration: '" + spec + "'");
         }
         return total;
     }
