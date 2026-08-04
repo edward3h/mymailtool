@@ -22,3 +22,8 @@ build
 /.project
 /.settings/
 bin
+
+.serena
+samples
+supertool
+
