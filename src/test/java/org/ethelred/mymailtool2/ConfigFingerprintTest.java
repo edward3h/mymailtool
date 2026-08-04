@@ -93,13 +93,17 @@ public class ConfigFingerprintTest
     }
 
     @Test
-    public void missingFileFingerprintDiffersFromExistingFileWithContent(@TempDir File dir) throws IOException
+    public void missingFileFingerprintDiffersFromExistingEmptyFile(@TempDir File dir) throws IOException
     {
         File f = new File(dir, "maybe.conf");
 
         String fpMissing = ConfigFingerprint.compute(List.of(f));
 
-        Files.writeString(f.toPath(), "some content");
+        // Create the file but leave it empty: content contributes zero bytes
+        // either way, so the only difference in the hashed byte stream is the
+        // exists flag (0 vs 1). This isolates the exists-flag as load-bearing,
+        // rather than conflating it with a content difference.
+        Files.writeString(f.toPath(), "");
         String fpExisting = ConfigFingerprint.compute(List.of(f));
 
         assertThat(fpMissing).isNotEqualTo(fpExisting);
