@@ -1,7 +1,9 @@
 package org.ethelred.mymailtool2.mock;
 
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
+import jakarta.mail.Flags;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for the UID-capable mock folder infrastructure.
@@ -174,6 +177,49 @@ public class MockUidFolderTest
 
         Message byUid = uf.getMessageByUID(1L);
         assertThat(uf.getUID(byUid)).isEqualTo(1L);
+    }
+
+    @Test
+    public void expungeFindsMessageFetchedByUid() throws MessagingException
+    {
+        MockData data = MockData.getInstance();
+        data.setUidCapable(FOLDER_NAME, true);
+        data.addMessage(FOLDER_NAME, MockMessage.create("2024-01-01", "a@example.com", "one"));
+        data.addMessage(FOLDER_NAME, MockMessage.create("2024-01-02", "b@example.com", "two"));
+
+        Store store = getStore();
+        UIDFolder uf = (UIDFolder) store.getFolder(FOLDER_NAME);
+        MockFolder folder = (MockFolder) uf;
+
+        // fetch only via UID, never via sequence number, then flag deleted and expunge
+        Message m = uf.getMessageByUID(1L);
+        m.setFlag(Flags.Flag.DELETED, true);
+
+        Message[] expunged = folder.expunge();
+
+        assertThat(expunged).hasLength(1);
+        assertThat(expunged[0].getSubject()).isEqualTo("one");
+        assertThat(data.folderSize(FOLDER_NAME)).isEqualTo(1);
+        assertThat(data.getMessage(FOLDER_NAME, 1).toString()).contains("two");
+    }
+
+    @Test
+    public void getUIDThrowsForMessageFromAnotherFolder() throws MessagingException
+    {
+        MockData data = MockData.getInstance();
+        String otherFolderName = "OtherUidFolder";
+        data.setUidCapable(FOLDER_NAME, true);
+        data.setUidCapable(otherFolderName, true);
+        data.addMessage(FOLDER_NAME, MockMessage.create("2024-01-01", "a@example.com", "in folder A"));
+        data.addMessage(otherFolderName, MockMessage.create("2024-01-01", "b@example.com", "in folder B"));
+
+        Store store = getStore();
+        UIDFolder folderA = (UIDFolder) store.getFolder(FOLDER_NAME);
+        UIDFolder folderB = (UIDFolder) store.getFolder(otherFolderName);
+
+        Message messageFromB = folderB.getMessageByUID(1L);
+
+        assertThrows(NoSuchElementException.class, () -> folderA.getUID(messageFromB));
     }
 
     @Test

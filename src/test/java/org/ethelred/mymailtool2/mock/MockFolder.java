@@ -134,15 +134,27 @@ public class MockFolder extends Folder
     @Override
     public Message getMessage(int i) throws MessagingException
     {
-        if (msgCache.containsKey(i)) {
-            return msgCache.get(i);
-        }
         MockMessage mm = data.getMessage(name, i);
         if (mm == null) {
             throw new MessagingException();
         }
-        Message result = mm.getMimeMessage(this, i);
-        msgCache.put(i, result);
+        return getOrCreateCachedMessage(i, mm);
+    }
+
+    /**
+     * Returns the cached {@link Message} wrapper for the given sequence number, creating and
+     * caching it via {@link MockMessage#getMimeMessage} if not already cached. Any code path that
+     * wraps a {@link MockMessage} into a {@link Message} for this folder (whether addressed by
+     * sequence number or by some other means, e.g. UID) must go through this method so that
+     * {@link #expunge()} (which only inspects {@link #msgCache}) can find it later.
+     */
+    protected Message getOrCreateCachedMessage(int seqNum, MockMessage mm) throws MessagingException
+    {
+        if (msgCache.containsKey(seqNum)) {
+            return msgCache.get(seqNum);
+        }
+        Message result = mm.getMimeMessage(this, seqNum);
+        msgCache.put(seqNum, result);
         return result;
     }
 

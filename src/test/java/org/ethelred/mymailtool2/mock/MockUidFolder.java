@@ -35,7 +35,7 @@ public class MockUidFolder extends MockFolder implements UIDFolder
     public long getUID(Message message) throws MessagingException
     {
         MockMessage mm = MockMessage.getOuter(message);
-        if (mm == null)
+        if (mm == null || message.getFolder() != this)
         {
             throw new NoSuchElementException("Message is not from this folder");
         }
@@ -79,6 +79,6 @@ public class MockUidFolder extends MockFolder implements UIDFolder
     private Message toMessage(MockMessage mm) throws MessagingException
     {
         int seqNum = data.indexOfMessage(name, mm);
-        return mm.getMimeMessage(this, seqNum);
+        return getOrCreateCachedMessage(seqNum, mm);
     }
 }
