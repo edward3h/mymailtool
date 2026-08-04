@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Console;
+import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,13 +45,24 @@ public class DefaultContext implements MailToolContext
     private int operationLimit = -1;
     private volatile boolean shutdown;
     private final boolean verbose;
+    private final FolderScanCache folderScanCache;
 
     int messageCheckedCount;
 
     public DefaultContext(MailToolConfiguration config)
     {
+        this(config, null);
+    }
+
+    public DefaultContext(MailToolConfiguration config, @CheckForNull String configFingerprint)
+    {
         this.config = config;
         this.verbose = config.verbose();
+        String accountKey = config.getUser() + "@" + config.getMailProperties().getOrDefault(MailToolConfiguration.HOST, "");
+        String scanStateFilePath = config.getScanStateFile();
+        File stateFile = scanStateFilePath == null ? null : new File(scanStateFilePath);
+        boolean disabled = config.disableScanCache() || stateFile == null;
+        this.folderScanCache = new DefaultFolderScanCache(accountKey, stateFile, configFingerprint, disabled);
     }
 
     @Override
@@ -270,5 +282,11 @@ public class DefaultContext implements MailToolContext
     @Override
     public boolean randomTraversal() {
         return config.randomTraversal();
+    }
+
+    @Override
+    public FolderScanCache getFolderScanCache()
+    {
+        return folderScanCache;
     }
 }

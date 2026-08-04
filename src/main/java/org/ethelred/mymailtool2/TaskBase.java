@@ -1,5 +1,7 @@
 package org.ethelred.mymailtool2;
 
+import javax.annotation.CheckForNull;
+
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -43,18 +45,23 @@ abstract class TaskBase implements Task
         {
             f.open(openMode());
 
+            Message lastConsidered = null;
+            boolean completedFully = false;
             try
             {
                 for (Message m : readMessages(f))
                 {
+                    lastConsidered = m;
                     runMessage(f, m);
                 }
+                completedFully = true;
             }
             catch (ShortcutFolderScanException sc)
             {
                 LOGGER.info("Short cut on folder {}", f.getName());
             }
             finally {
+                onFolderScanFinished(f, completedFully, lastConsidered);
                 if ((openMode() & Folder.READ_WRITE) > 0) {
                     f.expunge();
                 }
@@ -69,6 +76,11 @@ abstract class TaskBase implements Task
                 traverseFolder(child, true, readMessages);
             }
         }
+    }
+
+    protected void onFolderScanFinished(Folder f, boolean completedFully, @CheckForNull Message lastConsidered)
+    {
+        // default no-op
     }
 
     protected abstract void runMessage(Folder f, Message m) throws MessagingException, IOException;

@@ -7,6 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckForNull;
+
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -16,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * tests for base functionality
@@ -72,6 +75,45 @@ public class TaskBaseTest
 
     }
 
+    @Test
+    public void testOnFolderScanFinished_naturalCompletion() throws IOException, MessagingException
+    {
+        RecordingMockTaskBase tb = new RecordingMockTaskBase();
+        tb.giveUpAfter = Integer.MAX_VALUE;
+        tb.init(mockContext);
+        tb.traverseFolder("Folder", false, true);
+
+        assertThat(tb.finishedCallCount).isEqualTo(1);
+        assertThat(tb.recordedCompletedFully).isTrue();
+        assertThat(tb.recordedLastConsidered).isSameInstanceAs(tb.lastRunMessage);
+    }
+
+    @Test
+    public void testOnFolderScanFinished_shortcut() throws IOException, MessagingException
+    {
+        RecordingMockTaskBase tb = new RecordingMockTaskBase();
+        tb.init(mockContext);
+        tb.traverseFolder("Folder", false, true);
+
+        assertThat(tb.finishedCallCount).isEqualTo(1);
+        assertThat(tb.recordedCompletedFully).isFalse();
+        assertThat(tb.recordedLastConsidered).isSameInstanceAs(tb.lastRunMessage);
+    }
+
+    @Test
+    public void testOnFolderScanFinished_nonShortcutExceptionPropagates() throws IOException, MessagingException
+    {
+        RecordingMockTaskBase tb = new RecordingMockTaskBase();
+        tb.throwRuntimeExceptionAfter = 1;
+        tb.init(mockContext);
+
+        assertThrows(RuntimeException.class, () -> tb.traverseFolder("Folder", false, true));
+
+        assertThat(tb.finishedCallCount).isEqualTo(1);
+        assertThat(tb.recordedCompletedFully).isFalse();
+        assertThat(tb.recordedLastConsidered).isSameInstanceAs(tb.lastRunMessage);
+    }
+
     private class MockTaskBase extends TaskBase
     {
         int giveUpAfter = 1;
@@ -84,6 +126,55 @@ public class TaskBaseTest
             {
                 throw new ShortcutFolderScanException();
             }
+        }
+
+        @Override
+        protected void status(Folder f)
+        {
+
+            LOGGER.info("Status folder {}", f);
+        }
+
+        @Override
+        public void run()
+        {
+
+        }
+    }
+
+    private class RecordingMockTaskBase extends TaskBase
+    {
+        int giveUpAfter = 1;
+        int messageCounter;
+        Integer throwRuntimeExceptionAfter;
+        Message lastRunMessage;
+
+        int finishedCallCount;
+        boolean recordedCompletedFully;
+        Message recordedLastConsidered;
+
+        @Override
+        protected void runMessage(Folder f, Message m) throws MessagingException, IOException
+        {
+            lastRunMessage = m;
+            LOGGER.info("Check message {}", messageCounter);
+            int count = messageCounter++;
+            if (throwRuntimeExceptionAfter != null && count >= throwRuntimeExceptionAfter)
+            {
+                throw new RuntimeException("boom");
+            }
+            if (count > giveUpAfter)
+            {
+                throw new ShortcutFolderScanException();
+            }
+        }
+
+        @Override
+        protected void onFolderScanFinished(Folder f, boolean completedFully, @CheckForNull Message lastConsidered)
+        {
+            finishedCallCount++;
+            recordedCompletedFully = completedFully;
+            recordedLastConsidered = lastConsidered;
         }
 
         @Override
