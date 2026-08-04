@@ -14,8 +14,15 @@ import jakarta.mail.MessagingException;
  * scan so future runs can benefit from it.
  * <p>
  * This is purely a decision-making layer on top of {@link ScanState}: it does
- * not iterate over messages itself (see {@code UidRangeMessageIterable}) and
- * it is not yet wired into any production task/context code.
+ * not iterate over messages itself (see {@code UidRangeMessageIterable}).
+ * <p>
+ * Known limitation: once a message has been fully considered by a scan and
+ * matched nothing, its UID falls behind the recorded resume point and it will
+ * be skipped by every subsequent scan, even if something about the message
+ * itself later changes in a way that would now make it match (e.g. a
+ * {@code hasFlag}-based rule, and the message is flagged afterwards via
+ * another client). Only a full rescan (e.g. {@code --no-scan-cache}, or any
+ * change that invalidates the config fingerprint) will reconsider it.
  */
 public interface FolderScanCache
 {

@@ -33,3 +33,13 @@ By default it will try and read `.mymailtoolrc.properties` in the user's home di
 
 To run, use the `bin/mymailtool2` script. Pass `--help` to see command line options.
 
+Scan Cache
+----------
+Since it's meant to run from cron against the same mailboxes over and over, mymailtool remembers how far it got in each folder (a UID high-water-mark) and skips old messages it's already looked at on the next run. This is what keeps it fast even on a big mailbox with years of mail sitting in it.
+
+If your config files change, it forgets everything and does a full rescan next run. It also does a full rescan of a folder if the folder's UIDVALIDITY changes (e.g. it was rebuilt on the server). Pass `--no-scan-cache` (or set `mymailtool.noscancache`/`disableScanCache` in your config, depending on which config format you're using) to force a full rescan every time.
+
+Known limitation: once mymailtool has looked at a message and it didn't match anything, that's it - it won't look at that message again, even if something about it changes later (e.g. you go and flag it manually in your normal mail client, and you've got a rule that matches on flags). If you hit this, run once with `--no-scan-cache` to force a fresh look.
+
+The scan state is stored in a small properties file, by default somewhere sensible for your OS (e.g. `~/.cache/mymailtool/scan-state.properties` on Linux). You can point it elsewhere with `mymailtool.scanstatefile`/`scanStateFile` in your config.
+
