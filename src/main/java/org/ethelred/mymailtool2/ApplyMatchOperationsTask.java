@@ -8,18 +8,21 @@ import com.google.common.collect.Sets;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import jakarta.mail.UIDFolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.ethelred.mymailtool2.matcher.AgeMatcher;
 import org.ethelred.mymailtool2.matcher.FolderMatcher;
 import org.ethelred.util.Predicates;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.OptionalLong;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -41,6 +44,14 @@ public class ApplyMatchOperationsTask extends TaskBase
     Predicate<Message> defaultMinAgeDelegate;
     private  boolean deferredDefaultMinAge(Message message){return defaultMinAgeDelegate.test(message);}
     private final Random random = new Random();
+
+    // Bridges the UID-range snapshot taken in readMessages() to the completion recording done
+    // in onFolderScanFinished() for the same folder's scan. -1 means "no valid UID snapshot for
+    // this folder's current scan". Safe as a plain mutable field ONLY because run() traverses
+    // folders strictly sequentially, one at a time, in a single for loop -- never concurrently.
+    // A future refactor introducing parallel folder traversal would need to make this
+    // per-traversal state instead of a shared field.
+    private long scanEndUidExclusive = -1;
 
     public boolean hasRules()
     {
@@ -222,6 +233,61 @@ public class ApplyMatchOperationsTask extends TaskBase
     protected void status(Folder f)
     {
         LOGGER.info("Working on folder {}", f.getFullName());
+    }
+
+    @Override
+    protected Iterable<? extends Message> readMessages(Folder f)
+    {
+        scanEndUidExclusive = -1;
+        try
+        {
+            OptionalLong resumeUid = context.getFolderScanCache().getResumeUid(f);
+            if (resumeUid.isPresent())
+            {
+                UidRangeMessageIterable it = new UidRangeMessageIterable(f, resumeUid.getAsLong());
+                scanEndUidExclusive = it.getEndUidExclusive();
+                LOGGER.info("Resuming folder {} from UID {} (of {})", f.getFullName(), resumeUid.getAsLong(), scanEndUidExclusive);
+                return it;
+            }
+        }
+        catch (MessagingException e)
+        {
+            LOGGER.warn("Scan cache lookup failed for {}, falling back to full scan", f, e);
+        }
+        // Full scan path: still snapshot endUid if the folder supports it, so
+        // onFolderScanFinished can persist a fresh baseline even though this wasn't a
+        // resumed/incremental scan.
+        if (f instanceof UIDFolder uf)
+        {
+            try
+            {
+                scanEndUidExclusive = uf.getUIDNext();
+            }
+            catch (MessagingException ignored)
+            {
+                // leave scanEndUidExclusive at -1; onFolderScanFinished will skip recording
+            }
+        }
+        return super.readMessages(f);
+    }
+
+    @Override
+    protected void onFolderScanFinished(Folder f, boolean completedFully, @CheckForNull Message lastConsidered)
+    {
+        if (scanEndUidExclusive < 0)
+        {
+            // No valid UID snapshot was ever taken for this folder's scan (non-UIDFolder, or
+            // getUIDNext() failed) -- nothing meaningful to persist.
+            return;
+        }
+        try
+        {
+            context.getFolderScanCache().recordScanCompletion(f, scanEndUidExclusive, lastConsidered, completedFully);
+        }
+        catch (MessagingException e)
+        {
+            LOGGER.warn("Failed to persist scan state for {}", f, e);
+        }
     }
 
     public void addRule(String folder, Predicate<Message> matcher, List<Predicate<Message>> checkMatchers, MessageOperation operation, boolean includeSubFolders)
