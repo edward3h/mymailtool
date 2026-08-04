@@ -43,3 +43,7 @@ Known limitation: once mymailtool has looked at a message and it didn't match an
 
 The scan state is stored in a small properties file, by default somewhere sensible for your OS (e.g. `~/.cache/mymailtool/scan-state.properties` on Linux). You can point it elsewhere with `mymailtool.scanstatefile`/`scanStateFile` in your config.
 
+Renamed or removed folders leave a harmless stale entry in the state file; delete the file to clean up if you care.
+
+Don't run mymailtool2 concurrently against the same account - the scan-state file has no locking and concurrent writes could lose an update (harmless - worst case is an extra rescan - but not something to rely on).
+
