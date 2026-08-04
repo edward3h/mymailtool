@@ -28,7 +28,6 @@ public class DefaultFolderScanCache implements FolderScanCache
     @CheckForNull
     private final String currentFingerprint;
     private final boolean disabled;
-    @CheckForNull
     private final ScanState state;
 
     public DefaultFolderScanCache(String accountKey, @CheckForNull File stateFile,
@@ -38,13 +37,16 @@ public class DefaultFolderScanCache implements FolderScanCache
         this.stateFile = stateFile;
         this.currentFingerprint = currentFingerprint;
         this.disabled = disabled;
-        this.state = (disabled || stateFile == null) ? null : ScanState.loadOrEmpty(stateFile);
+        // Always non-null, even when unused (disabled or no stateFile): callers guard on those
+        // conditions independently before touching state, so there is no cross-field invariant
+        // to reconstruct here, and this branch never has anything to load in that case anyway.
+        this.state = (disabled || stateFile == null) ? new ScanState() : ScanState.loadOrEmpty(stateFile);
     }
 
     @Override
     public OptionalLong getResumeUid(Folder folder) throws MessagingException
     {
-        if (disabled || stateFile == null || currentFingerprint == null || !(folder instanceof UIDFolder))
+        if (disabled || stateFile == null || currentFingerprint == null || !(folder instanceof UIDFolder uidFolder))
         {
             return OptionalLong.empty();
         }
@@ -61,7 +63,7 @@ public class DefaultFolderScanCache implements FolderScanCache
             return OptionalLong.empty();
         }
 
-        long currentUidValidity = ((UIDFolder) folder).getUIDValidity();
+        long currentUidValidity = uidFolder.getUIDValidity();
         if (stored.get().uidValidity() != currentUidValidity)
         {
             return OptionalLong.empty();
@@ -74,12 +76,16 @@ public class DefaultFolderScanCache implements FolderScanCache
     public void recordScanCompletion(Folder folder, long endUidExclusiveOfThisScan,
                                       @CheckForNull Message lastConsidered, boolean completedFully) throws MessagingException
     {
-        if (disabled || stateFile == null || !(folder instanceof UIDFolder))
+        // Mirrors getResumeUid's treatment of a null fingerprint as "cache not usable this run":
+        // recording here would stamp a null fingerprint over any good one already on disk,
+        // which would make every future getResumeUid call see a mismatch and force a full scan
+        // even once a real fingerprint becomes available again. No-op instead and let a run
+        // with a working fingerprint record state normally.
+        if (disabled || stateFile == null || currentFingerprint == null || !(folder instanceof UIDFolder uidFolder))
         {
             return;
         }
 
-        UIDFolder uidFolder = (UIDFolder) folder;
         long nextUid;
         if (completedFully)
         {

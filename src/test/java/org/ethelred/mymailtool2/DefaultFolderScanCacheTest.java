@@ -255,6 +255,25 @@ public class DefaultFolderScanCacheTest
     }
 
     @Test
+    public void nullFingerprintRecordScanCompletionIsNoOpAndDoesNotOverwritePriorState(@TempDir File dir) throws MessagingException, IOException
+    {
+        File stateFile = new File(dir, "scan-state.properties");
+        ScanState seed = new ScanState();
+        seed.setConfigFingerprint(FINGERPRINT);
+        seed.put(ACCOUNT, FOLDER_NAME, new ScanState.FolderScanState(1L, 42L));
+        seed.save(stateFile);
+
+        Folder folder = uidFolder();
+        FolderScanCache cache = new DefaultFolderScanCache(ACCOUNT, stateFile, null, false);
+        cache.recordScanCompletion(folder, 999L, null, true);
+
+        ScanState reloaded = ScanState.loadOrEmpty(stateFile);
+        assertThat(reloaded.getConfigFingerprint()).isEqualTo(FINGERPRINT);
+        assertThat(reloaded.get(ACCOUNT, FOLDER_NAME))
+                .hasValue(new ScanState.FolderScanState(1L, 42L));
+    }
+
+    @Test
     public void disabledRecordScanCompletionIsTrueNoOp(@TempDir File dir) throws MessagingException
     {
         File stateFile = new File(dir, "scan-state.properties");
@@ -291,7 +310,11 @@ public class DefaultFolderScanCacheTest
     @Test
     public void ioFailureOnSaveIsSwallowedNotPropagated(@TempDir File dir) throws MessagingException
     {
-        // Use a directory as the "state file" so writing to it fails with IOException.
+        // Use a directory as the "state file". ScanState.save() writes its content to a sibling
+        // ".tmp" file first (which succeeds, since that path doesn't exist), then fails only at
+        // the final atomic Files.move() step, because it can't move a regular file onto an
+        // existing directory. This reliably reproduces an IOException from the rename, not from
+        // the initial write.
         File stateFileAsDirectory = new File(dir, "state-is-a-directory");
         assertThat(stateFileAsDirectory.mkdirs()).isTrue();
 
