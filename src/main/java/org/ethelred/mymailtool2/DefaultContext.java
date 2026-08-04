@@ -58,7 +58,11 @@ public class DefaultContext implements MailToolContext
     {
         this.config = config;
         this.verbose = config.verbose();
-        String accountKey = config.getUser() + "@" + config.getMailProperties().getOrDefault(MailToolConfiguration.HOST, "");
+        // A null user (e.g. some auth modes, or test configs) is tolerated: the cache just
+        // gets a stable-but-generic key in that case instead of a distinct per-account bucket,
+        // which is still functionally correct.
+        String user = config.getUser() == null ? "unknown" : config.getUser();
+        String accountKey = user + "@" + config.getMailProperties().getOrDefault(MailToolConfiguration.HOST, "");
         String scanStateFilePath = config.getScanStateFile();
         File stateFile = scanStateFilePath == null ? null : new File(scanStateFilePath);
         boolean disabled = config.disableScanCache() || stateFile == null;

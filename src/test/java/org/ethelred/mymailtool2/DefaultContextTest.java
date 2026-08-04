@@ -95,4 +95,47 @@ public class DefaultContextTest
             context2.disconnect();
         }
     }
+
+    @Test
+    public void nullUser_doesNotBlowUpAndProducesStableKey() throws MessagingException
+    {
+        // MockDefaultConfiguration.getUser() returns null, exercising the "no user configured"
+        // guard in the account-key computation: it should fall back to a stable placeholder
+        // rather than embedding the literal string "null", and still work correctly end to end.
+        File stateFile = new File(tempDir, "scan-state.json");
+        MockDefaultConfiguration config = new MockDefaultConfiguration()
+        {
+            @Override
+            public String getScanStateFile()
+            {
+                return stateFile.getAbsolutePath();
+            }
+        };
+        assertThat(config.getUser()).isNull();
+
+        DefaultContext context1 = new DefaultContext(config, "fingerprint-1");
+        context1.connect();
+        try
+        {
+            Folder folder = context1.getFolder("Folder");
+            assertThat(context1.getFolderScanCache().getResumeUid(folder)).isEqualTo(OptionalLong.empty());
+            context1.getFolderScanCache().recordScanCompletion(folder, 7L, null, true);
+        }
+        finally
+        {
+            context1.disconnect();
+        }
+
+        DefaultContext context2 = new DefaultContext(config, "fingerprint-1");
+        context2.connect();
+        try
+        {
+            Folder folder = context2.getFolder("Folder");
+            assertThat(context2.getFolderScanCache().getResumeUid(folder)).isEqualTo(OptionalLong.of(7L));
+        }
+        finally
+        {
+            context2.disconnect();
+        }
+    }
 }
