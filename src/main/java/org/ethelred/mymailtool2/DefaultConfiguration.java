@@ -1,6 +1,7 @@
 package org.ethelred.mymailtool2;
 
 import com.google.common.collect.ImmutableList;
+import dev.dirs.ProjectDirectories;
 import org.ethelred.mymailtool2.propertiesfile.PropertiesFileConfigurationHandler;
 
 import java.io.File;
@@ -92,7 +93,14 @@ class DefaultConfiguration implements MailToolConfiguration
     @Override
     public String getScanStateFile()
     {
-        return dev.dirs.ProjectDirectories.from("org", "ethelred", "mymailtool").cacheDir + File.separator + "scan-state.properties";
+        try
+        {
+            return ProjectDirectories.from("org", "ethelred", "mymailtool").cacheDir + File.separator + "scan-state.properties";
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     @Override

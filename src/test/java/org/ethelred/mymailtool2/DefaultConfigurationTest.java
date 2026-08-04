@@ -54,4 +54,15 @@ public class DefaultConfigurationTest
         DefaultConfiguration config = new DefaultConfiguration();
         assertThat(config.disableScanCache()).isFalse();
     }
+
+    @Test
+    public void testGetScanStateFileNeverThrows()
+    {
+        // getScanStateFile() wraps ProjectDirectories.from(...) in a try/catch so that,
+        // as the always-safe fallback layer, it returns null instead of propagating an
+        // exception (e.g. on an unsupported OS) - hard to trigger for real in a unit test,
+        // but this at least pins down that calling it under normal conditions never throws.
+        DefaultConfiguration config = new DefaultConfiguration();
+        assertThat(config.getScanStateFile()).isNotNull();
+    }
 }
