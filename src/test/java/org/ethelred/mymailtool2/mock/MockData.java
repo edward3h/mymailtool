@@ -47,6 +47,7 @@ public final class MockData
     private Map<String, Long> uidValidity = Maps.newHashMap();
     private Map<String, Long> nextUid = Maps.newHashMap();
     private Map<String, Boolean> uidCapable = Maps.newHashMap();
+    private Map<String, Boolean> uidNextFailure = Maps.newHashMap();
 
     private static final long DEFAULT_UID_VALIDITY = 1L;
 
@@ -110,6 +111,24 @@ public final class MockData
     {
         folderName = _checkName(folderName);
         uidCapable.put(folderName, capable);
+    }
+
+    /**
+     * Test hook: when set, {@link MockUidFolder#getUIDNext()} for {@code folderName} throws a
+     * {@link jakarta.mail.MessagingException} instead of returning normally, simulating a
+     * transient IMAP failure at exactly that call (e.g. the snapshot taken inside
+     * {@code UidRangeMessageIterable}'s constructor).
+     */
+    public void setUidNextFailure(String folderName, boolean fail)
+    {
+        folderName = _checkName(folderName);
+        uidNextFailure.put(folderName, fail);
+    }
+
+    public boolean shouldFailUidNext(String folderName)
+    {
+        folderName = _checkName(folderName);
+        return uidNextFailure.getOrDefault(folderName, false);
     }
 
     public MockMessage findMessageByUid(String folderName, long uid)
@@ -212,6 +231,7 @@ public final class MockData
         getInstance().uidValidity.clear();
         getInstance().nextUid.clear();
         getInstance().uidCapable.clear();
+        getInstance().uidNextFailure.clear();
     }
 
     private static final class SingletonHolder

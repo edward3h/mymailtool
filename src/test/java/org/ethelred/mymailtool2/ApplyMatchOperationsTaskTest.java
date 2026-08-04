@@ -356,6 +356,54 @@ public class ApplyMatchOperationsTaskTest
     }
 
     @Test
+    public void testTransientUidNextFailureDuringResumeFallsBackToFullScanForThatFolder(@TempDir File tempDir)
+    {
+        MockData data = MockData.getInstance();
+        data.setUidCapable("F1", true);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        c.set(2013, Calendar.JANUARY, 1);
+        for (int i = 1; i <= 5; i++)
+        {
+            c.add(Calendar.DATE, 1);
+            data.addMessage("F1", MockMessage.create(dateFormat.format(c.getTime()), "foo@example.com", String.valueOf(i)));
+        }
+        ClockFactory.setClock(c.getTimeInMillis());
+
+        File stateFile = new File(tempDir, "scan-state.properties");
+        MockDefaultConfiguration config = configWithStateFile(stateFile);
+
+        // Run 1: establishes a valid resume point (nextUid = 6) without moving messages, so F1
+        // still has all 5 messages to prove a "fallback to full scan" against.
+        ApplyMatchOperationsTask task1 = ApplyMatchOperationsTask.create();
+        Predicate<Message> matchAll1 = new AgeMatcher("0 days", true, task1);
+        task1.addRule("F1", matchAll1, List.of(matchAll1), new TrackMatchMessageOperation(), false);
+        MailToolContext context1 = new DefaultContext(config, FP1);
+        runTask(task1, context1);
+        assertThat(((DefaultContext) context1).messageCheckedCount).isEqualTo(5);
+        assertThat(data.folderSize("F1")).isEqualTo(5);
+
+        // Simulate a transient IMAP failure at exactly the getUIDNext() snapshot call made
+        // inside UidRangeMessageIterable's constructor, on the resume path.
+        data.setUidNextFailure("F1", true);
+
+        // Run 2: a valid resume UID exists (from run 1), so readMessages() takes the resume
+        // path and constructs a UidRangeMessageIterable, whose constructor's getUIDNext() call
+        // fails. This must degrade gracefully to a full scan of this one folder, NOT propagate
+        // out of run() and abort the whole task.
+        ApplyMatchOperationsTask task2 = ApplyMatchOperationsTask.create();
+        Predicate<Message> matchAll2 = new AgeMatcher("0 days", true, task2);
+        task2.addRule("F1", matchAll2, List.of(matchAll2), new TrackMatchMessageOperation(), false);
+        MailToolContext context2 = new DefaultContext(config, FP1);
+        runTask(task2, context2);
+
+        // All 5 messages were checked via the full-scan fallback -- proving the failure was
+        // contained to this folder's resume-path lookup rather than aborting the whole run
+        // (which would have left messageCheckedCount at 0 for every remaining folder).
+        assertThat(((DefaultContext) context2).messageCheckedCount).isEqualTo(5);
+    }
+
+    @Test
     public void testDisableScanCacheAlwaysFullRescan(@TempDir File tempDir)
     {
         MockData data = MockData.getInstance();

@@ -46,12 +46,12 @@ public class ApplyMatchOperationsTask extends TaskBase
     private final Random random = new Random();
 
     // Bridges the UID-range snapshot taken in readMessages() to the completion recording done
-    // in onFolderScanFinished() for the same folder's scan. -1 means "no valid UID snapshot for
-    // this folder's current scan". Safe as a plain mutable field ONLY because run() traverses
+    // in onFolderScanFinished() for the same folder's scan. Empty means "no valid UID snapshot
+    // for this folder's current scan". Safe as a plain mutable field ONLY because run() traverses
     // folders strictly sequentially, one at a time, in a single for loop -- never concurrently.
     // A future refactor introducing parallel folder traversal would need to make this
     // per-traversal state instead of a shared field.
-    private long scanEndUidExclusive = -1;
+    private OptionalLong scanEndUidExclusive = OptionalLong.empty();
 
     public boolean hasRules()
     {
@@ -238,20 +238,26 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected Iterable<? extends Message> readMessages(Folder f)
     {
-        scanEndUidExclusive = -1;
+        scanEndUidExclusive = OptionalLong.empty();
         try
         {
             OptionalLong resumeUid = context.getFolderScanCache().getResumeUid(f);
             if (resumeUid.isPresent())
             {
                 UidRangeMessageIterable it = new UidRangeMessageIterable(f, resumeUid.getAsLong());
-                scanEndUidExclusive = it.getEndUidExclusive();
+                scanEndUidExclusive = OptionalLong.of(it.getEndUidExclusive());
                 LOGGER.info("Resuming folder {} from UID {} (of {})", f.getFullName(), resumeUid.getAsLong(), scanEndUidExclusive);
                 return it;
             }
         }
-        catch (MessagingException e)
+        catch (MessagingException | RuntimeException e)
         {
+            // RuntimeException here covers UidRangeMessageIterable's constructor, which wraps
+            // any MessagingException from its own getUIDNext() snapshot call as an unchecked
+            // exception. Without catching it too, a transient IMAP failure at that specific call
+            // would propagate out of this method (and out of TaskBase.traverseFolder's
+            // ShortcutFolderScanException-only catch, and out of run()'s MessagingException/
+            // IOException-only catch), aborting the whole run instead of just this one folder.
             LOGGER.warn("Scan cache lookup failed for {}, falling back to full scan", f, e);
         }
         // Full scan path: still snapshot endUid if the folder supports it, so
@@ -261,11 +267,11 @@ public class ApplyMatchOperationsTask extends TaskBase
         {
             try
             {
-                scanEndUidExclusive = uf.getUIDNext();
+                scanEndUidExclusive = OptionalLong.of(uf.getUIDNext());
             }
             catch (MessagingException ignored)
             {
-                // leave scanEndUidExclusive at -1; onFolderScanFinished will skip recording
+                // leave scanEndUidExclusive empty; onFolderScanFinished will skip recording
             }
         }
         return super.readMessages(f);
@@ -274,7 +280,7 @@ public class ApplyMatchOperationsTask extends TaskBase
     @Override
     protected void onFolderScanFinished(Folder f, boolean completedFully, @CheckForNull Message lastConsidered)
     {
-        if (scanEndUidExclusive < 0)
+        if (scanEndUidExclusive.isEmpty())
         {
             // No valid UID snapshot was ever taken for this folder's scan (non-UIDFolder, or
             // getUIDNext() failed) -- nothing meaningful to persist.
@@ -282,7 +288,7 @@ public class ApplyMatchOperationsTask extends TaskBase
         }
         try
         {
-            context.getFolderScanCache().recordScanCompletion(f, scanEndUidExclusive, lastConsidered, completedFully);
+            context.getFolderScanCache().recordScanCompletion(f, scanEndUidExclusive.getAsLong(), lastConsidered, completedFully);
         }
         catch (MessagingException e)
         {

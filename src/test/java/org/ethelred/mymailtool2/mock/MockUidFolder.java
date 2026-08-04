@@ -28,6 +28,10 @@ public class MockUidFolder extends MockFolder implements UIDFolder
     @Override
     public long getUIDNext() throws MessagingException
     {
+        if (data.shouldFailUidNext(name))
+        {
+            throw new MessagingException("Simulated transient getUIDNext() failure for " + name);
+        }
         return data.getUidNext(name);
     }
 
