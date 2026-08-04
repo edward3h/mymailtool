@@ -10,8 +10,13 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  *
@@ -24,6 +29,9 @@ public class Main
 
     @VisibleForTesting
     MailToolConfiguration config;
+
+    @VisibleForTesting
+    String configFingerprint;
 
     private MailToolContext context;
     private volatile MailToolConfiguration defaultConfiguration;
@@ -51,6 +59,19 @@ public class Main
             for (String fileLocation : temp.getFileLocations())
             {
                 FileConfigurationHelper.loadFileConfiguration(temp, fileLocation);
+            }
+
+            List<File> configFiles = StreamSupport.stream(temp.getFileLocations().spliterator(), false)
+                    .map(File::new)
+                    .collect(Collectors.toList());
+            try
+            {
+                configFingerprint = ConfigFingerprint.compute(configFiles);
+            }
+            catch (IOException e)
+            {
+                LOGGER.warn("Failed to compute config fingerprint, scan cache will be disabled this run", e);
+                configFingerprint = null;
             }
 
             validateRequiredConfiguration(temp);
@@ -104,7 +125,7 @@ public class Main
                 setDebugLogging();
             }
 
-            context = new DefaultContext(config);
+            context = new DefaultContext(config, configFingerprint);
             context.connect();
 
             LOGGER.debug("About to get task from config {}", config);
