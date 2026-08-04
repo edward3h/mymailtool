@@ -27,3 +27,4 @@ bin
 samples
 supertool
 
+.worktrees/
