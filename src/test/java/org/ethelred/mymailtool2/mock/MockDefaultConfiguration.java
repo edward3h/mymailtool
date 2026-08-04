@@ -98,6 +98,18 @@ public class MockDefaultConfiguration implements MailToolConfiguration
         return false;
     }
 
+    @Override
+    public String getScanStateFile()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        return false;
+    }
+
     public void addFileHandler(FileConfigurationHandler fileConfigurationHandler)
     {
         defaultFileHandlers.add(fileConfigurationHandler);

@@ -307,6 +307,18 @@ class JavascriptFileConfiguration extends BaseFileConfiguration
         return false;
     }
 
+    @Override
+    public String getScanStateFile()
+    {
+        return config.getString("scanStateFile");
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        return Boolean.parseBoolean(config.getString("disableScanCache"));
+    }
+
     private abstract class OperationBuilder
     {
         protected Predicate<Message> delegate;

@@ -90,6 +90,18 @@ class DefaultConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public String getScanStateFile()
+    {
+        return dev.dirs.ProjectDirectories.from("org", "ethelred", "mymailtool").cacheDir + File.separator + "scan-state.properties";
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "DefaultConfiguration";
     }

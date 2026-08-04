@@ -66,6 +66,9 @@ class CommandLineConfiguration implements MailToolConfiguration
     @Option(name = "--random", usage = "Traverse folders in random order")
     private boolean random;
 
+    @Option(name = "--no-scan-cache", usage = "Disable incremental UID-based scan cache; always do a full rescan")
+    private boolean disableScanCache;
+
     @Override
     public int getChunkSize()
     {
@@ -307,6 +310,18 @@ class CommandLineConfiguration implements MailToolConfiguration
     public String getTimeLimit()
     {
         return runTimeLimit;
+    }
+
+    @Override
+    public String getScanStateFile()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        return disableScanCache;
     }
 
     @Override

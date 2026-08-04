@@ -132,6 +132,25 @@ class CompositeConfiguration implements MailToolConfiguration
         return false;
     }
 
+    @Override
+    public String getScanStateFile()
+    {
+        return (String) first("getScanStateFile");
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        for (MailToolConfiguration subConf : configs)
+        {
+            if (subConf.disableScanCache())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private class LazyCombinedIterable<T> implements Iterable<T>
     {
         private final Function<MailToolConfiguration, Iterable<T>> accessor;

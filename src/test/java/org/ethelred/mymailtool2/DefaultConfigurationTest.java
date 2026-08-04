@@ -36,4 +36,22 @@ public class DefaultConfigurationTest
         assertThat(config.getFileHandlers().iterator().next())
                 .isInstanceOf(PropertiesFileConfigurationHandler.class);
     }
+
+    @Test
+    public void testGetScanStateFileReturnsPathEndingInScanStateProperties()
+    {
+        DefaultConfiguration config = new DefaultConfiguration();
+        String scanStateFile = config.getScanStateFile();
+
+        assertThat(scanStateFile).isNotNull();
+        assertThat(scanStateFile).endsWith("scan-state.properties");
+        assertThat(scanStateFile).contains("mymailtool");
+    }
+
+    @Test
+    public void testDisableScanCacheDefaultsToFalse()
+    {
+        DefaultConfiguration config = new DefaultConfiguration();
+        assertThat(config.disableScanCache()).isFalse();
+    }
 }

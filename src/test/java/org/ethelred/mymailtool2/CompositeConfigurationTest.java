@@ -108,6 +108,18 @@ public class CompositeConfigurationTest
             public boolean randomTraversal() {
                 return false;
             }
+
+            @Override
+            public String getScanStateFile()
+            {
+                return null;
+            }
+
+            @Override
+            public boolean disableScanCache()
+            {
+                return false;
+            }
         };
 
         MailToolConfiguration comp = new CompositeConfiguration(mock);
@@ -152,5 +164,31 @@ public class CompositeConfigurationTest
         verify(mockDefault).getFileLocations();
         verify(mockFile1).getFileLocations();
         verify(mockFile2).getFileLocations();
+    }
+
+    @Test
+    public void testGetScanStateFilePicksFirstNonNull()
+    {
+        final MailToolConfiguration mockFirst = mock(MailToolConfiguration.class);
+        final MailToolConfiguration mockSecond = mock(MailToolConfiguration.class);
+        when(mockFirst.getScanStateFile()).thenReturn(null);
+        when(mockSecond.getScanStateFile()).thenReturn("/path/to/scan-state.properties");
+
+        CompositeConfiguration cmp = new CompositeConfiguration(mockFirst, mockSecond);
+
+        assertThat(cmp.getScanStateFile()).isEqualTo("/path/to/scan-state.properties");
+    }
+
+    @Test
+    public void testDisableScanCacheTrueIfAnySubConfigTrue()
+    {
+        final MailToolConfiguration mockFirst = mock(MailToolConfiguration.class);
+        final MailToolConfiguration mockSecond = mock(MailToolConfiguration.class);
+        when(mockFirst.disableScanCache()).thenReturn(false);
+        when(mockSecond.disableScanCache()).thenReturn(true);
+
+        CompositeConfiguration cmp = new CompositeConfiguration(mockFirst, mockSecond);
+
+        assertThat(cmp.disableScanCache()).isTrue();
     }
 }
