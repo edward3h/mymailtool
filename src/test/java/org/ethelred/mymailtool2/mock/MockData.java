@@ -44,6 +44,11 @@ public final class MockData
     }
 
     private Map<String, List<MockMessage>> folderMessages = Maps.newHashMap();
+    private Map<String, Long> uidValidity = Maps.newHashMap();
+    private Map<String, Long> nextUid = Maps.newHashMap();
+    private Map<String, Boolean> uidCapable = Maps.newHashMap();
+
+    private static final long DEFAULT_UID_VALIDITY = 1L;
 
 
     public void addFolder(String sName)
@@ -69,9 +74,101 @@ public final class MockData
     {
         folder = _checkName(folder);
         addFolder(folder);
+        long assignedUid = nextUid.getOrDefault(folder, 1L);
+        message.setUid(assignedUid);
+        nextUid.put(folder, assignedUid + 1);
         folderMessages.get(folder).add(message);
         Collections.sort(folderMessages.get(folder), DATE_SORT);
                         //System.err.println(folder + " add message " + message);
+    }
+
+    public long getUidValidity(String folderName)
+    {
+        folderName = _checkName(folderName);
+        return uidValidity.getOrDefault(folderName, DEFAULT_UID_VALIDITY);
+    }
+
+    public void setUidValidity(String folderName, long value)
+    {
+        folderName = _checkName(folderName);
+        uidValidity.put(folderName, value);
+    }
+
+    public long getUidNext(String folderName)
+    {
+        folderName = _checkName(folderName);
+        return nextUid.getOrDefault(folderName, 1L);
+    }
+
+    public boolean isUidCapable(String folderName)
+    {
+        folderName = _checkName(folderName);
+        return uidCapable.getOrDefault(folderName, false);
+    }
+
+    public void setUidCapable(String folderName, boolean capable)
+    {
+        folderName = _checkName(folderName);
+        uidCapable.put(folderName, capable);
+    }
+
+    public MockMessage findMessageByUid(String folderName, long uid)
+    {
+        folderName = _checkName(folderName);
+        List<MockMessage> messages = folderMessages.get(folderName);
+        if (messages == null)
+        {
+            return null;
+        }
+        for (MockMessage m : messages)
+        {
+            if (m.getUid() == uid)
+            {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    public List<MockMessage> getMessagesByUidRange(String folderName, long startUid, long endUidInclusive)
+    {
+        folderName = _checkName(folderName);
+        List<MockMessage> messages = folderMessages.get(folderName);
+        List<MockMessage> result = Lists.newArrayList();
+        if (messages == null)
+        {
+            return result;
+        }
+        long end = endUidInclusive;
+        if (end == jakarta.mail.UIDFolder.LASTUID)
+        {
+            end = Long.MAX_VALUE;
+        }
+        for (MockMessage m : messages)
+        {
+            if (m.getUid() >= startUid && m.getUid() <= end)
+            {
+                result.add(m);
+            }
+        }
+        Collections.sort(result, Comparator.comparingLong(MockMessage::getUid));
+        return result;
+    }
+
+    /**
+     * Returns the 1-based sequence number of a message within a folder, as used by
+     * {@link MockFolder#getMessage(int)}, or -1 if not found.
+     */
+    public int indexOfMessage(String folderName, MockMessage message)
+    {
+        folderName = _checkName(folderName);
+        List<MockMessage> messages = folderMessages.get(folderName);
+        if (messages == null)
+        {
+            return -1;
+        }
+        int idx = messages.indexOf(message);
+        return idx < 0 ? -1 : idx + 1;
     }
 
     public boolean hasFolder(String name)
@@ -112,6 +209,9 @@ public final class MockData
     public static void clear()
     {
         getInstance().folderMessages.clear();
+        getInstance().uidValidity.clear();
+        getInstance().nextUid.clear();
+        getInstance().uidCapable.clear();
     }
 
     private static final class SingletonHolder

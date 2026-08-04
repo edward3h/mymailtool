@@ -16,9 +16,9 @@ import com.google.common.collect.Maps;
  */
 public class MockFolder extends Folder
 {
-    private final String name;
+    protected final String name;
 
-    private final MockData data;
+    protected final MockData data;
     private Map<Integer, Message> msgCache = Maps.newHashMap();
 
     public MockFolder(Store store, MockData data, String name)
