@@ -94,6 +94,18 @@ class SystemPropertiesConfiguration implements MailToolConfiguration
     }
 
     @Override
+    public String getScanStateFile()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "SystemPropertiesConfiguration";
     }

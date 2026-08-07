@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Console;
+import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,13 +45,28 @@ public class DefaultContext implements MailToolContext
     private int operationLimit = -1;
     private volatile boolean shutdown;
     private final boolean verbose;
+    private final FolderScanCache folderScanCache;
 
     int messageCheckedCount;
 
     public DefaultContext(MailToolConfiguration config)
     {
+        this(config, null);
+    }
+
+    public DefaultContext(MailToolConfiguration config, @CheckForNull String configFingerprint)
+    {
         this.config = config;
         this.verbose = config.verbose();
+        // A null user (e.g. some auth modes, or test configs) is tolerated: the cache just
+        // gets a stable-but-generic key in that case instead of a distinct per-account bucket,
+        // which is still functionally correct.
+        String user = config.getUser() == null ? "unknown" : config.getUser();
+        String accountKey = user + "@" + config.getMailProperties().getOrDefault(MailToolConfiguration.HOST, "");
+        String scanStateFilePath = config.getScanStateFile();
+        File stateFile = scanStateFilePath == null ? null : new File(scanStateFilePath);
+        boolean disabled = config.disableScanCache() || stateFile == null;
+        this.folderScanCache = new DefaultFolderScanCache(accountKey, stateFile, configFingerprint, disabled);
     }
 
     @Override
@@ -270,5 +286,11 @@ public class DefaultContext implements MailToolContext
     @Override
     public boolean randomTraversal() {
         return config.randomTraversal();
+    }
+
+    @Override
+    public FolderScanCache getFolderScanCache()
+    {
+        return folderScanCache;
     }
 }

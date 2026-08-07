@@ -42,4 +42,8 @@ public interface MailToolConfiguration
     int getChunkSize();
 
     boolean randomTraversal();
+
+    String getScanStateFile();
+
+    boolean disableScanCache();
 }

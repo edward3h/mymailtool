@@ -282,6 +282,18 @@ class PropertiesFileConfiguration extends BaseFileConfiguration
         return false;
     }
 
+    @Override
+    public String getScanStateFile()
+    {
+        return delegate.getProperty("mymailtool.scanstatefile");
+    }
+
+    @Override
+    public boolean disableScanCache()
+    {
+        return Boolean.parseBoolean(delegate.getProperty("mymailtool.noscancache"));
+    }
+
     private void addFileLocations(String filenames)
     {
         for (String fn : filenames.split(","))

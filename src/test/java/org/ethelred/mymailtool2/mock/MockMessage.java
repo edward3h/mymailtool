@@ -32,6 +32,7 @@ public final class MockMessage
     private Map<String, String> mockheaders = Maps.newHashMap();
     private List<Attachment> attachments = Lists.newArrayList();
     private Flags flags = new Flags();
+    private long uid;
 
     private record Attachment(String filename, byte[] content) {}
 
@@ -74,6 +75,16 @@ public final class MockMessage
     {
         flags.add(flag);
         return this;
+    }
+
+    long getUid()
+    {
+        return uid;
+    }
+
+    void setUid(long uid)
+    {
+        this.uid = uid;
     }
 
 

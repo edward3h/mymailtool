@@ -29,6 +29,10 @@ public class MockStore extends Store
     @Override
     public Folder getFolder(String s) throws MessagingException
     {
+        if (data.isUidCapable(s))
+        {
+            return new MockUidFolder(this, data, s);
+        }
         return new MockFolder(this, data, s);
     }
 
